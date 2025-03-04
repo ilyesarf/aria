@@ -1,36 +1,123 @@
 #include "header.h"
+#include "menu_save/menuSave.h"
+#include "menu_best_score/menuBestScore.h"
+#include "menu_joueur/menuJoueur.h"
+#include "menu_principal/menuPrincipal.h"
+#include "menu_option/menuOption.h"
+
+SDL_Surface* init_screen() {
+    SDL_Surface *screen;  
+    screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 32, SDL_SWSURFACE);
+    SDL_WM_SetCaption("JEU", NULL);
+    return screen;
+}
+
+void init_audio() {
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+    Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096);
+}
+
+SDL_Surface* load_image(char *filename) {
+    SDL_Surface *image = IMG_Load(filename);
+    if (image == NULL) {
+        printf("Error opening image: %s!! \n\n", filename);
+        exit(1);
+    }
+    return image;
+}
+
+Mix_Chunk* load_sound(char *filename) {
+    Mix_Chunk *hoverSound = Mix_LoadWAV(filename);
+    if (hoverSound == NULL) {
+        printf("Error opening audio file: %s!!\n\n", filename);
+        exit(1);
+    }
+    return hoverSound;
+}
+
+TTF_Font* load_font(char *filename) {
+    TTF_Font* font = TTF_OpenFont(filename, 24);
+    if (font == NULL) {
+        printf("Error opening font file: %s!!\n\n", filename);
+        exit(1);
+    }
+    return font;
+}
+
+void renderText(SDL_Surface *screen, const char *text, TTF_Font *font, SDL_Color textColor, int x, int y) {
+    SDL_Surface *textSurface = TTF_RenderText_Solid(font, text, textColor);
+    if (textSurface) {
+        SDL_Rect textLocation = {x, y, 0, 0};
+        SDL_BlitSurface(textSurface, NULL, screen, &textLocation);
+        SDL_FreeSurface(textSurface);
+    }
+}
+
+void renderButton(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button button){
+    if (button.selected){
+        if (button.hoverImage != NULL) {
+            SDL_BlitSurface(button.hoverImage, NULL, screen, &(SDL_Rect){button.rect.x-50, button.rect.y-50, 0, 0});
+        }
+    } else{
+        if(button.normalImage != NULL){
+            SDL_BlitSurface(button.normalImage, NULL, screen, &(SDL_Rect){button.rect.x-50, button.rect.y-50, 0, 0});
+        }
+    }
+}
+
+void init_menus(Menu *menus){
+    int working_menus[6] = {MENU_SAVE, MENU_NEW_LOAD_SAVE, MENU_BEST_SCORE, MENU_PLAYER, MENU_PRINCIPAL, MENU_OPTION};
+    for (int i = 0; i < 6; i++) {
+        if (working_menus[i] == MENU_SAVE) {
+            initMenuSave(menus);
+        } else if (working_menus[i] == MENU_NEW_LOAD_SAVE) {
+            initMenuChooseSave(menus);
+        } else if (working_menus[i] == MENU_BEST_SCORE) {
+            initMenuBestScore(menus);
+        } else if (working_menus[i] == MENU_PLAYER) {
+            initMenuJoueur(menus);
+        } else if (working_menus[i] == MENU_PRINCIPAL) {
+            initMenuPrincipal(menus);
+        } else if (working_menus[i] == MENU_OPTION) {
+            initMenuOption(menus);
+        }
+    }
+}
 
 int main() {
     SDL_Surface *screen; 
     screen = init_screen();
+    init_audio();
+    TTF_Init();
+    SDL_EnableUNICODE(1); // Enable Unicode translation for keyboard input
     SDL_Surface *background;
-    background = init_background();
+    background = load_image("background.png"); 
     TTF_Font *font;
-    font = init_font();
-    SDL_Color textColor = {0,0,0}; // black text
+    font = load_font("font.ttf");
+    SDL_Color textColor = {0, 0, 0, 0}; // black text
     Mix_Chunk *hoverSound;
-    hoverSound = init_audio();
+    hoverSound = load_sound("beep.wav"); 
 
-    Button buttons[N_BTNS];
-    init_buttons(buttons);
+    Menu menus[N_MENUS];
+    init_menus(menus);
 
-    int running = 1, menuState = 1;
+    int menuState = MENU_PRINCIPAL; // Changed initial menuState to MENU_PRINCIPAL
 
-    while (running) {
-        handleEvents(&running, &menuState, buttons, hoverSound);
-        printf("menu state: %d\n", menuState);
-        if (menuState==1){
-            printf("Menu Save!\n");
-            renderMenuSauv(background, screen, font, textColor, buttons);
-        } else if (menuState==2){
-            printf("Menu Choose Save!\n");
-            renderMenuChooseSave(background, screen, font, textColor, buttons);
-        } else if (menuState==3){
-            printf("New game...\n");
-        } else{
-            printf("Load game...\n");
+    while (menuState != QUIT_GAME) {
+        SDL_Event event;
+        //SDL_PollEvent(&event);
+        //printf("menu state: %d\n", menuState); 
+        
+        if (menuState == MAIN_GAME) {
+            printf("MAIN GAME...\n");
+            menuState = -1;
+        } else {
+            menus[menuState].render(background, screen, font, textColor, menus[menuState].buttons, menus[menuState].n_btns);
+            menus[menuState].handleEvent(&menuState, event, menus[menuState].buttons, menus[menuState].n_btns, hoverSound);
+            //printf("menu state: %d\n", menuState);
         }
-        SDL_Delay(16);
+        SDL_Flip(screen); // Ensure the screen is updated
+        //SDL_Delay(16);
     }
 
     cleanup(hoverSound, background, font);

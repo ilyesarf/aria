@@ -1,0 +1,145 @@
+#include <SDL/SDL.h>//inclure SDL.h  pour permettre au programme d'être portable sur tous les systèmes.
+#include <SDL/SDL_image.h>//.................//Pour manipuler des images ayants des types autre que bmp
+#include <SDL/SDL_mixer.h>//.................//Pour manipuler de l’audio.
+#include <SDL/SDL_ttf.h>//.................//Pour manipuler des textes
+#include "header.h"
+int main ( int argc, char** argv )
+{
+
+	SDL_Surface *ecran;//Déclaration d'une variable pointeure sur surface:  pour l'écran,
+	SDL_Surface *image;//Déclaration d'une variable pointeure sur surface: pour l'image 
+	///................../Déclaration des variables pointeurs sur surfaces:  pour le texte
+	SDL_Surface *surfaceTexte;
+	//Déclaration des variables de type entier pour la boucle de jeu 
+	int quitter = 1;
+	//Déclaration d'un compteur pour la mise à jour aprés un événement
+	int play = 0;
+	//Déclaration des positions d'affichage : une pour l'image et une pour le texte
+	SDL_Rect posecranimg;
+	SDL_Rect positiontext;
+	/*Déclaration du police*/
+	TTF_Font *font;
+	/*Déclaration de la couleur */
+	SDL_Color textColor;
+	//Déclaration de l'événment 
+	SDL_Event event;
+	//Déclaration d'une chaine de caractère
+	//..................
+	//Déclaration d'une variable pointeur sur l'audio pour le son continue
+	Mix_Music *musique;
+	//Initialisation des sous systhème de SDL vidéo, son et texte
+	if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+    printf("SDL_Init_Audio error: %s\n", SDL_GetError());
+    return 1;
+	}
+
+	if (Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 512) < 0) {
+		printf("Mix_OpenAudio error: %s\n", Mix_GetError());
+		return 1;
+	}
+
+	/* initialisation de SDL_Video */
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
+		printf("Echec d'initialisation de SDL : %s\n", SDL_GetError());
+		return 1;
+	
+	}
+	
+	else
+	printf("Bonjour le monde, SDL est initialisé avec succès.\n");
+	
+	TTF_Init();
+	/* creation d'une fenetre avec une zone d'affichage de 600*430 pixels et qui pemet d'afficher des image couleur*/
+	ecran = SDL_SetVideoMode(600, 430,  32,SDL_HWSURFACE | SDL_DOUBLEBUF);
+	if ( ecran == NULL )
+	{
+		fprintf(stderr, "Echec de creation de la fenetre de 300*300: %s.\n", SDL_GetError());
+		return 1;
+	}
+	
+	//téléchargement de l'image palestine.jpg
+	//..................
+	image = IMG_Load("palestine.jpg");
+	if (image== NULL) {
+			printf("Image not found\n");
+			return 0;
+	}
+	//Position de l'image palestine.jpg
+	posecranimg .x = 0;
+	posecranimg.y = 0;
+	posecranimg.w = image->w;
+	posecranimg.h = image->h;	
+	//position du texte
+	positiontext.x=100;
+	positiontext.y=400;
+    // couleur du texte noire
+    textColor.r=0;
+	textColor.g=0;
+	textColor.b=0;
+	//téléchargement du police
+    font = TTF_OpenFont( "arial.ttf", 20 );
+    //Télécharger la musique
+	
+	musique = Mix_LoadMUS("palestine.mp3");
+	if (musique == NULL){
+		printf("Music not found\n");
+		return 0;
+	}
+	//Lancer la musique avant la boucle du jeu     
+	Mix_PlayMusic(musique, -1);
+      /* instructions f et g du workshop */
+
+	while(quitter) 
+	{
+		// Activité 2 du workshop  Afficher l'image palestine.jpg
+		//..................
+		SDL_BlitSurface(image, &posecranimg, ecran, NULL);
+		//Lecture de l'événement	
+		SDL_PollEvent(&event); 
+		// Selon le type de l'événement
+		switch (event.type)
+			{ 
+			// exit if the window is closed
+			case SDL_QUIT: 
+				quitter = 0;
+				break;
+			//Lecture d'un événement par clavier
+			case SDL_KEYDOWN:
+				switch(event.key.keysym.sym) { 
+					case SDLK_ESCAPE: 
+					quitter =0; 
+					break;
+				}
+				break;	
+		//Si on clique sur le bouton echap
+			case SDL_MOUSEBUTTONDOWN:
+			//lecture d'un événement clique bouton souris
+				if(event.button.button == SDL_BUTTON_LEFT) {
+					play=1;
+				}
+			
+				break;
+			
+		}
+		if(play==1){	//écriture du texte We Will NEVER forget \n We will NEVER stop sharing
+			surfaceTexte = TTF_RenderText_Solid(font, "We will NEVER forget we will NEVER stop sharing ", textColor );
+			//Affichage du texte
+			SDL_BlitSurface(surfaceTexte, NULL, ecran, &positiontext);
+		}
+		//Refraichir l'écran
+		//..................
+		SDL_Flip(ecran);
+
+	}
+	
+		//Fermeture des sous-systèmes audio et texte, libération de la mémoire des ressources images, texte et son.
+		SDL_FreeSurface(image);
+		Mix_FreeMusic(musique);
+		Mix_CloseAudio();
+		SDL_FreeSurface (surfaceTexte);
+		TTF_CloseFont (font);
+		TTF_Quit();
+	
+	return 0;
+}
