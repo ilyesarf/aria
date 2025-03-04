@@ -14,7 +14,7 @@ SDL_Surface* init_screen() {
 
 void init_audio() {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-    Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096);
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
 }
 
 SDL_Surface* load_image(char *filename) {
@@ -83,6 +83,13 @@ void init_menus(Menu *menus){
         }
     }
 }
+Mix_Music* load_music(const char* filename) {
+    Mix_Music* music = Mix_LoadMUS(filename);
+    if (!music) {
+        printf("Failed to load music '%s': %s\n", filename, Mix_GetError());
+    }
+    return music;
+}
 
 int main() {
     SDL_Surface *screen; 
@@ -96,7 +103,13 @@ int main() {
     font = load_font("font.ttf");
     SDL_Color textColor = {0, 0, 0, 0}; // black text
     Mix_Chunk *hoverSound;
+    Mix_Music *musique = load_music("30-hours.mp3");;
     hoverSound = load_sound("beep.wav"); 
+    int volume = 50; // Initial volume (50%)
+
+    Mix_PlayMusic(musique, -1);
+    Mix_VolumeMusic(volume); // Set initial volume
+
 
     Menu menus[N_MENUS];
     init_menus(menus);
