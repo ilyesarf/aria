@@ -19,22 +19,22 @@ void initMenuPrincipal(Menu *menus) {
 void initMenuPrincipalButtons(Button *buttons) {
     buttons[0].normalImage = load_image("buttons/avatar1.png");
     buttons[0].hoverImage = load_image("buttons/avatar1hov.png");
-    buttons[0].rect = (SDL_Rect){SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT / 2 - 100, 150, 40}; // Button 1
+    buttons[0].rect = (SDL_Rect){700,200,150,150}; // start
     buttons[0].selected = 0;
 
     buttons[1].normalImage = load_image("buttons/avatar1.png");
     buttons[1].hoverImage = load_image("buttons/avatar1hov.png");
-    buttons[1].rect = (SDL_Rect){SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT / 2 - 50, 150, 40}; // Button 2
+    buttons[1].rect = (SDL_Rect){700,350,400,150}; // Button 2
     buttons[1].selected = 0;
 
     buttons[2].normalImage = load_image("buttons/avatar1.png");
     buttons[2].hoverImage = load_image("buttons/avatar1hov.png");
-    buttons[2].rect = (SDL_Rect){SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT / 2, 150, 40}; // Button 3
+    buttons[2].rect = (SDL_Rect){700,500,400,150}; // Button 3
     buttons[2].selected = 0;
 
-    buttons[3].normalImage = load_image("buttons/return.png");
-    buttons[3].hoverImage = load_image("buttons/returnhov.png");
-    buttons[3].rect = (SDL_Rect){SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT / 2 + 50, 150, 40}; // Return
+    buttons[3].normalImage = load_image("buttons/quit.png");
+    buttons[3].hoverImage = load_image("buttons/quithov.png");
+    buttons[3].rect = (SDL_Rect){700,650,400,150}; // Return
     buttons[3].selected = 0;
 }
 

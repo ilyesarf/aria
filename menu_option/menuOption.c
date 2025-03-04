@@ -21,27 +21,27 @@ void initMenuOption(Menu *menus) {
 void initMenuOptionButtons(Button *buttons) {
     buttons[0].normalImage = load_image("buttons/fullscreen.png");
     buttons[0].hoverImage = load_image("buttons/fullscreenhov.png");
-    buttons[0].rect = (SDL_Rect){SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT / 2 - 100, 150, 40}; // Fullscreen
+    buttons[0].rect = (SDL_Rect){200,200,400,150}; // Fullscreen
     buttons[0].selected = 0;
 
     buttons[1].normalImage = load_image("buttons/windowed.png");
     buttons[1].hoverImage = load_image("buttons/windowedhov.png");
-    buttons[1].rect = (SDL_Rect){SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT / 2 - 50, 150, 40}; // Windowed
+    buttons[1].rect = (SDL_Rect){200,350,400,150}; // Windowed
     buttons[1].selected = 0;
 
     buttons[2].normalImage = load_image("buttons/volumeup.png");
     buttons[2].hoverImage = load_image("buttons/volumeuphov.png");
-    buttons[2].rect = (SDL_Rect){SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT / 2, 150, 40}; // Volume Up
+    buttons[2].rect = (SDL_Rect){200,500,400,150}; // Volume Up
     buttons[2].selected = 0;
 
     buttons[3].normalImage = load_image("buttons/volumedwn.png");
     buttons[3].hoverImage = load_image("buttons/volumedwnhov.png");
-    buttons[3].rect = (SDL_Rect){SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT / 2 + 50, 150, 40}; // Volume Down
+    buttons[3].rect = (SDL_Rect){200,650,400,150}; // Volume Down
     buttons[3].selected = 0;
 
     buttons[4].normalImage = load_image("buttons/return.png");
     buttons[4].hoverImage = load_image("buttons/returnhov.png");
-    buttons[4].rect = (SDL_Rect){SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT / 2 + 100, 150, 40}; // Return
+    buttons[4].rect = (SDL_Rect){200,800,400,150}; // Return
     buttons[4].selected = 0;
 }
 
