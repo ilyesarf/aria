@@ -16,14 +16,14 @@ void initMenuSave(struct Menu *menus){
 void initMenuSaveButtons(Button *buttons){
     buttons[0].normalImage = load_image("buttons/yes.png");
     buttons[0].hoverImage = load_image("buttons/yeshov.png");
-    buttons[0].rect = (SDL_Rect){SCREEN_WIDTH/2-100, SCREEN_HEIGHT/2, 100, 50}; // OUI
+    buttons[0].rect = (SDL_Rect){800, 200,300,40}; // OUI
     //buttons[0].text = "OUI";
     buttons[0].selected = 0;
 
 
     buttons[1].normalImage = load_image("buttons/no.png");
     buttons[1].hoverImage = load_image("buttons/nohov.png");
-    buttons[1].rect = (SDL_Rect){SCREEN_WIDTH/2+100, SCREEN_HEIGHT/2, 100, 50}; // NON
+    buttons[1].rect = (SDL_Rect){800, 350,300,40}; // NON
     //buttons[1].text = "NON";
     buttons[1].selected = 0;
 }
@@ -41,12 +41,12 @@ void initMenuChooseSaveButtons(Button *buttons) {
 
     buttons[0].normalImage = load_image("buttons/load.png");
     buttons[0].hoverImage = load_image("buttons/loadhov.png");
-    buttons[0].rect = (SDL_Rect){SCREEN_WIDTH / 2 - 100, 180, 200, 50} ;
+    buttons[0].rect = (SDL_Rect){800, 200,300,40} ;
     buttons[0].selected = 0;
 
     buttons[1].normalImage = load_image("buttons/newgame.png");
     buttons[1].hoverImage = load_image("buttons/newgamehov.png");
-    buttons[1].rect = (SDL_Rect){SCREEN_WIDTH / 2 - 100, 260, 200, 50};
+    buttons[1].rect = (SDL_Rect){800, 350,300,40};
     buttons[1].selected = 0;
 }
 
