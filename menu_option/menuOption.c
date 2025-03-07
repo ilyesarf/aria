@@ -112,7 +112,8 @@ void handleEventOptionMenu(int *menuState, SDL_Event event, Button *buttons, int
                             int volume = Mix_VolumeMusic(-1);
                             Mix_VolumeMusic(volume - 5);
                         } else if (i == 4) {
-                            *menuState = MENU_PRINCIPAL; // Return to main menu
+                            *menuState = MENU_ENIGME; // Return to main menu
+                            printf("Return selected\n");
                         }
                     }
                 }

@@ -9,6 +9,7 @@ MENU_BEST_SCORE_DIR = menu_best_score
 MENU_PLAYER_DIR = menu_joueur
 MENU_PRINCIPAL_DIR = menu_principal
 MENU_OPTION_DIR = menu_option
+MENU_ENIGME_DIR = menu_enigme
 BIN_DIR = bin
 
 # Source files
@@ -17,7 +18,8 @@ SRCS = $(SRC_DIR)/main.c \
        $(MENU_BEST_SCORE_DIR)/menuBestScore.c \
 	   $(MENU_PLAYER_DIR)/menuJoueur.c \
 	   $(MENU_PRINCIPAL_DIR)/menuPrincipal.c \
-	   $(MENU_OPTION_DIR)/menuOption.c
+	   $(MENU_OPTION_DIR)/menuOption.c \
+       $(MENU_ENIGME_DIR)/menuEnigme.c
 
 # Object files
 OBJS = $(SRCS:.c=.o)
@@ -33,7 +35,7 @@ $(TARGET): $(OBJS)
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(SRC_DIR)/main.o: $(SRC_DIR)/main.c $(MENU_SAVE_DIR)/menuSave.h $(MENU_BEST_SCORE_DIR)/menuBestScore.h $(MENU_PLAYER_DIR)/menuJoueur.h $(MENU_PRINCIPAL_DIR)/menuPrincipal.h $(MENU_OPTION_DIR)/menuOption.h $(SRC_DIR)/header.h
+$(SRC_DIR)/main.o: $(SRC_DIR)/main.c $(MENU_SAVE_DIR)/menuSave.h $(MENU_BEST_SCORE_DIR)/menuBestScore.h $(MENU_PLAYER_DIR)/menuJoueur.h $(MENU_PRINCIPAL_DIR)/menuPrincipal.h $(MENU_OPTION_DIR)/menuOption.h $(MENU_ENIGME_DIR)/menuEnigme.h $(SRC_DIR)/header.h
 
 clean:
 	rm -f $(OBJS) $(TARGET)

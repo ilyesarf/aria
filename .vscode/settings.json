@@ -1,6 +1,8 @@
 {
     "files.associations": {
+        "*.py": "python",
         "header.h": "c",
-        "main.h": "c"
+        "main.h": "c",
+        "menuenigme.h": "c"
     }
 }

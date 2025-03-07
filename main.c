@@ -4,6 +4,7 @@
 #include "menu_joueur/menuJoueur.h"
 #include "menu_principal/menuPrincipal.h"
 #include "menu_option/menuOption.h"
+#include "menu_enigme/menuEnigme.h"
 
 SDL_Surface* init_screen() {
     SDL_Surface *screen;  
@@ -66,8 +67,8 @@ void renderButton(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Butt
 }
 
 void init_menus(Menu *menus){
-    int working_menus[6] = {MENU_SAVE, MENU_NEW_LOAD_SAVE, MENU_BEST_SCORE, MENU_PLAYER, MENU_PRINCIPAL, MENU_OPTION};
-    for (int i = 0; i < 6; i++) {
+    int working_menus[7] = {MENU_SAVE, MENU_NEW_LOAD_SAVE, MENU_BEST_SCORE, MENU_PLAYER, MENU_PRINCIPAL, MENU_OPTION ,MENU_ENIGME};
+    for (int i = 0; i < 7; i++) {
         if (working_menus[i] == MENU_SAVE) {
             initMenuSave(menus);
         } else if (working_menus[i] == MENU_NEW_LOAD_SAVE) {
@@ -80,6 +81,8 @@ void init_menus(Menu *menus){
             initMenuPrincipal(menus);
         } else if (working_menus[i] == MENU_OPTION) {
             initMenuOption(menus);
+        } else if (working_menus[i] == MENU_ENIGME) {
+            initMenuEnigme(menus);
         }
     }
 }

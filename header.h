@@ -21,6 +21,7 @@
 #define MENU_PLAYER 5
 #define MENU_CHOOSE_PLAYER 6
 #define MENU_BEST_SCORE 7
+#define MENU_ENIGME 8
 
 typedef struct {
     SDL_Surface *normalImage;
