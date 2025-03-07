@@ -56,29 +56,29 @@ void renderMenuEnigme(SDL_Surface *background, SDL_Surface *screen, TTF_Font *fo
             renderButton(screen, font, textColor, buttons[i]);
         }
     } else {
-        for (int i = 2; i < n_btns; i++) {
-            renderButton(screen, font, textColor, buttons[i]);
-        }
+        displayQuizUI(screen, TTF_OpenFont("font.ttf", 40), (SDL_Color){255, 255, 255, 0},buttons,n_btns);
     }
 
     SDL_Flip(screen);
 }
 
-void displayQuizUI(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor) {
-    // Clear the screen
-    SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-
+void displayQuizUI(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns) {
+   
     // Display the "Quiz" message
     renderText(screen, "Quiz", font, textColor, 600, 100);
 
     // Display the question
     renderText(screen, "What is the capital of France?", font, textColor, 400, 200);
 
+    // Render the buttons
+    for (int i = 2; i < n_btns; i++) {
+        renderButton(screen, font, textColor, buttons[i]);
+    }
 
     // Display text below the buttons
-    renderText(screen, "Option 1: Paris", font, textColor, 400, 350);
-    renderText(screen, "Option 2: London", font, textColor, 400, 450);
-    renderText(screen, "Option 3: Berlin", font, textColor, 400, 550);
+    renderText(screen, "Option 1: Paris",  font, textColor, 425, 300);
+    renderText(screen, "Option 2: London", font, textColor, 425, 400);
+    renderText(screen, "Option 3: Berlin", font, textColor, 425, 500);
 
     SDL_Flip(screen);
 }
@@ -94,7 +94,7 @@ void handleEventEnigme(int *menuState, SDL_Event event, Button *buttons, int n_b
                     event.motion.y >= buttons[i].rect.y && event.motion.y <= buttons[i].rect.y + buttons[i].rect.h) {
                     if (!buttons[i].selected) {
                         buttons[i].selected = 1;
-                        
+                        Mix_PlayChannel(-1, hoverSound, 0);
                     }
                 } else {
                     buttons[i].selected = 0;
@@ -118,9 +118,7 @@ void handleEventEnigme(int *menuState, SDL_Event event, Button *buttons, int n_b
                                 }
                             }
                             Mix_PlayMusic(suspenseMusic, 1);
-
-                            // Display Quiz UI
-                            displayQuizUI(SDL_GetVideoSurface(), TTF_OpenFont("font.ttf", 24), (SDL_Color){255, 255, 255, 0});
+                            
                         } else if (i == 1) {
                             printf("Puzzle selected\n");
                             // Display Puzzle UI
