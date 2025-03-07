@@ -2,18 +2,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void init_enemy(Enemy *enemy, int health, int x, int y, SDL_Surface* sprite) {
+void init_enemy(Enemy *enemy, int health, int x, int y, SDL_Surface* frames[]) {
     enemy->health = health;
     enemy->x = x;
     enemy->y = y;
-    enemy->sprite = sprite;
+    for (int i = 0; i < 4; i++) {
+        enemy->frames[i] = frames[i];
+    }
+    enemy->current_frame = 0;
 }
 
 void display_enemy(Enemy *enemy, SDL_Surface* screen) {
     SDL_Rect dstrect;
     dstrect.x = enemy->x;
     dstrect.y = enemy->y;
-    SDL_BlitSurface(enemy->sprite, NULL, screen, &dstrect);
+    SDL_BlitSurface(enemy->frames[enemy->current_frame], NULL, screen, &dstrect);
 }
 
 void move_enemy_randomly(Enemy *enemy, int level) {
@@ -27,7 +30,7 @@ void move_enemy_randomly(Enemy *enemy, int level) {
 }
 
 void animate_enemy_move(Enemy *enemy) {
-    // Code to animate enemy movement
+    enemy->current_frame = (enemy->current_frame + 1) % 4;
 }
 
 void animate_enemy_attack(Enemy *enemy) {

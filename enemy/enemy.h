@@ -6,10 +6,11 @@
 typedef struct {
     int health;
     int x, y; // Position of the enemy
-    SDL_Surface* sprite; // Enemy sprite
+    SDL_Surface* frames[4]; // Enemy animation frames
+    int current_frame;
 } Enemy;
 
-void init_enemy(Enemy *enemy, int health, int x, int y, SDL_Surface* sprite);
+void init_enemy(Enemy *enemy, int health, int x, int y, SDL_Surface* frames[]);
 void display_enemy(Enemy *enemy, SDL_Surface* screen);
 void move_enemy_randomly(Enemy *enemy, int level);
 void animate_enemy_move(Enemy *enemy);
