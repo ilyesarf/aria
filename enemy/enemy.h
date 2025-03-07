@@ -19,4 +19,4 @@ int check_collision_player_enemy(int player_x, int player_y, Enemy *enemy);
 void update_health(Enemy *enemy, int damage);
 void display_health(Enemy *enemy);
 
-#endif // ENEMY_H
+#endif // ENEMY_H// temporary change

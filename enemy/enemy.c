@@ -52,3 +52,4 @@ void update_health(Enemy *enemy, int damage) {
 void display_health(Enemy *enemy) {
     printf("Enemy health: %d\n", enemy->health);
 }
+// temporary change
