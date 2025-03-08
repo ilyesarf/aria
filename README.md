@@ -21,5 +21,13 @@
         - ./assets/buttons: contains button png files
         - ./assets/sounds: contains sound wav files
         - ./assets/music: contains music mp3 files
-        - ./assets/game: contains background & characters jpeg files
+        - ./assets/game: contains background & characters jpeg & png files
         - ./assets/fonts: contains fonts ttf files
+
+## Compilation notes
+* every directory has a Makefile. you have to make it from "./"
+
+Example: compiling menus
+```
+$ make -C ./menu
+```

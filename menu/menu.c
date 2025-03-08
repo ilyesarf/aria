@@ -101,13 +101,13 @@ int main() {
     TTF_Init();
     SDL_EnableUNICODE(1); // Enable Unicode translation for keyboard input
     SDL_Surface *background;
-    background = load_image("background.png"); 
+    background = load_image("./assets/game/background.png"); 
     TTF_Font *font;
-    font = load_font("font.ttf");
+    font = load_font("./assets/fonts/font.ttf");
     SDL_Color textColor = {0, 0, 0, 0}; // black text
     Mix_Chunk *hoverSound;
-    Mix_Music *musique = load_music("30-hours.mp3");;
-    hoverSound = load_sound("beep.wav"); 
+    Mix_Music *musique = load_music("./assets/music/30-hours.mp3");;
+    hoverSound = load_sound("./assets/sounds/beep.wav"); 
     int volume = 50; // Initial volume (50%)
 
     Mix_PlayMusic(musique, -1);

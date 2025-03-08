@@ -10,7 +10,7 @@ MENU_PLAYER_DIR = menu_joueur
 MENU_PRINCIPAL_DIR = menu_principal
 MENU_OPTION_DIR = menu_option
 MENU_ENIGME_DIR = menu_enigme
-BIN_DIR = bin
+BIN_DIR = ../bin
 
 # Source files
 SRCS = $(SRC_DIR)/menu.c \
