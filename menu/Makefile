@@ -16,9 +16,9 @@ BIN_DIR = ../bin
 SRCS = $(SRC_DIR)/menu.c \
        $(MENU_SAVE_DIR)/menuSave.c \
        $(MENU_BEST_SCORE_DIR)/menuBestScore.c \
-	   $(MENU_PLAYER_DIR)/menuJoueur.c \
-	   $(MENU_PRINCIPAL_DIR)/menuPrincipal.c \
-	   $(MENU_OPTION_DIR)/menuOption.c \
+       $(MENU_PLAYER_DIR)/menuJoueur.c \
+       $(MENU_PRINCIPAL_DIR)/menuPrincipal.c \
+       $(MENU_OPTION_DIR)/menuOption.c \
        $(MENU_ENIGME_DIR)/menuEnigme.c
 
 # Object files
@@ -29,8 +29,11 @@ TARGET = $(BIN_DIR)/menu
 
 all: $(TARGET)
 
-$(TARGET): $(OBJS)
+$(TARGET): $(OBJS) | $(BIN_DIR)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
+
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR)
 
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -40,6 +43,6 @@ $(SRC_DIR)/menu.o: $(SRC_DIR)/menu.c $(MENU_SAVE_DIR)/menuSave.h $(MENU_BEST_SCO
 clean:
 	rm -f $(OBJS) $(TARGET)
 
-re: fclean all
+re: clean all
 
 

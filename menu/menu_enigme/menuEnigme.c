@@ -23,28 +23,28 @@ void initMenuEnigme(Menu *menus) {
 }
 
 void initMenuEnigmeButtons(Button *buttons) {
-    buttons[0].normalImage = load_image("./assets/buttons/quiz.png");
-    buttons[0].hoverImage = load_image("./assets/buttons/quizhov.png");
+    buttons[0].normalImage = load_image("../assets/buttons/quiz.png");
+    buttons[0].hoverImage = load_image("../assets/buttons/quizhov.png");
     buttons[0].rect = (SDL_Rect){600,200,300,40}; // Quiz
     buttons[0].selected = 0;
 
-    buttons[1].normalImage = load_image("./assets/buttons/puzzle.png");
-    buttons[1].hoverImage = load_image("./assets/buttons/puzzlehov.png");
+    buttons[1].normalImage = load_image("../assets/buttons/puzzle.png");
+    buttons[1].hoverImage = load_image("../assets/buttons/puzzlehov.png");
     buttons[1].rect = (SDL_Rect){1000,200,300,40}; // Puzzle
     buttons[1].selected = 0;
 
-    buttons[2].normalImage = load_image("./assets/buttons/butbase.png");
-    buttons[2].hoverImage = load_image("./assets/buttons/butbase.png");
+    buttons[2].normalImage = load_image("../assets/buttons/butbase.png");
+    buttons[2].hoverImage = load_image("../assets/buttons/butbase.png");
     buttons[2].rect = (SDL_Rect){400,300,300,40}; // Option 1
     buttons[2].selected = 0;
 
-    buttons[3].normalImage = load_image("./assets/buttons/butbase.png");
-    buttons[3].hoverImage = load_image("./assets/buttons/butbase.png");
+    buttons[3].normalImage = load_image("../assets/buttons/butbase.png");
+    buttons[3].hoverImage = load_image("../assets/buttons/butbase.png");
     buttons[3].rect = (SDL_Rect){400,400,300,40}; // Option 2
     buttons[3].selected = 0;
 
-    buttons[4].normalImage = load_image("./assets/buttons/butbase.png");
-    buttons[4].hoverImage = load_image("./assets/buttons/butbase.png");
+    buttons[4].normalImage = load_image("../assets/buttons/butbase.png");
+    buttons[4].hoverImage = load_image("../assets/buttons/butbase.png");
     buttons[4].rect = (SDL_Rect){400,500,300,40}; // Option 3
     buttons[4].selected = 0;
 }
@@ -56,7 +56,7 @@ void renderMenuEnigme(SDL_Surface *background, SDL_Surface *screen, TTF_Font *fo
             renderButton(screen, font, textColor, buttons[i]);
         }
     } else {
-        displayQuizUI(screen, TTF_OpenFont("./assets/fonts/font.ttf", 40), (SDL_Color){255, 255, 255, 0},buttons,n_btns);
+        displayQuizUI(screen, TTF_OpenFont("../assets/fonts/font.ttf", 40), (SDL_Color){255, 255, 255, 0},buttons,n_btns);
     }
 
     SDL_Flip(screen);
@@ -112,7 +112,7 @@ void handleEventEnigme(int *menuState, SDL_Event event, Button *buttons, int n_b
                             buttons[1].selected = 0;
                             // Play suspense music
                             if (suspenseMusic == NULL) {
-                                suspenseMusic = Mix_LoadMUS("./assets/music/suspense.mp3");
+                                suspenseMusic = Mix_LoadMUS("../assets/music/suspense.mp3");
                                 if (!suspenseMusic) {
                                     printf("Failed to load suspense music: %s\n", Mix_GetError());
                                 }
