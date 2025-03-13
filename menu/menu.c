@@ -36,14 +36,6 @@ Mix_Chunk* load_sound(char *filename) {
     return hoverSound;
 }
 
-Mix_Music* load_music(const char* filename) {
-    Mix_Music* music = Mix_LoadMUS(filename);
-    if (!music) {
-        printf("Failed to load music '%s': %s\n", filename, Mix_GetError());
-    }
-    return music;
-}
-
 TTF_Font* load_font(char *filename) {
     TTF_Font* font = TTF_OpenFont(filename, 24);
     if (font == NULL) {
@@ -94,7 +86,13 @@ void init_menus(Menu *menus){
         }
     }
 }
-
+Mix_Music* load_music(const char* filename) {
+    Mix_Music* music = Mix_LoadMUS(filename);
+    if (!music) {
+        printf("Failed to load music '%s': %s\n", filename, Mix_GetError());
+    }
+    return music;
+}
 
 int main() {
     SDL_Surface *screen; 
@@ -103,13 +101,13 @@ int main() {
     TTF_Init();
     SDL_EnableUNICODE(1); // Enable Unicode translation for keyboard input
     SDL_Surface *background;
-    background = load_image("../assets/game/background.png"); 
+    background = load_image("./assets/game/background.png"); 
     TTF_Font *font;
-    font = load_font("../assets/fonts/font.ttf");
+    font = load_font("./assets/fonts/font.ttf");
     SDL_Color textColor = {0, 0, 0, 0}; // black text
     Mix_Chunk *hoverSound;
-    Mix_Music *musique = load_music("../assets/music/30-hours.mp3");;
-    hoverSound = load_sound("../assets/sounds/beep.wav"); 
+    Mix_Music *musique = load_music("./assets/music/30-hours.mp3");;
+    hoverSound = load_sound("./assets/sounds/beep.wav"); 
     int volume = 50; // Initial volume (50%)
 
     Mix_PlayMusic(musique, -1);

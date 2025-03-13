@@ -14,15 +14,15 @@ void initMenuSave(struct Menu *menus){
 }
 
 void initMenuSaveButtons(Button *buttons){
-    buttons[0].normalImage = load_image("../assets/buttons/yes.png");
-    buttons[0].hoverImage = load_image("../assets/buttons/yeshov.png");
+    buttons[0].normalImage = load_image("./assets/buttons/yes.png");
+    buttons[0].hoverImage = load_image("./assets/buttons/yeshov.png");
     buttons[0].rect = (SDL_Rect){800, 200,300,40}; // OUI
     //buttons[0].text = "OUI";
     buttons[0].selected = 0;
 
 
-    buttons[1].normalImage = load_image("../assets/buttons/no.png");
-    buttons[1].hoverImage = load_image("../assets/buttons/nohov.png");
+    buttons[1].normalImage = load_image("./assets/buttons/no.png");
+    buttons[1].hoverImage = load_image("./assets/buttons/nohov.png");
     buttons[1].rect = (SDL_Rect){800, 350,300,40}; // NON
     //buttons[1].text = "NON";
     buttons[1].selected = 0;
@@ -39,13 +39,13 @@ void initMenuChooseSave(Menu *menus){
 
 void initMenuChooseSaveButtons(Button *buttons) {
 
-    buttons[0].normalImage = load_image("../assets/buttons/load.png");
-    buttons[0].hoverImage = load_image("../assets/buttons/loadhov.png");
+    buttons[0].normalImage = load_image("./assets/buttons/load.png");
+    buttons[0].hoverImage = load_image("./assets/buttons/loadhov.png");
     buttons[0].rect = (SDL_Rect){800, 200,300,40} ;
     buttons[0].selected = 0;
 
-    buttons[1].normalImage = load_image("../assets/buttons/newgame.png");
-    buttons[1].hoverImage = load_image("../assets/buttons/newgamehov.png");
+    buttons[1].normalImage = load_image("./assets/buttons/newgame.png");
+    buttons[1].hoverImage = load_image("./assets/buttons/newgamehov.png");
     buttons[1].rect = (SDL_Rect){800, 350,300,40};
     buttons[1].selected = 0;
 }

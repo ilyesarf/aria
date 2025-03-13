@@ -26,18 +26,18 @@ void initMenuBestScore(Menu *menus) {
 }
 
 void initMenuBestScoreButtons(Button *buttons) {
-    buttons[0].normalImage = load_image("../assets/buttons/submit.png");
-    buttons[0].hoverImage = load_image("../assets/buttons/submithov.png");
+    buttons[0].normalImage = load_image("./assets/buttons/submit.png");
+    buttons[0].hoverImage = load_image("./assets/buttons/submithov.png");
     buttons[0].rect = (SDL_Rect){SCREEN_WIDTH / 2 + 125, SCREEN_HEIGHT / 2 + 75, 75, 35}; // Valider
     buttons[0].selected = 0;
 
-    buttons[1].normalImage = load_image("../assets/buttons/quit.png");
-    buttons[1].hoverImage = load_image("../assets/buttons/quithov.png");
+    buttons[1].normalImage = load_image("./assets/buttons/quit.png");
+    buttons[1].hoverImage = load_image("./assets/buttons/quithov.png");
     buttons[1].rect = (SDL_Rect){SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 + 50, 100, 50}; // Quitter
     buttons[1].selected = 0;
 
-    buttons[2].normalImage = load_image("../assets/buttons/return.png");
-    buttons[2].hoverImage = load_image("../assets/buttons/returnhov.png");
+    buttons[2].normalImage = load_image("./assets/buttons/return.png");
+    buttons[2].hoverImage = load_image("./assets/buttons/returnhov.png");
     buttons[2].rect = (SDL_Rect){SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 + 125, 100, 50}; // Retour
     buttons[2].selected = 0;
 }

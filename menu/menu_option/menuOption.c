@@ -19,35 +19,35 @@ void initMenuOption(Menu *menus) {
 }
 
 void initMenuOptionButtons(Button *buttons) {
-    buttons[0].normalImage = load_image("../assets/buttons/fullscreen.png");
-    buttons[0].hoverImage = load_image("../assets/buttons/fullscreenhov.png");
+    buttons[0].normalImage = load_image("./assets/buttons/fullscreen.png");
+    buttons[0].hoverImage = load_image("./assets/buttons/fullscreenhov.png");
     buttons[0].rect = (SDL_Rect){600,200,300,40}; // Fullscreen
     buttons[0].selected = 0;
 
-    buttons[1].normalImage = load_image("../assets/buttons/windowed.png");
-    buttons[1].hoverImage = load_image("../assets/buttons/windowedhov.png");
+    buttons[1].normalImage = load_image("./assets/buttons/windowed.png");
+    buttons[1].hoverImage = load_image("./assets/buttons/windowedhov.png");
     buttons[1].rect = (SDL_Rect){1000,200,300,40}; // Windowed
     buttons[1].selected = 0;
 
-    buttons[2].normalImage = load_image("../assets/buttons/volumeup.png");
-    buttons[2].hoverImage = load_image("../assets/buttons/volumeuphov.png");
+    buttons[2].normalImage = load_image("./assets/buttons/volumeup.png");
+    buttons[2].hoverImage = load_image("./assets/buttons/volumeuphov.png");
     buttons[2].rect = (SDL_Rect){600,500,300,40}; // Volume Up
     buttons[2].selected = 0;
 
-    buttons[3].normalImage = load_image("../assets/buttons/volumedwn.png");
-    buttons[3].hoverImage = load_image("../assets/buttons/volumedwnhov.png");
+    buttons[3].normalImage = load_image("./assets/buttons/volumedwn.png");
+    buttons[3].hoverImage = load_image("./assets/buttons/volumedwnhov.png");
     buttons[3].rect = (SDL_Rect){1000,500,300,40}; // Volume Down
     buttons[3].selected = 0;
 
-    buttons[4].normalImage = load_image("../assets/buttons/return.png");
-    buttons[4].hoverImage = load_image("../assets/buttons/returnhov.png");
+    buttons[4].normalImage = load_image("./assets/buttons/return.png");
+    buttons[4].hoverImage = load_image("./assets/buttons/returnhov.png");
     buttons[4].rect = (SDL_Rect){800,800,300,40}; // Return
     buttons[4].selected = 0;
 
 }
 
 void renderVolumeText(SDL_Surface *screen, SDL_Color textColor, int volume) {
-    TTF_Font* font = TTF_OpenFont("../assets/fonts/font.ttf", 40);
+    TTF_Font* font = TTF_OpenFont("./assets/fonts/font.ttf", 40);
     char volumeText[20];
     sprintf(volumeText, "Volume: %d", volume);
     SDL_Surface *textSurface = TTF_RenderText_Solid(font, volumeText, textColor);
@@ -105,10 +105,7 @@ void handleEventOptionMenu(int *menuState, SDL_Event event, Button *buttons, int
                             // Handle Volume Up
                             printf("Volume Up selected\n");
                             int volume = Mix_VolumeMusic(-1);
-                            if(volume<100){
-                                Mix_VolumeMusic(volume + 5);
-                            }
-                            
+                            Mix_VolumeMusic(volume + 5);
                         } else if (i == 3) {
                             // Handle Volume Down
                             printf("Volume Down selected\n");
