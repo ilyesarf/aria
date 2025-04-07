@@ -14,7 +14,7 @@ void initMenuSave(struct Menu *menus){
 }
 
 void initMenuSaveButtons(Button *buttons){
-    buttons[0].normalImage = load_image("./assets/buttons/yes.png");
+    buttons[0].normalImage = load_image("./assets/buttons/avatar1.png");
     buttons[0].hoverImage = load_image("./assets/buttons/yeshov.png");
     buttons[0].rect = (SDL_Rect){800, 200,300,40}; // OUI
     //buttons[0].text = "OUI";

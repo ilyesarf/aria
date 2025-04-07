@@ -3,12 +3,21 @@
 #include <SDL/SDL_mixer.h>
 #include <SDL/SDL_ttf.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "menuEnigme.h"
 #include "../header.h"
 
 static int showSubButtons = 0;
+static int askedQuestions[MAX_QUESTIONS] = {0};
+static int currentQuestionIndex = -1;
+static int score = 0;
+static int lives = 3;
+static int level = 1;
+static Question questions[MAX_QUESTIONS];
+static int numQuestions = 0;
 
 Mix_Music *suspenseMusic = NULL;
 
@@ -20,6 +29,7 @@ void initMenuEnigme(Menu *menus) {
     menus[MENU_ENIGME].render = renderMenuEnigme;
     menus[MENU_ENIGME].handleEvent = handleEventEnigme;
     menus[MENU_ENIGME].init_buttons(menus[MENU_ENIGME].buttons);
+    loadQuestions("questions.txt", questions, &numQuestions);
 }
 
 void initMenuEnigmeButtons(Button *buttons) {
@@ -63,12 +73,17 @@ void renderMenuEnigme(SDL_Surface *background, SDL_Surface *screen, TTF_Font *fo
 }
 
 void displayQuizUI(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns) {
-   
+    if (currentQuestionIndex == -1) {
+        currentQuestionIndex = getRandomQuestionIndex(askedQuestions, numQuestions);
+    }
+
+    Question currentQuestion = questions[currentQuestionIndex];
+
     // Display the "Quiz" message
     renderText(screen, "Quiz", font, textColor, 600, 100);
 
     // Display the question
-    renderText(screen, "What is the capital of France?", font, textColor, 400, 200);
+    renderText(screen, currentQuestion.question, font, textColor, 400, 200);
 
     // Render the buttons
     for (int i = 2; i < n_btns; i++) {
@@ -76,11 +91,66 @@ void displayQuizUI(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, But
     }
 
     // Display text below the buttons
-    renderText(screen, "Option 1: Paris",  font, textColor, 425, 300);
-    renderText(screen, "Option 2: London", font, textColor, 425, 400);
-    renderText(screen, "Option 3: Berlin", font, textColor, 425, 500);
+    renderText(screen, currentQuestion.options[0], font, textColor, 425, 300);
+    renderText(screen, currentQuestion.options[1], font, textColor, 425, 400);
+    renderText(screen, currentQuestion.options[2], font, textColor, 425, 500);
 
     SDL_Flip(screen);
+}
+
+void loadQuestions(const char *filename, Question *questions, int *numQuestions) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        printf("Failed to open questions file: %s\n", filename);
+        return;
+    }
+
+    char line[256];
+    int questionIndex = 0;
+    printf("aaaaaaaaaaaaaa");
+    while (fgets(line, sizeof(line), file) && questionIndex < MAX_QUESTIONS) {
+        // Utilisation de sscanf avec des limites de taille pour éviter les débordements de tampon
+        if (sscanf(line, "%255[^;];%255[^;];%255[^;];%255[^;];%d",
+                   questions[questionIndex].question,
+                   questions[questionIndex].options[0],
+                   questions[questionIndex].options[1],
+                   questions[questionIndex].options[2],
+                   &questions[questionIndex].correctOption) == 5) {
+            questionIndex++;
+        } else {
+            printf("Failed to parse line: %s\n", line);
+        }
+    }
+
+    *numQuestions = questionIndex;
+    fclose(file);
+}
+
+int getRandomQuestionIndex(int *askedQuestions, int numQuestions) {
+    int index;
+    do {
+        index = rand() % numQuestions;
+    } while (askedQuestions[index]);
+
+    askedQuestions[index] = 1;
+    return index;
+}
+
+void checkAnswer(int selectedOption, int correctOption, int *score, int *lives, int *level) {
+    if (selectedOption == correctOption) {
+        printf("Correct answer!\n");
+        (*score)++;
+        if (*score % 5 == 0) {
+            (*level)++;
+        }
+    } else {
+        printf("Wrong answer!\n");
+        (*lives)--;
+        if (*lives == 0) {
+            printf("Game Over!\n");
+            // Handle game over logic
+        }
+    }
 }
 
 void handleEventEnigme(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
@@ -94,7 +164,7 @@ void handleEventEnigme(int *menuState, SDL_Event event, Button *buttons, int n_b
                     event.motion.y >= buttons[i].rect.y && event.motion.y <= buttons[i].rect.y + buttons[i].rect.h) {
                     if (!buttons[i].selected) {
                         buttons[i].selected = 1;
-                        Mix_PlayChannel(-1, hoverSound, 0);
+                        //Mix_PlayChannel(-1, hoverSound, 0);
                     }
                 } else {
                     buttons[i].selected = 0;
@@ -122,6 +192,10 @@ void handleEventEnigme(int *menuState, SDL_Event event, Button *buttons, int n_b
                         } else if (i == 1) {
                             printf("Puzzle selected\n");
                             // Display Puzzle UI
+                        }
+                        if (showSubButtons) {
+                            checkAnswer(i - 2, questions[currentQuestionIndex].correctOption, &score, &lives, &level);
+                            currentQuestionIndex = getRandomQuestionIndex(askedQuestions, numQuestions);
                         }
                     }
                 }
