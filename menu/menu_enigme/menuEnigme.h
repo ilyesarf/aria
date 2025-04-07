@@ -7,6 +7,13 @@
 #include <SDL/SDL_image.h>
 
 #include "../header.h"
+#define MAX_QUESTIONS 10
+
+typedef struct {
+    char question[256];
+    char options[3][256];
+    int correctOption;
+} Question;
 
 void initMenuEnigme(Menu *menus);
 void initMenuEnigmeButtons(Button *buttons);
