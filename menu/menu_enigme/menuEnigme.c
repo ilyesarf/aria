@@ -11,7 +11,6 @@
 #include "../header.h"
 
 static int showSubButtons = 0;
-static int askedQuestions[MAX_QUESTIONS] = {0};
 static int currentQuestionIndex = -1;
 static int score = 0;
 static int lives = 3;
@@ -24,49 +23,60 @@ Mix_Music *suspenseMusic = NULL;
 void initMenuEnigme(Menu *menus) {
     printf("Init Menu Enigme\n");
     menus[MENU_ENIGME].n_btns = 5;
-    menus[MENU_ENIGME].buttons = malloc(menus[MENU_ENIGME].n_btns * sizeof(Button)); // Allocate memory for buttons
+    menus[MENU_ENIGME].buttons = malloc(menus[MENU_ENIGME].n_btns * sizeof(Button));
+    if (!menus[MENU_ENIGME].buttons) {
+        fprintf(stderr, "Failed to allocate memory for buttons\n");
+        exit(EXIT_FAILURE);
+    }
+
     menus[MENU_ENIGME].init_buttons = initMenuEnigmeButtons;
     menus[MENU_ENIGME].render = renderMenuEnigme;
     menus[MENU_ENIGME].handleEvent = handleEventEnigme;
     menus[MENU_ENIGME].init_buttons(menus[MENU_ENIGME].buttons);
-    loadQuestions("questions.txt", questions, &numQuestions);
+
+    srand(time(NULL)); // Seed the random number generator
+    loadQuestions("/home/amine/pizza/aria/menu/menu_enigme/questions.txt", questions, &numQuestions);
+    if (numQuestions == 0) {
+        fprintf(stderr, "No questions loaded. Exiting.\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 void initMenuEnigmeButtons(Button *buttons) {
     buttons[0].normalImage = load_image("./assets/buttons/quiz.png");
     buttons[0].hoverImage = load_image("./assets/buttons/quizhov.png");
-    buttons[0].rect = (SDL_Rect){600,200,300,40}; // Quiz
+    buttons[0].rect = (SDL_Rect){600, 200, 300, 40};
     buttons[0].selected = 0;
 
     buttons[1].normalImage = load_image("./assets/buttons/puzzle.png");
     buttons[1].hoverImage = load_image("./assets/buttons/puzzlehov.png");
-    buttons[1].rect = (SDL_Rect){1000,200,300,40}; // Puzzle
+    buttons[1].rect = (SDL_Rect){1000, 200, 300, 40};
     buttons[1].selected = 0;
 
-    buttons[2].normalImage = load_image("./assets/buttons/butbase.png");
-    buttons[2].hoverImage = load_image("./assets/buttons/butbase.png");
-    buttons[2].rect = (SDL_Rect){400,300,300,40}; // Option 1
-    buttons[2].selected = 0;
-
-    buttons[3].normalImage = load_image("./assets/buttons/butbase.png");
-    buttons[3].hoverImage = load_image("./assets/buttons/butbase.png");
-    buttons[3].rect = (SDL_Rect){400,400,300,40}; // Option 2
-    buttons[3].selected = 0;
-
-    buttons[4].normalImage = load_image("./assets/buttons/butbase.png");
-    buttons[4].hoverImage = load_image("./assets/buttons/butbase.png");
-    buttons[4].rect = (SDL_Rect){400,500,300,40}; // Option 3
-    buttons[4].selected = 0;
+    for (int i = 2; i < 5; i++) {
+        buttons[i].normalImage = load_image("./assets/buttons/butbase.png");
+        buttons[i].hoverImage = load_image("./assets/buttons/butbase.png");
+        buttons[i].rect = (SDL_Rect){400, 300 + (i - 2) * 200, 300, 40};
+        buttons[i].selected = 0;
+    }
 }
 
 void renderMenuEnigme(SDL_Surface *background, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns) {
     SDL_BlitSurface(background, NULL, screen, NULL);
+
+    char scoreText[50], livesText[50];
+    snprintf(scoreText, sizeof(scoreText), "Score: %d", score);
+    snprintf(livesText, sizeof(livesText), "Lives: %d", lives);
+
+    renderText(screen, scoreText, font, textColor, 50, 50);
+    renderText(screen, livesText, font, textColor, 50, 100);
+
     if (!showSubButtons) {
         for (int i = 0; i < 2; i++) {
             renderButton(screen, font, textColor, buttons[i]);
         }
     } else {
-        displayQuizUI(screen, TTF_OpenFont("./assets/fonts/font.ttf", 40), (SDL_Color){255, 255, 255, 0},buttons,n_btns);
+        displayQuizUI(screen, font, textColor, buttons, n_btns);
     }
 
     SDL_Flip(screen);
@@ -74,26 +84,26 @@ void renderMenuEnigme(SDL_Surface *background, SDL_Surface *screen, TTF_Font *fo
 
 void displayQuizUI(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns) {
     if (currentQuestionIndex == -1) {
-        currentQuestionIndex = getRandomQuestionIndex(askedQuestions, numQuestions);
+        currentQuestionIndex = 0;
+    }
+
+    if (currentQuestionIndex >= numQuestions) {
+        printf("All questions answered. Resetting...\n");
+        currentQuestionIndex = 0;
     }
 
     Question currentQuestion = questions[currentQuestionIndex];
 
-    // Display the "Quiz" message
     renderText(screen, "Quiz", font, textColor, 600, 100);
-
-    // Display the question
     renderText(screen, currentQuestion.question, font, textColor, 400, 200);
 
-    // Render the buttons
     for (int i = 2; i < n_btns; i++) {
         renderButton(screen, font, textColor, buttons[i]);
     }
 
-    // Display text below the buttons
     renderText(screen, currentQuestion.options[0], font, textColor, 425, 300);
-    renderText(screen, currentQuestion.options[1], font, textColor, 425, 400);
-    renderText(screen, currentQuestion.options[2], font, textColor, 425, 500);
+    renderText(screen, currentQuestion.options[1], font, textColor, 425, 500);
+    renderText(screen, currentQuestion.options[2], font, textColor, 425, 700);
 
     SDL_Flip(screen);
 }
@@ -101,15 +111,14 @@ void displayQuizUI(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, But
 void loadQuestions(const char *filename, Question *questions, int *numQuestions) {
     FILE *file = fopen(filename, "r");
     if (!file) {
-        printf("Failed to open questions file: %s\n", filename);
+        fprintf(stderr, "Failed to open questions file: %s\n", filename);
         return;
     }
 
     char line[256];
     int questionIndex = 0;
-    printf("aaaaaaaaaaaaaa");
+
     while (fgets(line, sizeof(line), file) && questionIndex < MAX_QUESTIONS) {
-        // Utilisation de sscanf avec des limites de taille pour éviter les débordements de tampon
         if (sscanf(line, "%255[^;];%255[^;];%255[^;];%255[^;];%d",
                    questions[questionIndex].question,
                    questions[questionIndex].options[0],
@@ -118,38 +127,46 @@ void loadQuestions(const char *filename, Question *questions, int *numQuestions)
                    &questions[questionIndex].correctOption) == 5) {
             questionIndex++;
         } else {
-            printf("Failed to parse line: %s\n", line);
+            fprintf(stderr, "Failed to parse line: %s\n", line);
         }
     }
 
     *numQuestions = questionIndex;
     fclose(file);
+
+    for (int i = 0; i < *numQuestions; i++) {
+        int j = rand() % *numQuestions;
+        Question temp = questions[i];
+        questions[i] = questions[j];
+        questions[j] = temp;
+    }
 }
 
-int getRandomQuestionIndex(int *askedQuestions, int numQuestions) {
-    int index;
-    do {
-        index = rand() % numQuestions;
-    } while (askedQuestions[index]);
-
-    askedQuestions[index] = 1;
-    return index;
-}
-
-void checkAnswer(int selectedOption, int correctOption, int *score, int *lives, int *level) {
-    if (selectedOption == correctOption) {
-        printf("Correct answer!\n");
-        (*score)++;
-        if (*score % 5 == 0) {
-            (*level)++;
+void checkAnswer(int selectedOption, int correctOption, int *score, int *lives, int *level, int *menuState) {
+    if(selectedOption >  -1){
+        if (selectedOption == correctOption) {
+            printf("Correct answer!\n");
+            (*score)++;
+            if (*score % 5 == 0) {
+                (*level)++;
+            }
+        } else {
+            printf("Wrong answer!\n");
+            if (*lives > 0) {
+                (*lives)--;
+            }
+            if (*lives == 0) {
+                printf("Returning to Menu Option...\n");
+                *score = 0;
+                *lives = 3;
+                *level = 1;
+                *menuState = MENU_OPTION;
+            }
         }
-    } else {
-        printf("Wrong answer!\n");
-        (*lives)--;
-        if (*lives == 0) {
-            printf("Game Over!\n");
-            // Handle game over logic
+        if (*score == 10){
+            *menuState = MENU_PRINCIPAL;
         }
+        currentQuestionIndex++;
     }
 }
 
@@ -162,10 +179,7 @@ void handleEventEnigme(int *menuState, SDL_Event event, Button *buttons, int n_b
             for (int i = 0; i < n_btns; i++) {
                 if (event.motion.x >= buttons[i].rect.x && event.motion.x <= buttons[i].rect.x + buttons[i].rect.w &&
                     event.motion.y >= buttons[i].rect.y && event.motion.y <= buttons[i].rect.y + buttons[i].rect.h) {
-                    if (!buttons[i].selected) {
-                        buttons[i].selected = 1;
-                        //Mix_PlayChannel(-1, hoverSound, 0);
-                    }
+                    buttons[i].selected = 1;
                 } else {
                     buttons[i].selected = 0;
                 }
@@ -177,25 +191,12 @@ void handleEventEnigme(int *menuState, SDL_Event event, Button *buttons, int n_b
                     if (buttons[i].selected) {
                         if (i == 0) {
                             printf("Quiz selected\n");
-                            showSubButtons = 1; // Show sub buttons
-                            buttons[0].selected = 0; // Hide main buttons
-                            buttons[1].selected = 0;
-                            // Play suspense music
-                            if (suspenseMusic == NULL) {
-                                suspenseMusic = Mix_LoadMUS("./assets/music/suspense.mp3");
-                                if (!suspenseMusic) {
-                                    printf("Failed to load suspense music: %s\n", Mix_GetError());
-                                }
-                            }
-                            Mix_PlayMusic(suspenseMusic, 1);
-                            
+                            showSubButtons = 1;
                         } else if (i == 1) {
                             printf("Puzzle selected\n");
-                            // Display Puzzle UI
                         }
                         if (showSubButtons) {
-                            checkAnswer(i - 2, questions[currentQuestionIndex].correctOption, &score, &lives, &level);
-                            currentQuestionIndex = getRandomQuestionIndex(askedQuestions, numQuestions);
+                            checkAnswer(i -2 , questions[currentQuestionIndex].correctOption, &score, &lives, &level, menuState);
                         }
                     }
                 }

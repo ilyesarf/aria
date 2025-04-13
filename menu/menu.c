@@ -37,7 +37,7 @@ Mix_Chunk* load_sound(char *filename) {
 }
 
 TTF_Font* load_font(char *filename) {
-    TTF_Font* font = TTF_OpenFont(filename, 24);
+    TTF_Font* font = TTF_OpenFont(filename, 40);
     if (font == NULL) {
         printf("Error opening font file: %s!!\n\n", filename);
         exit(1);
