@@ -8,10 +8,10 @@ void init_enemy(Enemy *enemy, int health, int x, int y) {
     enemy->y = y;
     enemy->current_frame = 0;
 
-    enemy->frames[0] = IMG_Load("shadowf1t.png");
-    enemy->frames[1] = IMG_Load("shadowf2t.png");
-    enemy->frames[2] = IMG_Load("shadowf3t.png");
-    enemy->frames[3] = IMG_Load("shadowf4t.png");
+    enemy->frames[0] = IMG_Load("shadowanim/shadowf1t.png");
+    enemy->frames[1] = IMG_Load("shadowanim/shadowf2t.png");
+    enemy->frames[2] = IMG_Load("shadowanim/shadowf3t.png");
+    enemy->frames[3] = IMG_Load("shadowanim/shadowf4t.png");
 
     for (int i = 0; i < 4; i++) {
         if (!enemy->frames[i]) {
