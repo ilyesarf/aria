@@ -1,48 +1,53 @@
 #include "enemy.h"
 #include <SDL/SDL.h>
-#include <stdio.h>
+#include <SDL/SDL_image.h>
+#include <time.h>
 
-int main(int argc, char* argv[]) {
+int main() {
     SDL_Init(SDL_INIT_VIDEO);
-    SDL_Surface* screen = SDL_SetVideoMode(640, 480, 32, SDL_SWSURFACE);
+    SDL_Surface* screen = SDL_SetVideoMode(800, 600, 32, SDL_SWSURFACE);
+    IMG_Init(IMG_INIT_PNG);
+    srand(time(NULL));
 
-    SDL_Surface* frames[4];
-    frames[0] = SDL_LoadBMP("shadowf1t.bmp");
-    frames[1] = SDL_LoadBMP("shadowf2t.bmp");
-    frames[2] = SDL_LoadBMP("shadowf3t.bmp");
-    frames[3] = SDL_LoadBMP("shadowf4t.bmp");
+    Enemy shadow;
+    init_enemy(&shadow, 100, 100, 100);
 
-    for (int i = 0; i < 4; i++) {
-        SDL_SetColorKey(frames[i], SDL_SRCCOLORKEY, SDL_MapRGB(frames[i]->format, 255, 0, 255));
-    }
-
-    Enemy enemy1;
-    init_enemy(&enemy1, 100, 0, 0, frames);
+    StaticElement wall = { .rect = {300, 300, 100, 100} }; // Exemple d'obstacle
 
     int running = 1;
     SDL_Event event;
+    int player_x = 400, player_y = 300;
+    int level = 2;
 
     while (running) {
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
+            if (event.type == SDL_QUIT)
                 running = 0;
-            }
         }
 
-        move_enemy_randomly(&enemy1, 1);
-        animate_enemy_move(&enemy1);
-
         SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-        display_enemy(&enemy1, screen);
+
+        SDL_Rect wallRect = wall.rect;
+        SDL_FillRect(screen, &wallRect, SDL_MapRGB(screen->format, 100, 100, 100));
+
+        if (level == 1)
+            move_enemy_randomly(&shadow, level);
+        else
+            move_enemy_ai(&shadow, player_x, player_y);
+
+        SDL_Rect enemy_rect = {shadow.x, shadow.y, 128, 128};
+        if (check_collision_enemy_es(enemy_rect, wall.rect)) {
+            shadow.x -= 2; shadow.y -= 2; // recule si collision
+        }
+
+        animate_enemy_move(&shadow);
+        display_enemy(&shadow, screen);
+
         SDL_Flip(screen);
-
-        SDL_Delay(100); // Adjust the delay for animation speed
+        SDL_Delay(60);
     }
 
-    for (int i = 0; i < 4; i++) {
-        SDL_FreeSurface(frames[i]);
-    }
+    for (int i = 0; i < 4; i++) SDL_FreeSurface(shadow.frames[i]);
     SDL_Quit();
-
     return 0;
 }
