@@ -1,11 +1,6 @@
 #ifndef MENUSAUV_H
 #define MENUSAUV_H
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_mixer.h>
-#include <SDL/SDL_ttf.h>
-#include <SDL/SDL_image.h>
-
 #include "../header.h"
 
 /*
@@ -25,7 +20,6 @@ void renderMenuSave(SDL_Surface *background, SDL_Surface *screen, TTF_Font *font
 void renderMenuChooseSave(SDL_Surface *background, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns);
 void handleEventSaveMenu(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
 void handleEventChooseSaveMenu(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
-void cleanup(Mix_Chunk *hoverSound, SDL_Surface *background, TTF_Font *font); 
 
 #endif
 

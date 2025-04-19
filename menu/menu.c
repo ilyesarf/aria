@@ -9,6 +9,10 @@
 SDL_Surface* init_screen() {
     SDL_Surface *screen;  
     screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 32, SDL_SWSURFACE);
+    if (!screen){
+        printf("Error init screen !!\n");
+        exit(1);
+    }
     SDL_WM_SetCaption("JEU", NULL);
     return screen;
 }
@@ -94,6 +98,17 @@ Mix_Music* load_music(const char* filename) {
     return music;
 }
 
+void cleanup(Mix_Chunk *hoverSound, Mix_Music *musique, SDL_Surface *background, TTF_Font *font) {
+    Mix_FreeChunk(hoverSound);
+    hoverSound = NULL;
+    Mix_FreeMusic(musique);
+    Mix_CloseAudio();
+    SDL_FreeSurface(background);
+    TTF_CloseFont(font);
+    TTF_Quit();
+    SDL_Quit();
+}
+
 int main() {
     SDL_Surface *screen; 
     screen = init_screen();
@@ -136,6 +151,6 @@ int main() {
         //SDL_Delay(16);
     }
 
-    cleanup(hoverSound, background, font);
+    cleanup(hoverSound, musique, background, font);
     return 0;
 }

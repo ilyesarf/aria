@@ -1,9 +1,3 @@
-#include <SDL/SDL.h>//inclure SDL.h  pour permettre au programme d'être portable sur tous les systèmes.
-#include <SDL/SDL_image.h>//.................//Pour manipuler des images ayants des types autre que bmp
-#include <SDL/SDL_mixer.h>//.................//Pour manipuler de l’audio.
-#include <SDL/SDL_ttf.h>//.................//Pour manipuler des textes
-#include <stdio.h>
-#include <unistd.h>
 
 #include "menuBestScore.h"
 #include "../header.h"

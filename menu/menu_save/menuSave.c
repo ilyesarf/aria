@@ -139,10 +139,4 @@ void handleEventChooseSaveMenu(int *menuState, SDL_Event event, Button *buttons,
     }
 }
 
-void cleanup(Mix_Chunk *hoverSound, SDL_Surface *background, TTF_Font *font) {
-    Mix_FreeChunk(hoverSound);
-    SDL_FreeSurface(background);
-    TTF_CloseFont(font);
-    TTF_Quit();
-    SDL_Quit();
-}
+
