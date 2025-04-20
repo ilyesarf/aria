@@ -39,13 +39,27 @@ void renderMenuPrincipal(SDL_Surface *background, SDL_Surface *screen, TTF_Font 
 
     for (int i = 0; i < n_btns; i++) {
         renderButton(screen, font, textColor, buttons[i]);     
-        printf("Button %d: rect=(%d, %d, %d, %d), selected=%d\n",
-               i, buttons[i].rect.x, buttons[i].rect.y, buttons[i].rect.w, buttons[i].rect.h, buttons[i].selected);
+        /*printf("Button %d: rect=(%d, %d, %d, %d), selected=%d\n",
+               i, buttons[i].rect.x, buttons[i].rect.y, buttons[i].rect.w, buttons[i].rect.h, buttons[i].selected);*/
     }
 
-    printf("All buttons rendered !!\n");
+    //printf("All buttons rendered !!\n");
 
     SDL_Flip(screen);
+}
+void cleanupMenuPrincipal(Menu *menu) {
+    for (int i = 0; i < menu->n_btns; i++) {
+        if (menu->buttons[i].normalImage) {
+            SDL_FreeSurface(menu->buttons[i].normalImage);
+            menu->buttons[i].normalImage = NULL;
+        }
+        if (menu->buttons[i].hoverImage) {
+            SDL_FreeSurface(menu->buttons[i].hoverImage);
+            menu->buttons[i].hoverImage = NULL;
+        }
+    }
+    free(menu->buttons);
+    menu->buttons = NULL;
 }
 
 void handleEventPrincipalMenu(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {

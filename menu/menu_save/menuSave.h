@@ -20,6 +20,7 @@ void renderMenuSave(SDL_Surface *background, SDL_Surface *screen, TTF_Font *font
 void renderMenuChooseSave(SDL_Surface *background, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns);
 void handleEventSaveMenu(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
 void handleEventChooseSaveMenu(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
+void cleanupMenuSave(Menu *menu) ;
 
 #endif
 

@@ -15,12 +15,27 @@ typedef struct {
     int correctOption;
 } Question;
 
+
+// MenuEnigme Functions
 void initMenuEnigme(Menu *menus);
 void initMenuEnigmeButtons(Button *buttons);
-void displayQuizUI(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns);
 void renderMenuEnigme(SDL_Surface *background, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns);
 void handleEventEnigme(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
+void cleanupMenuEnigme(Menu *menu) ;
+
+// QuizEnigme Functions
 void loadQuestions(const char *filename, Question *questions, int *numQuestions);
+void renderQuizUI(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns);
+void handleQuizEvent(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
 void checkAnswer(int selectedOption, int correctOption, int *score, int *lives, int *level, int *menuState);
+void displayQuizUI(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns);
+
+// PuzzleEnigme Functions
+/*void renderPuzzle(SDL_Surface *screen);
+void handlePuzzleEvent(SDL_Event event, int *menuState, SDL_Surface *screen);
+void updatePuzzleTimer(int *menuState, SDL_Surface *screen);
+void displayRotozoomMessage(SDL_Surface *message, SDL_Surface *screen);*/
+
+
 
 #endif

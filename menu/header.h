@@ -6,6 +6,8 @@
 #include <SDL/SDL_ttf.h>
 #include <SDL/SDL_image.h>
 
+
+
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
 #define N_BTNS 4
@@ -23,6 +25,8 @@
 #define MENU_CHOOSE_PLAYER 6
 #define MENU_BEST_SCORE 7
 #define MENU_ENIGME 8
+#define MENU_QUIZ 9
+#define MENU_PUZZLE 10
 
 typedef struct {
     SDL_Surface *normalImage;
@@ -50,6 +54,6 @@ void renderButton(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Butt
 
 void init_menus(Menu *menus);
 
-void cleanup(Mix_Chunk *hoverSound, Mix_Music *musique, SDL_Surface *background, TTF_Font *font);
+void cleanup(Mix_Chunk *hoverSound, Mix_Music *musique, SDL_Surface *background, TTF_Font *font , Menu *menus);
 
 #endif

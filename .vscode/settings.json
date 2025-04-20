@@ -4,6 +4,7 @@
         "header.h": "c",
         "main.h": "c",
         "menuenigme.h": "c",
-        "unistd.h": "c"
+        "unistd.h": "c",
+        "menubestscore.h": "c"
     }
 }

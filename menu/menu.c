@@ -1,10 +1,10 @@
 #include "header.h"
 #include "menu_save/menuSave.h"
+#include "menu_option/menuOption.h"
 #include "menu_best_score/menuBestScore.h"
 #include "menu_joueur/menuJoueur.h"
-#include "menu_principal/menuPrincipal.h"
-#include "menu_option/menuOption.h"
 #include "menu_enigme/menuEnigme.h"
+#include "menu_principal/menuPrincipal.h"
 
 SDL_Surface* init_screen() {
     SDL_Surface *screen;  
@@ -72,7 +72,7 @@ void renderButton(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Butt
 
 void init_menus(Menu *menus){
     int working_menus[7] = {MENU_SAVE, MENU_NEW_LOAD_SAVE, MENU_BEST_SCORE, MENU_PLAYER, MENU_PRINCIPAL, MENU_OPTION ,MENU_ENIGME};
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 9; i++) {
         if (working_menus[i] == MENU_SAVE) {
             initMenuSave(menus);
         } else if (working_menus[i] == MENU_NEW_LOAD_SAVE) {
@@ -97,14 +97,26 @@ Mix_Music* load_music(const char* filename) {
     }
     return music;
 }
+void cleanupMenus(Menu *menus) {
+    cleanupMenuPrincipal(&menus[MENU_PRINCIPAL]);
+    cleanupMenuSave(&menus[MENU_SAVE]);
+    cleanupMenuOption(&menus[MENU_OPTION]);
+    cleanupMenuBestScore(&menus[MENU_BEST_SCORE]);
+    cleanupMenuJoueur(&menus[MENU_PLAYER]);
+    cleanupMenuEnigme(&menus[MENU_ENIGME]);
+    // Add cleanup calls for other menus as needed
+}
 
-void cleanup(Mix_Chunk *hoverSound, Mix_Music *musique, SDL_Surface *background, TTF_Font *font) {
+void cleanup(Mix_Chunk *hoverSound, Mix_Music *musique, SDL_Surface *background, TTF_Font *font, Menu *menus) {
+    cleanupMenus(menus); // Free all menus
     Mix_FreeChunk(hoverSound);
     hoverSound = NULL;
     Mix_FreeMusic(musique);
-    Mix_CloseAudio();
+    musique = NULL;
     SDL_FreeSurface(background);
+    background = NULL;
     TTF_CloseFont(font);
+    font = NULL;
     TTF_Quit();
     SDL_Quit();
 }
@@ -119,7 +131,7 @@ int main() {
     background = load_image("./assets/game/background.png"); 
     TTF_Font *font;
     font = load_font("./assets/fonts/font.ttf");
-    SDL_Color textColor = {255, 255, 255, 255}; // black text
+    SDL_Color textColor = {255, 255, 255, 255}; // white text
     Mix_Chunk *hoverSound;
     Mix_Music *musique = load_music("./assets/music/30-hours.mp3");;
     hoverSound = load_sound("./assets/sounds/beep.wav"); 
@@ -151,6 +163,6 @@ int main() {
         //SDL_Delay(16);
     }
 
-    cleanup(hoverSound, musique, background, font);
+    cleanup(hoverSound, musique, background, font, menus);
     return 0;
 }

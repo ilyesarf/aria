@@ -19,7 +19,7 @@ SRCS = $(SRC_DIR)/menu.c \
 	   $(MENU_PLAYER_DIR)/menuJoueur.c \
 	   $(MENU_PRINCIPAL_DIR)/menuPrincipal.c \
 	   $(MENU_OPTION_DIR)/menuOption.c \
-       $(MENU_ENIGME_DIR)/menuEnigme.c
+       $(MENU_ENIGME_DIR)/menuEnigme.c \
 
 # Object files
 OBJS = $(SRCS:.c=.o)
