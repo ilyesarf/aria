@@ -1,8 +1,4 @@
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-#include <SDL/SDL_mixer.h>
-#include <SDL/SDL_ttf.h>
-#include <stdio.h>
+
 #include "menuPrincipal.h"
 #include "../header.h"
 
@@ -42,8 +38,12 @@ void renderMenuPrincipal(SDL_Surface *background, SDL_Surface *screen, TTF_Font 
     SDL_BlitSurface(background, NULL, screen, NULL);
 
     for (int i = 0; i < n_btns; i++) {
-        renderButton(screen, font, textColor, buttons[i]);
+        renderButton(screen, font, textColor, buttons[i]);     
+        printf("Button %d: rect=(%d, %d, %d, %d), selected=%d\n",
+               i, buttons[i].rect.x, buttons[i].rect.y, buttons[i].rect.w, buttons[i].rect.h, buttons[i].selected);
     }
+
+    printf("All buttons rendered !!\n");
 
     SDL_Flip(screen);
 }

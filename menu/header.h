@@ -50,4 +50,6 @@ void renderButton(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Butt
 
 void init_menus(Menu *menus);
 
+void cleanup(Mix_Chunk *hoverSound, Mix_Music *musique, SDL_Surface *background, TTF_Font *font);
+
 #endif

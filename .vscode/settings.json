@@ -3,6 +3,7 @@
         "*.py": "python",
         "header.h": "c",
         "main.h": "c",
-        "menuenigme.h": "c"
+        "menuenigme.h": "c",
+        "unistd.h": "c"
     }
 }
