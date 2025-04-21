@@ -72,7 +72,7 @@ void renderButton(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Butt
 
 void init_menus(Menu *menus){
     int working_menus[7] = {MENU_SAVE, MENU_NEW_LOAD_SAVE, MENU_BEST_SCORE, MENU_PLAYER, MENU_PRINCIPAL, MENU_OPTION ,MENU_ENIGME};
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < 7; i++) {
         if (working_menus[i] == MENU_SAVE) {
             initMenuSave(menus);
         } else if (working_menus[i] == MENU_NEW_LOAD_SAVE) {

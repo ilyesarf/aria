@@ -31,10 +31,11 @@ void checkAnswer(int selectedOption, int correctOption, int *score, int *lives, 
 void displayQuizUI(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns);
 
 // PuzzleEnigme Functions
-/*void renderPuzzle(SDL_Surface *screen);
+void renderPuzzle(SDL_Surface *screen);
 void handlePuzzleEvent(SDL_Event event, int *menuState, SDL_Surface *screen);
 void updatePuzzleTimer(int *menuState, SDL_Surface *screen);
-void displayRotozoomMessage(SDL_Surface *message, SDL_Surface *screen);*/
+void displayRotozoomMessage(SDL_Surface *message, SDL_Surface *screen);
+//void shufflePieces() ;
 
 
 

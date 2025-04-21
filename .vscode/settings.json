@@ -5,6 +5,7 @@
         "main.h": "c",
         "menuenigme.h": "c",
         "unistd.h": "c",
-        "menubestscore.h": "c"
+        "menubestscore.h": "c",
+        "sdl_rotozoom.h": "c"
     }
 }
