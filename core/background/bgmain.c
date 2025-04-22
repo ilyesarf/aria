@@ -1,4 +1,4 @@
-#include "background.h"
+#include "bgmain.h"
 #include <time.h>
 
 int main() {

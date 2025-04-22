@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -g `sdl-config --cflags`
 LDFLAGS = `sdl-config --libs` -lSDL_image
 TARGET = bgtest
-SRCS = bgmain.c background.c
+SRCS = bgmain.c bgsource.c
 
 all:
     $(CC) $(CFLAGS) -o $(TARGET) $(SRCS) $(LDFLAGS)

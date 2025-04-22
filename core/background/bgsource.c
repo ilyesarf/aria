@@ -1,9 +1,14 @@
-#include "background.h"
+#include "bgmain.h"
 
 void init_background(Background *bg, const char *image_path, int level) {
     bg->image = IMG_Load(image_path);
     if (!bg->image) {
-        fprintf(stderr, "Failed to load background image: %s\n", IMG_GetError());
+        fprintf(stderr, "Failed to load background image '%s': %s\n", image_path, IMG_GetError());
+        exit(EXIT_FAILURE);
+    }
+    bg->platforms = malloc(bg->platform_count * sizeof(Platform));
+    if (!bg->platforms) {
+        fprintf(stderr, "Failed to allocate memory for platforms\n");
         exit(EXIT_FAILURE);
     }
 
@@ -16,7 +21,13 @@ void init_background(Background *bg, const char *image_path, int level) {
     } else if (level == 2) {
         bg->platform_count = 5;
         bg->platforms = malloc(bg->platform_count * sizeof(Platform));
-        // Initialize platforms for Level 2
+        if (!bg->platforms) {
+            fprintf(stderr, "Failed to allocate memory for platforms\n");
+            exit(EXIT_FAILURE);
+        }
+        for (int i = 0; i < bg->platform_count; i++) {
+            bg->platforms[i] = (Platform){0, 0, 100, 20, 'F'}; // Example initialization
+        }
     }
 }
 
@@ -33,8 +44,12 @@ void display_background(const Background *bg, SDL_Surface *screen) {
 void free_background(Background *bg) {
     if (bg->image) {
         SDL_FreeSurface(bg->image);
+        bg->image = NULL;
     }
-    free(bg->platforms);
+    if (bg->platforms) {
+        free(bg->platforms);
+        bg->platforms = NULL;
+    }
 }
 
 void scroll_background(Background *bg, int dx, int dy) {
