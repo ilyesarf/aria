@@ -7,7 +7,7 @@ int main() {
     IMG_Init(IMG_INIT_PNG);
 
     Background bg;
-    time_t start_time = time(NULL);
+    //time_t start_time = time(NULL);
 
     // Initialize background with a PNG file
     init_background(&bg, "./assets/game/background.png", 1);

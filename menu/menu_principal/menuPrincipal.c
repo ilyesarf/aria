@@ -6,6 +6,10 @@ void initMenuPrincipal(Menu *menus) {
     printf("Init Menu Principal\n");
     menus[MENU_PRINCIPAL].n_btns = 4;
     menus[MENU_PRINCIPAL].buttons = malloc(menus[MENU_PRINCIPAL].n_btns * sizeof(Button)); // Allocate memory for buttons
+    if (!menus[MENU_PRINCIPAL].buttons) {
+        fprintf(stderr, "Failed to allocate memory for buttons\n");
+        exit(EXIT_FAILURE);
+    }
     menus[MENU_PRINCIPAL].init_buttons = initMenuPrincipalButtons;
     menus[MENU_PRINCIPAL].render = renderMenuPrincipal;
     menus[MENU_PRINCIPAL].handleEvent = handleEventPrincipalMenu;

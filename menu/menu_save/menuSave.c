@@ -4,8 +4,11 @@
 void initMenuSave(struct Menu *menus){
     printf("Init Menu Save\n");
     menus[MENU_SAVE].n_btns = 2;
-
     menus[MENU_SAVE].buttons = malloc(menus[MENU_SAVE].n_btns * sizeof(Button)); // Allocate memory for buttons
+    if (!menus[MENU_SAVE].buttons) {
+        fprintf(stderr, "Failed to allocate memory for buttons\n");
+        exit(EXIT_FAILURE);
+    }
     menus[MENU_SAVE].init_buttons = initMenuSaveButtons;
     menus[MENU_SAVE].render = renderMenuSave;
     menus[MENU_SAVE].handleEvent = handleEventSaveMenu;

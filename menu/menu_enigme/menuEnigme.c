@@ -1,6 +1,5 @@
 #include "menuEnigme.h"
 #include "../header.h"
-#include <SDL/SDL_rotozoom.h> // For rotozoom effect
 
 // Global variables for quiz
 static int currentQuestionIndex = -1;

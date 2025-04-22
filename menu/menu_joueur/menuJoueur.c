@@ -8,6 +8,11 @@ void initMenuJoueur(Menu *menus) {
     printf("Init Menu Joueur\n");
     menus[MENU_PLAYER].n_btns = 9;
     menus[MENU_PLAYER].buttons = malloc(menus[MENU_PLAYER].n_btns * sizeof(Button)); // Allocate memory for buttons
+    if (!menus[MENU_PLAYER].buttons) {
+        fprintf(stderr, "Failed to allocate memory for buttons\n");
+        exit(EXIT_FAILURE);
+    }
+
     menus[MENU_PLAYER].init_buttons = initMenuJoueurButtons;
     menus[MENU_PLAYER].render = renderMenuJoueur;
     menus[MENU_PLAYER].handleEvent = handleEventJoueurMenu;

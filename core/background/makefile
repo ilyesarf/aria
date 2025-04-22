@@ -1,11 +1,30 @@
 CC = gcc
-CFLAGS = -Wall -g `sdl-config --cflags`
-LDFLAGS = `sdl-config --libs` -lSDL_image
-TARGET = bgtest
-SRCS = bgmain.c bgsource.c
+CFLAGS = -Wall -Wextra -Werror -Wno-error=unused-parameter `sdl-config --cflags` -g
+LDLIBS = -lSDL -lSDL_image
 
-all:
-    $(CC) $(CFLAGS) -o $(TARGET) $(SRCS) $(LDFLAGS)
+# Directories
+SRC_DIR = .
+BIN_DIR = ../../bin
+
+# Source files
+SRCS = $(SRC_DIR)/bgmain.c \
+	   $(SRC_DIR)/bgsource.c
+
+# Object files
+OBJS = $(SRCS:.c=.o)
+
+# Executable
+TARGET = $(BIN_DIR)/bgtest
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)  # <-- This line starts with a tab
+
+%.o: %.c %.h
+	$(CC) $(CFLAGS) -c $< -o $@  # <-- This line starts with a tab
 
 clean:
-    rm -f $(TARGET)
+	rm -f $(OBJS) $(TARGET)  # <-- This line starts with a tab
+
+re: clean all

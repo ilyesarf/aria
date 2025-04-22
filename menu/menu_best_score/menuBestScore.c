@@ -13,6 +13,11 @@ void initMenuBestScore(Menu *menus) {
     printf("Init Menu Best Score\n");
     menus[MENU_BEST_SCORE].n_btns = 3;
     menus[MENU_BEST_SCORE].buttons = malloc(menus[MENU_BEST_SCORE].n_btns * sizeof(Button)); // Allocate memory for buttons
+    if (!menus[MENU_BEST_SCORE].buttons) {
+        fprintf(stderr, "Failed to allocate memory for buttons\n");
+        exit(EXIT_FAILURE);
+    }
+
     menus[MENU_BEST_SCORE].init_buttons = initMenuBestScoreButtons;
     menus[MENU_BEST_SCORE].render = renderMenuBestScore;
     menus[MENU_BEST_SCORE].handleEvent = handleEventBestScore;

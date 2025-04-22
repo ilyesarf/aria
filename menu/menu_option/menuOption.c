@@ -8,6 +8,11 @@ void initMenuOption(Menu *menus) {
     printf("Init Menu Option\n");
     menus[MENU_OPTION].n_btns = 5;
     menus[MENU_OPTION].buttons = malloc(menus[MENU_OPTION].n_btns * sizeof(Button)); // Allocate memory for buttons
+    if (!menus[MENU_OPTION].buttons) {
+        fprintf(stderr, "Failed to allocate memory for buttons\n");
+        exit(EXIT_FAILURE);
+    }
+
     menus[MENU_OPTION].init_buttons = initMenuOptionButtons;
     menus[MENU_OPTION].render = renderMenuOption;
     menus[MENU_OPTION].handleEvent = handleEventOptionMenu;
