@@ -10,8 +10,8 @@
 int main()
 {	
 		int continuer=1,done=1;
-	SDL_Surface *screen,*backg,*backgm,*enig;
-	SDL_Rect backg_pos,backgm_pos,enigpos;
+	SDL_Surface *screen,*backg,*backgm;
+	SDL_Rect backg_pos,backgm_pos;
 	
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
 
@@ -21,9 +21,6 @@ int main()
 		printf("unable to set video mode:%s\n",SDL_GetError());
 		return 1;
 	}
-	enig = IMG_Load("1.jpg");
-	enigpos.x=0;
-	enigpos.y=0;
 	
 	backg = SDL_LoadBMP("backgg1.bmp");
 	backg_pos.x = 0;
@@ -32,12 +29,10 @@ int main()
 //initialisation du temps et de map et du perso 
 
 	Time temps;
-	Time tempsenig;
 	map m;
 	personne p;
 	
 	inittemps(&temps);
-	inittempsenig(&tempsenig);
 	initialiser_map (&m,screen,&p) ;
 	initialiserperso(&p);
 	
@@ -57,13 +52,7 @@ int main()
             {
             case SDLK_k:{
 		while(done){
-		update_timeenig(&tempsenig);
-		SDL_BlitSurface(enig,NULL,screen,&enigpos);
-		displaytime(tempsenig,screen);
-		SDL_Flip(screen);
-		if(tempsenig.ss==15)
-		{done=0;
-		}
+		
 		}}
                 break ;
 	case SDLK_c:
@@ -86,10 +75,7 @@ int main()
 		SDL_Flip(screen);
 		SDL_Delay(100);
 	}
-	sauvegarder(300,"mouard","test.txt");
-	char* nomjoueur;
-	int score;
-	meilleur ("test.txt",score,nomjoueur);
+	
 	freeTexttime(temps.temps);
 	free_perso(p);
 	SDL_Quit();
