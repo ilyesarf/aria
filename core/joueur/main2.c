@@ -46,120 +46,137 @@ initCharacter3(&player3);
 initialize_backg(backg);
 initialize_btn1(btn1);
 initialize_btn2(btn2);
+initBalls();
 
 while(!done){
 
 //display --------------------
 switch(interface){
-	case 0:  //sub menu
-	display_backg(screen,backg[0]);
+case 0:  //sub menu
+display_backg(screen,backg[0]);
       break;
-      	case 1: // game
-		t_prev=SDL_GetTicks();
-		display_player(screen,&player);
-		if(i.ash1==1){
-		display_player2(screen,&player2);}
-		if(i.spark1==1){
-		display_player3(screen,&player3);
+      case 1: // game
+t_prev=SDL_GetTicks();
+display_player(screen,&player);
+displayBalls(screen);
+if(i.ash1==1){
+display_player2(screen,&player2);
+updateBalls(screen);}
+if(i.spark1==1){
+display_player3(screen,&player3);
 }
-	break;
-	case 2:
-		display_backg(screen,backg[1]);
+break;
+case 2:
+display_backg(screen,backg[1]);
 
 
-	break;
-	case 3:
-		t_prev=SDL_GetTicks();
-		display_player(screen,&player);
-	break;
-	case 4:
-		display_backg(screen,backg[2]);
-	break;
+break;
+case 3:
+t_prev=SDL_GetTicks();
+display_player(screen,&player);
+      displayBalls(screen);
+break;
+case 4:
+display_backg(screen,backg[2]);
+break;
 }
 
 /// input
-		get_input(&i,k);
-
-
+get_input(&i,k);
+if ((interface == 1 || interface == 3) && i.h) {
+            createBall(&player);
+            i.h = 0;
+        }
+if ( interface == 1 && i.j) {
+  if(i.ash1==1){
+            createBall(&player2);
+            i.j = 0;
+        }
+}
 //update/*
 switch(interface){
-	case 0:  //sub menu
+case 0:  //sub menu
             if (i.interface==1){
-			interface =1;}
-		else if(i.interface==2){
-		interface=2;}
-		else if(i.interface==3){
-		interface=3;
+interface =1;}
+else if(i.interface==2){
+interface=2;}
+else if(i.interface==3){
+interface=3;
 }
         break;
 //2players
         case 1:
-		if(k==1){ 
-		get_keyp2(&i);
+if(k==1){
+get_keyp2(&i);
 }
 
-		animation(&player,i);
+animation(&player,i);
 
-		jump_character(&i, &player,&jump_height);
+jump_character(&i, &player,&jump_height);
+updateBalls();
 
 
-		if(i.ash1==1){ 
-		move_character(&i, &player,&player2,dt);
-		jump_character2(&i, &player2,&jump_height2);
-		animation2(&player2,i);
+
+if(i.ash1==1){
+move_character(&i, &player,&player2,dt);
+jump_character2(&i, &player2,&jump_height2);
+animation2(&player2,i);
+updateBalls();
 }
-		if(i.spark1==1){
-		move_character(&i, &player,&player3,dt);
-		jump_character2(&i, &player3,&jump_height2);
+if(i.spark1==1){
+move_character(&i, &player,&player3,dt);
+jump_character2(&i, &player3,&jump_height2);
 }
 
 
-	break;
-	case 2:
+break;
+case 2:
 //joystick or keyboard
-		if(i.c1==1){
-		display_btn1(screen,btn1[0]);
-		k=0;
+if(i.c1==1){
+display_btn1(screen,btn1[0]);
+k=0;
 
 
-		}
-		if(i.k1==1){
-		display_btn1(screen,btn1[1]);
-		k=1;
 }
-	if(i.interface==4){
-	interface=4;	
+if(i.k1==1){
+display_btn1(screen,btn1[1]);
+k=1;
 }
-	break;
+if(i.interface==4){
+interface=4;
+}
+break;
 //1 player
-	case 3:
+case 3:
 
-		animation(&player,i);
-		jump_character(&i, &player,&jump_height);
-		move_character(&i, &player,&player2,dt);
+animation(&player,i);
+jump_character(&i, &player,&jump_height);
+move_character(&i, &player,&player2,dt);
+updateBalls();
 
-	break;
-	case 4:
-		if(i.spark1==1){
-		display_btn2(screen,btn2[0]);
+break;
+case 4:
+if(i.spark1==1){
+display_btn2(screen,btn2[0]);
 
-		}
-		if(i.ash1==1){
-		display_btn2(screen,btn2[1]);
 }
-		if(i.interface==1){
-		interface=1;
+if(i.ash1==1){
+display_btn2(screen,btn2[1]);
 }
-	break;
+if(i.interface==1){
+interface=1;
 }
-		SDL_Flip(screen); 
-		SDL_Delay(10);
-		dt=SDL_GetTicks()-t_prev;
+break;
+}
+SDL_Flip(screen);
+SDL_Delay(10);
+dt=SDL_GetTicks()-t_prev;
 
 }
 
 free_player(&player);
 free_player(&player2);
 SDL_Quit();
+freeBalls();
 return 0;
 }
