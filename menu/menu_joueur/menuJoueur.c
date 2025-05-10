@@ -1,8 +1,4 @@
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-#include <SDL/SDL_mixer.h>
-#include <SDL/SDL_ttf.h>
-#include <stdio.h>
+
 #include "menuJoueur.h"
 #include "../header.h"
 
@@ -12,6 +8,11 @@ void initMenuJoueur(Menu *menus) {
     printf("Init Menu Joueur\n");
     menus[MENU_PLAYER].n_btns = 9;
     menus[MENU_PLAYER].buttons = malloc(menus[MENU_PLAYER].n_btns * sizeof(Button)); // Allocate memory for buttons
+    if (!menus[MENU_PLAYER].buttons) {
+        fprintf(stderr, "Failed to allocate memory for buttons\n");
+        exit(EXIT_FAILURE);
+    }
+
     menus[MENU_PLAYER].init_buttons = initMenuJoueurButtons;
     menus[MENU_PLAYER].render = renderMenuJoueur;
     menus[MENU_PLAYER].handleEvent = handleEventJoueurMenu;
@@ -117,4 +118,18 @@ void handleEventJoueurMenu(int *menuState, SDL_Event event, Button *buttons, int
             }
         }
     }
+}
+void cleanupMenuJoueur(Menu *menu) {
+    for (int i = 0; i < menu->n_btns; i++) {
+        if (menu->buttons[i].normalImage) {
+            SDL_FreeSurface(menu->buttons[i].normalImage);
+            menu->buttons[i].normalImage = NULL;
+        }
+        if (menu->buttons[i].hoverImage) {
+            SDL_FreeSurface(menu->buttons[i].hoverImage);
+            menu->buttons[i].hoverImage = NULL;
+        }
+    }
+    free(menu->buttons);
+    menu->buttons = NULL;
 }

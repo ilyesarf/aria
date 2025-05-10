@@ -1,14 +1,19 @@
 #include "header.h"
 #include "menu_save/menuSave.h"
+#include "menu_option/menuOption.h"
 #include "menu_best_score/menuBestScore.h"
 #include "menu_joueur/menuJoueur.h"
-#include "menu_principal/menuPrincipal.h"
-#include "menu_option/menuOption.h"
 #include "menu_enigme/menuEnigme.h"
+#include "menu_principal/menuPrincipal.h"
 
+const int working_menus[7] = {MENU_SAVE, MENU_NEW_LOAD_SAVE, MENU_BEST_SCORE, MENU_PLAYER, MENU_PRINCIPAL, MENU_OPTION ,MENU_ENIGME};
 SDL_Surface* init_screen() {
     SDL_Surface *screen;  
     screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 32, SDL_SWSURFACE);
+    if (!screen){
+        printf("Error init screen !!\n");
+        exit(1);
+    }
     SDL_WM_SetCaption("JEU", NULL);
     return screen;
 }
@@ -18,10 +23,10 @@ void init_audio() {
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
 }
 
-SDL_Surface* load_image(char *filename) {
+SDL_Surface *load_image(char *filename) {
     SDL_Surface *image = IMG_Load(filename);
     if (image == NULL) {
-        printf("Error opening image: %s!! \n\n", filename);
+        printf("Error opening image: %s: %s\n", filename, IMG_GetError());
         exit(1);
     }
     return image;
@@ -67,7 +72,6 @@ void renderButton(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Butt
 }
 
 void init_menus(Menu *menus){
-    int working_menus[7] = {MENU_SAVE, MENU_NEW_LOAD_SAVE, MENU_BEST_SCORE, MENU_PLAYER, MENU_PRINCIPAL, MENU_OPTION ,MENU_ENIGME};
     for (int i = 0; i < 7; i++) {
         if (working_menus[i] == MENU_SAVE) {
             initMenuSave(menus);
@@ -86,6 +90,8 @@ void init_menus(Menu *menus){
         }
     }
 }
+
+
 Mix_Music* load_music(const char* filename) {
     Mix_Music* music = Mix_LoadMUS(filename);
     if (!music) {
@@ -93,10 +99,37 @@ Mix_Music* load_music(const char* filename) {
     }
     return music;
 }
+void cleanupMenus(Menu *menus) {
+    cleanupMenuPrincipal(&menus[MENU_PRINCIPAL]);
+    cleanupMenuSave(&menus[MENU_SAVE]);
+    cleanupMenuOption(&menus[MENU_OPTION]);
+    cleanupMenuBestScore(&menus[MENU_BEST_SCORE]);
+    cleanupMenuJoueur(&menus[MENU_PLAYER]);
+    cleanupMenuEnigme(&menus[MENU_ENIGME]);
+    // Add cleanup calls for other menus as needed
+}
+
+void cleanup(Mix_Chunk *hoverSound, Mix_Music *musique, SDL_Surface *background, TTF_Font *font, Menu *menus) {
+    cleanupMenus(menus); // Free all menus
+    Mix_FreeChunk(hoverSound);
+    hoverSound = NULL;
+    Mix_FreeMusic(musique);
+    musique = NULL;
+    SDL_FreeSurface(background);
+    background = NULL;
+    TTF_CloseFont(font);
+    font = NULL;
+    TTF_Quit();
+    SDL_Quit();
+}
 
 int main() {
     SDL_Surface *screen; 
     screen = init_screen();
+    if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
+        printf("Failed to initialize SDL_image: %s\n", IMG_GetError());
+        exit(1);
+    }
     init_audio();
     TTF_Init();
     SDL_EnableUNICODE(1); // Enable Unicode translation for keyboard input
@@ -104,9 +137,10 @@ int main() {
     background = load_image("./assets/game/background.png"); 
     TTF_Font *font;
     font = load_font("./assets/fonts/font.ttf");
-    SDL_Color textColor = {0, 0, 0, 0}; // black text
+    SDL_Color textColor = {255, 255, 255, 255}; // white text
+    Mix_Music *musique;
     Mix_Chunk *hoverSound;
-    Mix_Music *musique = load_music("./assets/music/30-hours.mp3");;
+    musique = load_music("./assets/music/30-hours.mp3");;
     hoverSound = load_sound("./assets/sounds/beep.wav"); 
     int volume = 50; // Initial volume (50%)
 
@@ -117,7 +151,7 @@ int main() {
     Menu menus[N_MENUS];
     init_menus(menus);
 
-    int menuState = MENU_PRINCIPAL; // Changed initial menuState to MENU_PRINCIPAL
+    int menuState = MENU_SAVE; // Changed initial menuState to MENU_PRINCIPAL
 
     while (menuState != QUIT_GAME) {
         SDL_Event event;
@@ -136,6 +170,6 @@ int main() {
         //SDL_Delay(16);
     }
 
-    cleanup(hoverSound, background, font);
+    cleanup(hoverSound, musique, background, font, menus);
     return 0;
 }

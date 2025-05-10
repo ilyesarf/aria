@@ -1,9 +1,3 @@
-#include <SDL/SDL.h>//inclure SDL.h  pour permettre au programme d'être portable sur tous les systèmes.
-#include <SDL/SDL_image.h>//.................//Pour manipuler des images ayants des types autre que bmp
-#include <SDL/SDL_mixer.h>//.................//Pour manipuler de l’audio.
-#include <SDL/SDL_ttf.h>//.................//Pour manipuler des textes
-#include <stdio.h>
-#include <unistd.h>
 
 #include "menuBestScore.h"
 #include "../header.h"
@@ -19,6 +13,11 @@ void initMenuBestScore(Menu *menus) {
     printf("Init Menu Best Score\n");
     menus[MENU_BEST_SCORE].n_btns = 3;
     menus[MENU_BEST_SCORE].buttons = malloc(menus[MENU_BEST_SCORE].n_btns * sizeof(Button)); // Allocate memory for buttons
+    if (!menus[MENU_BEST_SCORE].buttons) {
+        fprintf(stderr, "Failed to allocate memory for buttons\n");
+        exit(EXIT_FAILURE);
+    }
+
     menus[MENU_BEST_SCORE].init_buttons = initMenuBestScoreButtons;
     menus[MENU_BEST_SCORE].render = renderMenuBestScore;
     menus[MENU_BEST_SCORE].handleEvent = handleEventBestScore;
@@ -163,5 +162,19 @@ void loadScores(ScoreEntry scores[]) {
             scores[i].score = 0;
         }
     }
+}
+void cleanupMenuBestScore(Menu *menu) {
+    for (int i = 0; i < menu->n_btns; i++) {
+        if (menu->buttons[i].normalImage) {
+            SDL_FreeSurface(menu->buttons[i].normalImage);
+            menu->buttons[i].normalImage = NULL;
+        }
+        if (menu->buttons[i].hoverImage) {
+            SDL_FreeSurface(menu->buttons[i].hoverImage);
+            menu->buttons[i].hoverImage = NULL;
+        }
+    }
+    free(menu->buttons);
+    menu->buttons = NULL;
 }
 

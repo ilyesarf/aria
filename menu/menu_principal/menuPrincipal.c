@@ -1,8 +1,4 @@
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-#include <SDL/SDL_mixer.h>
-#include <SDL/SDL_ttf.h>
-#include <stdio.h>
+
 #include "menuPrincipal.h"
 #include "../header.h"
 
@@ -10,6 +6,10 @@ void initMenuPrincipal(Menu *menus) {
     printf("Init Menu Principal\n");
     menus[MENU_PRINCIPAL].n_btns = 4;
     menus[MENU_PRINCIPAL].buttons = malloc(menus[MENU_PRINCIPAL].n_btns * sizeof(Button)); // Allocate memory for buttons
+    if (!menus[MENU_PRINCIPAL].buttons) {
+        fprintf(stderr, "Failed to allocate memory for buttons\n");
+        exit(EXIT_FAILURE);
+    }
     menus[MENU_PRINCIPAL].init_buttons = initMenuPrincipalButtons;
     menus[MENU_PRINCIPAL].render = renderMenuPrincipal;
     menus[MENU_PRINCIPAL].handleEvent = handleEventPrincipalMenu;
@@ -42,10 +42,28 @@ void renderMenuPrincipal(SDL_Surface *background, SDL_Surface *screen, TTF_Font 
     SDL_BlitSurface(background, NULL, screen, NULL);
 
     for (int i = 0; i < n_btns; i++) {
-        renderButton(screen, font, textColor, buttons[i]);
+        renderButton(screen, font, textColor, buttons[i]);     
+        /*printf("Button %d: rect=(%d, %d, %d, %d), selected=%d\n",
+               i, buttons[i].rect.x, buttons[i].rect.y, buttons[i].rect.w, buttons[i].rect.h, buttons[i].selected);*/
     }
 
+    //printf("All buttons rendered !!\n");
+
     SDL_Flip(screen);
+}
+void cleanupMenuPrincipal(Menu *menu) {
+    for (int i = 0; i < menu->n_btns; i++) {
+        if (menu->buttons[i].normalImage) {
+            SDL_FreeSurface(menu->buttons[i].normalImage);
+            menu->buttons[i].normalImage = NULL;
+        }
+        if (menu->buttons[i].hoverImage) {
+            SDL_FreeSurface(menu->buttons[i].hoverImage);
+            menu->buttons[i].hoverImage = NULL;
+        }
+    }
+    free(menu->buttons);
+    menu->buttons = NULL;
 }
 
 void handleEventPrincipalMenu(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {

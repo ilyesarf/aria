@@ -4,8 +4,11 @@
 void initMenuSave(struct Menu *menus){
     printf("Init Menu Save\n");
     menus[MENU_SAVE].n_btns = 2;
-
     menus[MENU_SAVE].buttons = malloc(menus[MENU_SAVE].n_btns * sizeof(Button)); // Allocate memory for buttons
+    if (!menus[MENU_SAVE].buttons) {
+        fprintf(stderr, "Failed to allocate memory for buttons\n");
+        exit(EXIT_FAILURE);
+    }
     menus[MENU_SAVE].init_buttons = initMenuSaveButtons;
     menus[MENU_SAVE].render = renderMenuSave;
     menus[MENU_SAVE].handleEvent = handleEventSaveMenu;
@@ -100,6 +103,20 @@ void handleEventSaveMenu(int *menuState, SDL_Event event, Button *buttons, int n
         }
     }
 }
+void cleanupMenuSave(Menu *menu) {
+    for (int i = 0; i < menu->n_btns; i++) {
+        if (menu->buttons[i].normalImage) {
+            SDL_FreeSurface(menu->buttons[i].normalImage);
+            menu->buttons[i].normalImage = NULL;
+        }
+        if (menu->buttons[i].hoverImage) {
+            SDL_FreeSurface(menu->buttons[i].hoverImage);
+            menu->buttons[i].hoverImage = NULL;
+        }
+    }
+    free(menu->buttons);
+    menu->buttons = NULL;
+}
 
 void handleEventChooseSaveMenu(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
     while (SDL_PollEvent(&event)) {
@@ -139,10 +156,4 @@ void handleEventChooseSaveMenu(int *menuState, SDL_Event event, Button *buttons,
     }
 }
 
-void cleanup(Mix_Chunk *hoverSound, SDL_Surface *background, TTF_Font *font) {
-    Mix_FreeChunk(hoverSound);
-    SDL_FreeSurface(background);
-    TTF_CloseFont(font);
-    TTF_Quit();
-    SDL_Quit();
-}
+

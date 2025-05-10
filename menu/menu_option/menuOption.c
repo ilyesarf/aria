@@ -1,8 +1,4 @@
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-#include <SDL/SDL_mixer.h>
-#include <SDL/SDL_ttf.h>
-#include <stdio.h>
+
 #include "menuOption.h"
 #include "../header.h"
 
@@ -12,6 +8,11 @@ void initMenuOption(Menu *menus) {
     printf("Init Menu Option\n");
     menus[MENU_OPTION].n_btns = 5;
     menus[MENU_OPTION].buttons = malloc(menus[MENU_OPTION].n_btns * sizeof(Button)); // Allocate memory for buttons
+    if (!menus[MENU_OPTION].buttons) {
+        fprintf(stderr, "Failed to allocate memory for buttons\n");
+        exit(EXIT_FAILURE);
+    }
+
     menus[MENU_OPTION].init_buttons = initMenuOptionButtons;
     menus[MENU_OPTION].render = renderMenuOption;
     menus[MENU_OPTION].handleEvent = handleEventOptionMenu;
@@ -70,6 +71,20 @@ void renderMenuOption(SDL_Surface *background, SDL_Surface *screen, TTF_Font *fo
 
 
     SDL_Flip(screen);
+}
+void cleanupMenuOption(Menu *menu) {
+    for (int i = 0; i < menu->n_btns; i++) {
+        if (menu->buttons[i].normalImage) {
+            SDL_FreeSurface(menu->buttons[i].normalImage);
+            menu->buttons[i].normalImage = NULL;
+        }
+        if (menu->buttons[i].hoverImage) {
+            SDL_FreeSurface(menu->buttons[i].hoverImage);
+            menu->buttons[i].hoverImage = NULL;
+        }
+    }
+    free(menu->buttons);
+    menu->buttons = NULL;
 }
 
 void handleEventOptionMenu(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {

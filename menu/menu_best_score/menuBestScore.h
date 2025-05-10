@@ -1,10 +1,10 @@
 #ifndef MENUBESTSCORE_H
 #define MENUBESTSCORE_H
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_mixer.h>
-#include <SDL/SDL_ttf.h>
-#include <SDL/SDL_image.h>
+
+#include <stdio.h>
+#include <unistd.h>
+
 
 #include "../header.h"
 
@@ -22,5 +22,5 @@ void handleInput(SDL_Event event, char *inputText, int maxLength);
 void loadScores(ScoreEntry scores[]);
 void saveScores(ScoreEntry scores[]);
 void addScore(ScoreEntry scores[], const char *name, int score);
-
+void cleanupMenuBestScore(Menu *menu) ;
 #endif
