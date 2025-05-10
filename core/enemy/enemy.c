@@ -21,6 +21,20 @@ void init_enemy(Enemy *enemy, int health, int x, int y) {
     }
 }
 
+SDL_Surface* load_background(const char* filename) {
+    SDL_Surface* image = IMG_Load(filename);
+    if (!image) {
+        printf("Failed to load background: %s\n", SDL_GetError());
+        exit(1);
+    }
+    return image;
+}
+
+void render_background(SDL_Surface* background, SDL_Surface* screen) {
+    SDL_BlitSurface(background, NULL, screen, NULL);
+}
+
+
 void display_enemy(Enemy *enemy, SDL_Surface* screen) {
     SDL_Rect dstrect = { enemy->x, enemy->y, 0, 0 };
     SDL_BlitSurface(enemy->frames[enemy->current_frame], NULL, screen, &dstrect);
@@ -55,7 +69,7 @@ void move_enemy_ai(Enemy *enemy, int player_x, int player_y) {
 }
 
 int check_collision_player_enemy(int player_x, int player_y, Enemy *enemy) {
-    SDL_Rect r = { enemy->x, enemy->y, 128, 128 };
+    SDL_Rect r = { enemy->x, enemy->y, 300, 128 };
     if (player_x >= r.x && player_x <= r.x + r.w &&
         player_y >= r.y && player_y <= r.y + r.h) {
         return 1;

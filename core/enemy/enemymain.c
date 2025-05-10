@@ -6,6 +6,7 @@
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Surface* screen = SDL_SetVideoMode(800, 600, 32, SDL_SWSURFACE);
+    SDL_Surface* background=IMG_LOAD("shadowanim/lastlvl.png");
     IMG_Init(IMG_INIT_PNG);
     srand(time(NULL));
 
@@ -20,13 +21,12 @@ int main() {
     int level = 2;
 
     while (running) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT)
-                running = 0;
-        }
-
+        
         SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-
+        while (SDL_PollEvent(&event)) {
+                    if (event.type == SDL_QUIT)
+                        running = 0;
+                }
         SDL_Rect wallRect = wall.rect;
         SDL_FillRect(screen, &wallRect, SDL_MapRGB(screen->format, 100, 100, 100));
 
@@ -37,7 +37,7 @@ int main() {
 
         SDL_Rect enemy_rect = {shadow.x, shadow.y, 128, 128};
         if (check_collision_enemy_es(enemy_rect, wall.rect)) {
-            shadow.x -= 2; shadow.y -= 2; // recule si collision
+            shadow.x -= 3; shadow.y -= 3; // recule si collision
         }
 
         animate_enemy_move(&shadow);
