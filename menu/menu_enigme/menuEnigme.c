@@ -35,7 +35,7 @@ void initMenuEnigme(Menu *menus) {
     menus[MENU_ENIGME].init_buttons(menus[MENU_ENIGME].buttons);
 
     srand(time(NULL)); // Seed the random number generator
-    loadQuestions("/home/amine/pizza/aria/menu/menu_enigme/questions.txt", questions, &numQuestions);
+    loadQuestions("./menu/menu_enigme/questions.txt", questions, &numQuestions);
     if (numQuestions == 0) {
         fprintf(stderr, "No questions loaded. Exiting.\n");
         exit(EXIT_FAILURE);
