@@ -28,8 +28,7 @@ int main() {
                 running = 0;
         }
 
-        // Render the background
-        render_background(background, screen);
+        SDL_BlitSurface(background, NULL, screen, NULL);
 
         SDL_Rect wallRect = wall.rect;
         SDL_FillRect(screen, &wallRect, SDL_MapRGB(screen->format, 0, 250, 100));

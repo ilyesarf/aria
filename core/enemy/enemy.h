@@ -18,6 +18,7 @@ typedef struct {
 } StaticElement;
 
 void init_enemy(Enemy *enemy, int health, int x, int y);
+SDL_Surface* load_background(const char* filename);
 void display_enemy(Enemy *enemy, SDL_Surface* screen);
 void draw_enemy_health_bar(SDL_Surface* screen, Enemy* enemy);
 void animate_enemy_move(Enemy *enemy);

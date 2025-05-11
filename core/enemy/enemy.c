@@ -30,11 +30,6 @@ SDL_Surface* load_background(const char* filename) {
     return image;
 }
 
-void render_background(SDL_Surface* background, SDL_Surface* screen) {
-    SDL_BlitSurface(background, NULL, screen, NULL);
-}
-
-
 void display_enemy(Enemy *enemy, SDL_Surface* screen) {
     SDL_Rect dstrect = { enemy->x, enemy->y, 0, 0 };
     SDL_BlitSurface(enemy->frames[enemy->current_frame], NULL, screen, &dstrect);
