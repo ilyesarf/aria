@@ -1,17 +1,13 @@
-CC = gcc
-CFLAGS = -Wall `sdl-config --cflags`
-LDFLAGS = `sdl-config --libs` -lSDL_image
-SRC = enemymain.c enemy.c
-OBJ = $(SRC:.c=.o)
-EXEC = enemy_game
+game: enemymain.o enemy.o
+	gcc enemymain.o enemy.o -o game -lSDL -lSDL_image -lSDL_mixer -lSDL_ttf -lm -g
 
-all: $(EXEC)
+enemymain.o: enemymain.c enemy.h
+	gcc -c enemymain.c -g
 
-$(EXEC): $(OBJ)
-	$(CC) -o $@ $^ $(LDFLAGS)
-
-%.o: %.c
-	$(CC) -o $@ -c $< $(CFLAGS)
+enemy.o: enemy.c enemy.h
+	gcc -c enemy.c -g
 
 clean:
-	rm -f *.o $(EXEC)
+	rm -f *.o game
+
+.PHONY: clean

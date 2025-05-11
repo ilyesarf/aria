@@ -1,12 +1,14 @@
 #include "enemy.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 void init_enemy(Enemy *enemy, int health, int x, int y) {
     enemy->health = health;
     enemy->x = x;
     enemy->y = y;
     enemy->current_frame = 0;
+    enemy->state = WAITING;
 
     enemy->frames[0] = IMG_Load("shadowanim/shadowf1t.png");
     enemy->frames[1] = IMG_Load("shadowanim/shadowf2t.png");
@@ -49,40 +51,123 @@ void animate_enemy_move(Enemy *enemy) {
 }
 
 void move_enemy_randomly(Enemy *enemy, int level) {
-    if (enemy->steps_left <= 0) {
-        // Calculate a new random direction
-        do {
-            enemy->dx = (rand() % (level == 1 ? 3 : 5)) - (level == 1 ? 1 : 2);
-            enemy->dy = (rand() % (level == 1 ? 3 : 5)) - (level == 1 ? 1 : 2);
-        } while (enemy->dx == 0 && enemy->dy == 0); // Ensure non-zero movement
-
-        // Set steps_left to a random distance for continuous movement
-        enemy->steps_left = rand() % 10 + 5; // Move between 5 to 15 steps in the same direction
+    // Persistent direction tracking
+    static int last_dir_change = 0;
+    const int dir_change_interval = 2000; // frames until direction change
+    
+    // Initialize directions if needed
+    if (enemy->dx == 0 && enemy->dy == 0) {
+        enemy->dx = (rand() % 2) ? 1 : -1;
+        enemy->dy = (rand() % 2) ? 1 : -1;
     }
-
-    // Move the enemy in the current direction
-    enemy->x += enemy->dx;
-    enemy->y += enemy->dy;
-
-    // Decrease the steps remaining
-    enemy->steps_left--;
+    
+    // Change direction periodically
+    if (SDL_GetTicks() - last_dir_change > dir_change_interval) {
+        // 25% chance to change x direction
+        if (rand() % 4 == 0) enemy->dx = (rand() % 2) ? 1 : -1;
+        
+        // 25% chance to change y direction 
+        if (rand() % 4 == 0) enemy->dy = (rand() % 2) ? 1 : -1;
+        
+        last_dir_change = SDL_GetTicks();
+    }
+    
+    // Apply movement 
+    int move_speed = (level == 1) ? 3 : 5;
+    enemy->x += enemy->dx * move_speed;
+    enemy->y += enemy->dy * move_speed;
+    
+    // Screen boundary checks with bounce
+    if (enemy->x < 0) {
+        enemy->x = 0;
+        enemy->dx = 1; // Force right movement
+    }
+    if (enemy->y < 0) {
+        enemy->y = 0;
+        enemy->dy = 1; // Force down movement
+    }
+    if (enemy->x > SCREEN_WIDTH - enemy->frames[0]->w) {
+        enemy->x = SCREEN_WIDTH - enemy->frames[0]->w;
+        enemy->dx = -1; // Force left movement
+    }
+    if (enemy->y > SCREEN_HEIGHT - enemy->frames[0]->h) {
+        enemy->y = SCREEN_HEIGHT - enemy->frames[0]->h;
+        enemy->dy = -1; // Force up movement
+    }
 }
 
-void move_enemy_ai(Enemy *enemy, int player_x, int player_y) {
-    if (player_x > enemy->x) enemy->x += 2;
-    else if (player_x < enemy->x) enemy->x -= 2;
 
-    if (player_y > enemy->y) enemy->y += 2;
-    else if (player_y < enemy->y) enemy->y -= 2;
+void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int s1, int s2) {
+    // Calculate the distance between the enemy and the player
+    int deltaX = player_x - enemy->x;
+    int deltaY = player_y - enemy->y;
+    int distance = sqrt(deltaX * deltaX + deltaY * deltaY);
+
+    // Update the enemy's state based on the distance
+    switch (enemy->state) {
+        case WAITING:
+            if (distance <= s1 && distance > s2) {
+                enemy->state = FOLLOWING; // Transition to FOLLOWING state
+            }
+            break;
+
+        case FOLLOWING:
+            if (distance <= s2) {
+                enemy->state = ATTACKING; // Transition to ATTACKING state
+            } else if (distance > s1) {
+                enemy->state = WAITING; // Transition back to WAITING state
+            }
+            break;
+
+        case ATTACKING:
+            if (distance > s2) {
+                enemy->state = FOLLOWING; // Transition back to FOLLOWING state
+            }
+            break;
+    }
+
+    // Perform actions based on the current state
+    switch (enemy->state) {
+        case WAITING:
+            // Enemy stays in place
+            break;
+
+        case FOLLOWING:
+            // Move toward the player
+            if (player_x > enemy->x) enemy->x += 2;
+            else if (player_x < enemy->x) enemy->x -= 2;
+
+            if (player_y > enemy->y) enemy->y += 2;
+            else if (player_y < enemy->y) enemy->y -= 2;
+            break;
+
+        case ATTACKING:
+            // Move faster toward the player for attacking
+            if (player_x > enemy->x) enemy->x += 4;
+            else if (player_x < enemy->x) enemy->x -= 4;
+
+            if (player_y > enemy->y) enemy->y += 4;
+            else if (player_y < enemy->y) enemy->y -= 4;
+            break;
+    }
 }
 
-int check_collision_player_enemy(int player_x, int player_y, Enemy *enemy) {
-    SDL_Rect r = { enemy->x, enemy->y, 300, 128 };
-    if (player_x >= r.x && player_x <= r.x + r.w &&
-        player_y >= r.y && player_y <= r.y + r.h) {
-        return 1;
+int check_collision_player_enemy(SDL_Rect player_rect, Enemy *enemy) {
+    SDL_Rect enemy_rect = { 
+        enemy->x, 
+        enemy->y, 
+        enemy->frames[0]->w,  // Use width of first frame
+        enemy->frames[0]->h   // Use height of first frame
+    };
+    
+    // Check for rectangle-rectangle collision
+    if (player_rect.x + player_rect.w < enemy_rect.x ||  // Player is left of enemy
+        player_rect.x > enemy_rect.x + enemy_rect.w ||   // Player is right of enemy
+        player_rect.y + player_rect.h < enemy_rect.y ||  // Player is above enemy
+        player_rect.y > enemy_rect.y + enemy_rect.h) {   // Player is below enemy
+        return 0; // No collision
     }
-    return 0;
+    return 1; // Collision detected
 }
 
 int check_collision_enemy_es(SDL_Rect enemy_rect, SDL_Rect es_rect) {
