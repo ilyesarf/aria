@@ -53,7 +53,7 @@ void animate_enemy_move(Enemy *enemy) {
 void move_enemy_randomly(Enemy *enemy, int level) {
     // Persistent direction tracking
     static int last_dir_change = 0;
-    const int dir_change_interval = 2000; // frames until direction change
+    const int dir_change_interval = 2000; // Time in milliseconds until direction change
     
     // Initialize directions if needed
     if (enemy->dx == 0 && enemy->dy == 0) {
@@ -72,8 +72,8 @@ void move_enemy_randomly(Enemy *enemy, int level) {
         last_dir_change = SDL_GetTicks();
     }
     
-    // Apply movement 
-    int move_speed = (level == 1) ? 3 : 5;
+    // Apply movement with slow speed
+    int move_speed = 5; // Set a small speed for slow movement
     enemy->x += enemy->dx * move_speed;
     enemy->y += enemy->dy * move_speed;
     
@@ -155,7 +155,7 @@ void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int s1, int s2) {
 void move_enemy_randomly2(Enemy *enemy, int level) {
     // Persistent direction tracking
     static int last_dir_change = 0;
-    const int dir_change_interval = 300; // frames until direction change
+    const int dir_change_interval = 500; // frames until direction change
     
     // Initialize directions if needed
     if (enemy->dx == 0 && enemy->dy == 0) {
@@ -175,7 +175,7 @@ void move_enemy_randomly2(Enemy *enemy, int level) {
     }
     
     // Apply movement 
-    int move_speed = 25;
+    int move_speed = 35;
     enemy->x += enemy->dx * move_speed;
     enemy->y += enemy->dy * move_speed;
     
