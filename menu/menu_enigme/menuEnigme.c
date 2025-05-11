@@ -44,7 +44,6 @@ void initMenuEnigme(Menu *menus) {
     menus[MENU_ENIGME].render = renderMenuEnigme;
     menus[MENU_ENIGME].handleEvent = handleEventEnigme;
     menus[MENU_ENIGME].init_buttons(menus[MENU_ENIGME].buttons);
-<<<<<<< HEAD
 
     srand(time(NULL)); // Seed the random number generator
     loadQuestions("./menu/menu_enigme/questions.txt", questions, &numQuestions);
@@ -52,8 +51,6 @@ void initMenuEnigme(Menu *menus) {
         fprintf(stderr, "No questions loaded. Exiting.\n");
         exit(EXIT_FAILURE);
     }
-=======
->>>>>>> bb84c9655ee73d490e074cdb01352909dd9f0e66
 }
 
 
