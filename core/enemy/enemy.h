@@ -36,6 +36,7 @@ void display_enemy(Enemy *enemy, SDL_Surface* screen);
 void draw_enemy_health_bar(SDL_Surface* screen, Enemy* enemy);
 void animate_enemy_move(Enemy *enemy);
 void move_enemy_randomly(Enemy *enemy, int level);
+void move_enemy_randomly2(Enemy *enemy, int level);
 void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int s1, int s2);
 int check_collision_player_enemy(SDL_Rect player_rect, Enemy *enemy);
 int check_collision_enemy_es(SDL_Rect enemy_rect, SDL_Rect es_rect);

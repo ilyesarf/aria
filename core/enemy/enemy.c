@@ -152,6 +152,52 @@ void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int s1, int s2) {
     }
 }
 
+void move_enemy_randomly2(Enemy *enemy, int level) {
+    // Persistent direction tracking
+    static int last_dir_change = 0;
+    const int dir_change_interval = 300; // frames until direction change
+    
+    // Initialize directions if needed
+    if (enemy->dx == 0 && enemy->dy == 0) {
+        enemy->dx = (rand() % 2) ? 1 : -1;
+        enemy->dy = (rand() % 2) ? 1 : -1;
+    }
+    
+    // Change direction periodically
+    if (SDL_GetTicks() - last_dir_change > dir_change_interval) {
+        // 25% chance to change x direction
+        if (rand() % 4 == 0) enemy->dx = (rand() % 2) ? 1 : -1;
+        
+        // 25% chance to change y direction 
+        if (rand() % 4 == 0) enemy->dy = (rand() % 2) ? 1 : -1;
+        
+        last_dir_change = SDL_GetTicks();
+    }
+    
+    // Apply movement 
+    int move_speed = 25;
+    enemy->x += enemy->dx * move_speed;
+    enemy->y += enemy->dy * move_speed;
+    
+    // Screen boundary checks with bounce
+    if (enemy->x < 0) {
+        enemy->x = 0;
+        enemy->dx = 1; // Force right movement
+    }
+    if (enemy->y < 0) {
+        enemy->y = 0;
+        enemy->dy = 1; // Force down movement
+    }
+    if (enemy->x > SCREEN_WIDTH - enemy->frames[0]->w) {
+        enemy->x = SCREEN_WIDTH - enemy->frames[0]->w;
+        enemy->dx = -1; // Force left movement
+    }
+    if (enemy->y > SCREEN_HEIGHT - enemy->frames[0]->h) {
+        enemy->y = SCREEN_HEIGHT - enemy->frames[0]->h;
+        enemy->dy = -1; // Force up movement
+    }
+}
+
 int check_collision_player_enemy(SDL_Rect player_rect, Enemy *enemy) {
     SDL_Rect enemy_rect = { 
         enemy->x, 

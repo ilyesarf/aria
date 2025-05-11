@@ -15,12 +15,12 @@ int main() {
     Enemy shadow;
     init_enemy(&shadow, 100, 150, 100);
 
-    StaticElement wall = { .rect = {700, 100, 100, 100} }; // Example obstacle
+    StaticElement wall = { .rect = {300, 300, 100, 100} }; // Example obstacle
 
     int running = 1;
     SDL_Event event;
-    int player_x = 700, player_y = 100;
-    int level = 2;
+    int player_x = 300, player_y = 300;
+    int level = 3;
 
     while (running) {
         while (SDL_PollEvent(&event)) {
@@ -34,13 +34,15 @@ int main() {
         SDL_FillRect(screen, &wallRect, SDL_MapRGB(screen->format, 250, 250, 100));
 
         if (level == 1){
-            
             move_enemy_randomly(&shadow, level); 
         }
-        else{
+        if (level==2){
             move_enemy_ai(&shadow, player_x, player_y, S1, S2);
         }
-        
+        else{
+            move_enemy_randomly2(&shadow, level);
+        }
+
         SDL_Rect enemy_rect = {shadow.x, shadow.y, 128, 128};
         if (check_collision_enemy_es(enemy_rect, wall.rect)) {
             shadow.x -= 50; shadow.y -=2; // Step back if collision
