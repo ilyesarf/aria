@@ -4,6 +4,7 @@ LDLIBS = -lSDL -lSDL_mixer -lSDL_ttf -lSDL_image
 
 # Directories
 SRC_DIR = .
+CORE_DIR = ../core
 MENU_SAVE_DIR = menu_save
 MENU_BEST_SCORE_DIR = menu_best_score
 MENU_PLAYER_DIR = menu_joueur
@@ -35,7 +36,7 @@ $(TARGET): $(OBJS)
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(SRC_DIR)/menu.o: $(SRC_DIR)/menu.c $(MENU_SAVE_DIR)/menuSave.h $(MENU_BEST_SCORE_DIR)/menuBestScore.h $(MENU_PLAYER_DIR)/menuJoueur.h $(MENU_PRINCIPAL_DIR)/menuPrincipal.h $(MENU_OPTION_DIR)/menuOption.h $(MENU_ENIGME_DIR)/menuEnigme.h $(SRC_DIR)/header.h
+$(SRC_DIR)/menu.o: $(SRC_DIR)/menu.c $(MENU_SAVE_DIR)/menuSave.h $(MENU_BEST_SCORE_DIR)/menuBestScore.h $(MENU_PLAYER_DIR)/menuJoueur.h $(MENU_PRINCIPAL_DIR)/menuPrincipal.h $(MENU_OPTION_DIR)/menuOption.h $(MENU_ENIGME_DIR)/menuEnigme.h $(CORE_DIR)/header.h $(SRC_DIR)/header.h
 
 clean:
 	rm -f $(OBJS) $(TARGET)
