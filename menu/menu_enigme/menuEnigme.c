@@ -149,14 +149,12 @@ void renderQuizUI(SDL_Surface *screen, SDL_Surface *butImage, TTF_Font *font, SD
     renderText(screen, currentQuestion.question, font, textColor, 400, 200);
 
     // Render the answer options
+
     for (int i = 2; i < n_btns; i++) {
+        buttons[i].text = currentQuestion.options[i - 2];
         renderButton(screen, butImage, font, textColor, buttons[i]);
     }
-
-    renderText(screen, currentQuestion.options[0], font, textColor, 425, 300);
-    renderText(screen, currentQuestion.options[1], font, textColor, 425, 500);
-    renderText(screen, currentQuestion.options[2], font, textColor, 425, 700);
-
+    
     // Render the score and lives
     char scoreText[50];
     char livesText[50];

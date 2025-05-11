@@ -18,12 +18,12 @@ void initMenuSave(struct Menu *menus){
 
 void initMenuSaveButtons(Button *buttons){
     buttons[0].rect = (SDL_Rect){800, 200,300,40}; // OUI
-    buttons[0].text = "OUI";
+    buttons[0].text = "Save";
     buttons[0].selected = 0;
 
 
     buttons[1].rect = (SDL_Rect){800, 350,300,40}; // NON
-    buttons[1].text = "NON";
+    buttons[1].text = "Resume";
     buttons[1].selected = 0;
 }
 
@@ -38,11 +38,11 @@ void initMenuChooseSave(Menu *menus){
 
 void initMenuChooseSaveButtons(Button *buttons) {
 
-    buttons[0].text = "Charger";
+    buttons[0].text = "Load Game";
     buttons[0].rect = (SDL_Rect){800, 200,300,40} ;
     buttons[0].selected = 0;
 
-    buttons[1].text = "Nouvelle partie";
+    buttons[1].text = "New Game";
     buttons[1].rect = (SDL_Rect){800, 350,300,40};
     buttons[1].selected = 0;
 }
@@ -66,7 +66,7 @@ void renderMenuChooseSave(SDL_Surface *background, SDL_Surface *butImage, SDL_Su
     SDL_Flip(screen);
 }
 
-void handleEventSaveMenu(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
+void handleEventSaveMenu(int *menuState, Level level, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
     while (SDL_PollEvent(&event)) {
 
         if (event.type == SDL_QUIT) *menuState = QUIT_GAME;
@@ -87,10 +87,11 @@ void handleEventSaveMenu(int *menuState, SDL_Event event, Button *buttons, int n
                 if (buttons[i].selected) {
                     if (i == 0) {
                         Mix_PlayChannel(-1, hoverSound, 0);
-                        *menuState = MENU_NEW_LOAD_SAVE; // OUI -> Next menu
+                        //save_game("savegame.dat", level);
+                        *menuState = MENU_PRINCIPAL; // OUI -> Next menu
                     } else if (i == 1) { 
                         Mix_PlayChannel(-1, hoverSound, 0);
-                        *menuState = MENU_PRINCIPAL; // NON -> Exit
+                        *menuState = MAIN_GAME; // NON -> Exit
                     }
                 }
             }
@@ -102,7 +103,7 @@ void cleanupMenuSave(Menu *menu) {
     menu->buttons = NULL;
 }
 
-void handleEventChooseSaveMenu(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
+void handleEventChooseSaveMenu(int *menuState, Level level, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_MOUSEMOTION) {
             for (int i = 0; i < n_btns; i++) {
@@ -119,8 +120,10 @@ void handleEventChooseSaveMenu(int *menuState, SDL_Event event, Button *buttons,
         if (event.button.button == SDL_BUTTON_LEFT) {
             for (int i = 0; i < 2; i++) {
                 if (buttons[i].selected) { 
-                    if (i == 0) *menuState = MAIN_GAME; // Charger jeu
-                         
+                    if (i == 0) {
+                        //load_game("savegame.dat", level);
+                        *menuState = MAIN_GAME; // Charger jeu
+                    }
                     else if (i == 1) *menuState = MENU_PLAYER; //Nouvelle jeu
                 }
             }
