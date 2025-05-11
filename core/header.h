@@ -1,13 +1,5 @@
 #include <SDL/SDL_image.h>
 
-
-typedef struct{
-    int n;
-    SDL_Surface *background;
-    Enemy *enemies;
-    StaticElement *static_elements;
-} Level;
-
 typedef struct {
     int health;
     int x, y; // Position
@@ -18,6 +10,13 @@ typedef struct {
 typedef struct {
     SDL_Rect rect; // Position et taille de l'obstacle
 } StaticElement;
+
+typedef struct{
+    int n;
+    SDL_Surface *background;
+    Enemy *enemies;
+    StaticElement *static_elements;
+} Level;
 
 typedef struct {
     SDL_Surface* img;
