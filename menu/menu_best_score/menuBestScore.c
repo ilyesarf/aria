@@ -25,31 +25,29 @@ void initMenuBestScore(Menu *menus) {
 }
 
 void initMenuBestScoreButtons(Button *buttons) {
-    buttons[0].normalImage = load_image("./assets/buttons/submit.png");
-    buttons[0].hoverImage = load_image("./assets/buttons/submithov.png");
+
+    buttons[0].text = "Submit";
     buttons[0].rect = (SDL_Rect){SCREEN_WIDTH / 2 + 125, SCREEN_HEIGHT / 2 + 75, 75, 35}; // Valider
     buttons[0].selected = 0;
 
-    buttons[1].normalImage = load_image("./assets/buttons/quit.png");
-    buttons[1].hoverImage = load_image("./assets/buttons/quithov.png");
+    buttons[1].text = "Quit";
     buttons[1].rect = (SDL_Rect){SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 + 50, 100, 50}; // Quitter
     buttons[1].selected = 0;
 
-    buttons[2].normalImage = load_image("./assets/buttons/return.png");
-    buttons[2].hoverImage = load_image("./assets/buttons/returnhov.png");
+    buttons[2].text = "Return";
     buttons[2].rect = (SDL_Rect){SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 + 125, 100, 50}; // Retour
     buttons[2].selected = 0;
 }
 
-void renderMenuBestScore(SDL_Surface *background, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns) {
+void renderMenuBestScore(SDL_Surface *background, SDL_Surface *butImage, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns) {
     SDL_BlitSurface(background, NULL, screen, NULL);
 
     if (inputActive) {
         renderInputBox(screen, font, inputText);
-        renderButton(screen, font, textColor, buttons[0]);
+        renderButton(screen, butImage, font, textColor, buttons[0]);
     } else {
         for (int i = 1; i < n_btns; i++) {
-            renderButton(screen, font, textColor, buttons[i]);
+            renderButton(screen, butImage, font, textColor, buttons[i]);
         }
     }
 
@@ -164,16 +162,6 @@ void loadScores(ScoreEntry scores[]) {
     }
 }
 void cleanupMenuBestScore(Menu *menu) {
-    for (int i = 0; i < menu->n_btns; i++) {
-        if (menu->buttons[i].normalImage) {
-            SDL_FreeSurface(menu->buttons[i].normalImage);
-            menu->buttons[i].normalImage = NULL;
-        }
-        if (menu->buttons[i].hoverImage) {
-            SDL_FreeSurface(menu->buttons[i].hoverImage);
-            menu->buttons[i].hoverImage = NULL;
-        }
-    }
     free(menu->buttons);
     menu->buttons = NULL;
 }

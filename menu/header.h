@@ -5,7 +5,7 @@
 #include <SDL/SDL_mixer.h>
 #include <SDL/SDL_ttf.h>
 #include <SDL/SDL_image.h>
-
+#include "../core/header.h"
 
 
 #define SCREEN_WIDTH 1920
@@ -29,8 +29,8 @@
 #define MENU_PUZZLE 10
 
 typedef struct {
-    SDL_Surface *normalImage;
-    SDL_Surface *hoverImage;
+    //SDL_Surface *normalImage;
+    //SDL_Surface *hoverImage;
     SDL_Rect rect;
     const char *text;
     int selected;
@@ -40,7 +40,7 @@ typedef struct Menu {
     int n_btns;
     Button *buttons;
     void (*init_buttons)(Button *buttons);
-    void (*render)(SDL_Surface *background, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns);
+    void (*render)(SDL_Surface *background, SDL_Surface *butImage, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns);
     void (*handleEvent)(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
 } Menu;
 
@@ -50,7 +50,7 @@ SDL_Surface* load_image(char *filename);
 Mix_Chunk* load_sound(char *filename);
 TTF_Font* load_font(char *filename);
 void renderText(SDL_Surface *screen, const char *text, TTF_Font *font, SDL_Color textColor, int x, int y);
-void renderButton(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button button);
+void renderButton(SDL_Surface *screen, SDL_Surface *butImage, TTF_Font *font, SDL_Color textColor, Button button);
 
 void init_menus(Menu *menus);
 

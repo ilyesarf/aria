@@ -7,6 +7,7 @@
 #include "menu_principal/menuPrincipal.h"
 
 const int working_menus[7] = {MENU_SAVE, MENU_NEW_LOAD_SAVE, MENU_BEST_SCORE, MENU_PLAYER, MENU_PRINCIPAL, MENU_OPTION ,MENU_ENIGME};
+
 SDL_Surface* init_screen() {
     SDL_Surface *screen;  
     screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 32, SDL_SWSURFACE);
@@ -26,7 +27,7 @@ void init_audio() {
 SDL_Surface *load_image(char *filename) {
     SDL_Surface *image = IMG_Load(filename);
     if (image == NULL) {
-        printf("Error opening image: %s: %s\n", filename, IMG_GetError());
+        printf("Error opening image: %s\n", IMG_GetError());
         exit(1);
     }
     return image;
@@ -59,19 +60,22 @@ void renderText(SDL_Surface *screen, const char *text, TTF_Font *font, SDL_Color
     }
 }
 
-void renderButton(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button button){
+void renderButton(SDL_Surface *screen, SDL_Surface *butImage, TTF_Font *font, SDL_Color textColor, Button button){
+    if (!butImage){
+        printf("renderButton: ButImage = NULL\n");
+        exit(1);
+    }
     if (button.selected){
-        if (button.hoverImage != NULL) {
-            SDL_BlitSurface(button.hoverImage, NULL, screen, &(SDL_Rect){button.rect.x-50, button.rect.y-50, 0, 0});
-        }
+        SDL_BlitSurface(butImage, NULL, screen, &(SDL_Rect){button.rect.x-50, button.rect.y-50, 0, 0});
+        renderText(screen, button.text, font, (SDL_Color){255,0,0,0}, button.rect.x+10, button.rect.y+10);
     } else{
-        if(button.normalImage != NULL){
-            SDL_BlitSurface(button.normalImage, NULL, screen, &(SDL_Rect){button.rect.x-50, button.rect.y-50, 0, 0});
-        }
+        SDL_BlitSurface(butImage, NULL, screen, &(SDL_Rect){button.rect.x-50, button.rect.y-50, 0, 0});
+        renderText(screen, button.text, font, textColor, button.rect.x+10, button.rect.y+10);
     }
 }
 
 void init_menus(Menu *menus){
+    
     for (int i = 0; i < 7; i++) {
         if (working_menus[i] == MENU_SAVE) {
             initMenuSave(menus);
@@ -89,6 +93,8 @@ void init_menus(Menu *menus){
             initMenuEnigme(menus);
         }
     }
+    
+    //initMenuSave(menus);
 }
 
 
@@ -130,14 +136,22 @@ int main() {
         printf("Failed to initialize SDL_image: %s\n", IMG_GetError());
         exit(1);
     }
-    init_audio();
-    TTF_Init();
+    
+
     SDL_EnableUNICODE(1); // Enable Unicode translation for keyboard input
+
     SDL_Surface *background;
     background = load_image("./assets/game/background.png"); 
+
+    TTF_Init();
     TTF_Font *font;
     font = load_font("./assets/fonts/font.ttf");
     SDL_Color textColor = {255, 255, 255, 255}; // white text
+    
+    SDL_Surface *butImage = NULL;
+    butImage = load_image("./assets/buttons/butbase.png");
+    
+    init_audio();
     Mix_Music *musique;
     Mix_Chunk *hoverSound;
     musique = load_music("./assets/music/30-hours.mp3");;
@@ -151,7 +165,7 @@ int main() {
     Menu menus[N_MENUS];
     init_menus(menus);
 
-    int menuState = MENU_SAVE; // Changed initial menuState to MENU_PRINCIPAL
+    int menuState = MENU_PRINCIPAL; // Changed initial menuState to MENU_PRINCIPAL
 
     while (menuState != QUIT_GAME) {
         SDL_Event event;
@@ -162,7 +176,7 @@ int main() {
             printf("MAIN GAME...\n");
             menuState = -1;
         } else {
-            menus[menuState].render(background, screen, font, textColor, menus[menuState].buttons, menus[menuState].n_btns);
+            menus[menuState].render(background, butImage, screen, font, textColor, menus[menuState].buttons, menus[menuState].n_btns);
             menus[menuState].handleEvent(&menuState, event, menus[menuState].buttons, menus[menuState].n_btns, hoverSound);
             //printf("menu state: %d\n", menuState);
         }

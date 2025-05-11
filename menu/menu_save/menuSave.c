@@ -17,17 +17,13 @@ void initMenuSave(struct Menu *menus){
 }
 
 void initMenuSaveButtons(Button *buttons){
-    buttons[0].normalImage = load_image("./assets/buttons/yes.png");
-    buttons[0].hoverImage = load_image("./assets/buttons/yeshov.png");
     buttons[0].rect = (SDL_Rect){800, 200,300,40}; // OUI
-    //buttons[0].text = "OUI";
+    buttons[0].text = "OUI";
     buttons[0].selected = 0;
 
 
-    buttons[1].normalImage = load_image("./assets/buttons/no.png");
-    buttons[1].hoverImage = load_image("./assets/buttons/nohov.png");
     buttons[1].rect = (SDL_Rect){800, 350,300,40}; // NON
-    //buttons[1].text = "NON";
+    buttons[1].text = "NON";
     buttons[1].selected = 0;
 }
 
@@ -42,31 +38,29 @@ void initMenuChooseSave(Menu *menus){
 
 void initMenuChooseSaveButtons(Button *buttons) {
 
-    buttons[0].normalImage = load_image("./assets/buttons/load.png");
-    buttons[0].hoverImage = load_image("./assets/buttons/loadhov.png");
+    buttons[0].text = "Charger";
     buttons[0].rect = (SDL_Rect){800, 200,300,40} ;
     buttons[0].selected = 0;
 
-    buttons[1].normalImage = load_image("./assets/buttons/newgame.png");
-    buttons[1].hoverImage = load_image("./assets/buttons/newgamehov.png");
+    buttons[1].text = "Nouvelle partie";
     buttons[1].rect = (SDL_Rect){800, 350,300,40};
     buttons[1].selected = 0;
 }
 
-void renderMenuSave(SDL_Surface *background, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns) {
+void renderMenuSave(SDL_Surface *background, SDL_Surface *butImage, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns) {
     SDL_BlitSurface(background, NULL, screen, NULL);
     for (int i = 0; i < n_btns; i++) {
-        renderButton(screen, font, textColor, buttons[i]); 
+        renderButton(screen, butImage, font, textColor, buttons[i]); 
     }
 
     SDL_Flip(screen);
 }
 
-void renderMenuChooseSave(SDL_Surface *background, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns) {
+void renderMenuChooseSave(SDL_Surface *background, SDL_Surface *butImage, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns) {
     SDL_BlitSurface(background, NULL, screen, NULL); // Draw background
 
     for (int i = 0; i < n_btns; i++) {
-        renderButton(screen, font, textColor, buttons[i]);
+        renderButton(screen, butImage, font, textColor, buttons[i]);
     }
 
     SDL_Flip(screen);
@@ -104,16 +98,6 @@ void handleEventSaveMenu(int *menuState, SDL_Event event, Button *buttons, int n
     }
 }
 void cleanupMenuSave(Menu *menu) {
-    for (int i = 0; i < menu->n_btns; i++) {
-        if (menu->buttons[i].normalImage) {
-            SDL_FreeSurface(menu->buttons[i].normalImage);
-            menu->buttons[i].normalImage = NULL;
-        }
-        if (menu->buttons[i].hoverImage) {
-            SDL_FreeSurface(menu->buttons[i].hoverImage);
-            menu->buttons[i].hoverImage = NULL;
-        }
-    }
     free(menu->buttons);
     menu->buttons = NULL;
 }
@@ -156,4 +140,23 @@ void handleEventChooseSaveMenu(int *menuState, SDL_Event event, Button *buttons,
     }
 }
 
+void load_game(char *filename, Level level) {
+    FILE *file = fopen(filename, "rb");
+    if (!file) {
+        fprintf(stderr, "Failed to open file: %s\n", filename);
+        return;
+    }
+    fread(&level, sizeof(Level), 1, file);
+    fclose(file);
+}
 
+void save_game(char *filename, Level level) {
+    FILE *file = fopen(filename, "wb");
+    if (!file) {
+        fprintf(stderr, "Failed to open file: %s\n", filename);
+        return;
+    }
+    fwrite(&level, sizeof(Level), 1, file);
+    fclose(file);
+    printf("Game saved to %s\n", filename); 
+}
