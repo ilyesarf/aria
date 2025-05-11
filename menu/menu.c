@@ -75,7 +75,7 @@ void renderButton(SDL_Surface *screen, SDL_Surface *butImage, TTF_Font *font, SD
 }
 
 void init_menus(Menu *menus){
-    /*
+    
     for (int i = 0; i < 7; i++) {
         if (working_menus[i] == MENU_SAVE) {
             initMenuSave(menus);
@@ -93,8 +93,8 @@ void init_menus(Menu *menus){
             initMenuEnigme(menus);
         }
     }
-    */
-    initMenuSave(menus);
+    
+    //initMenuSave(menus);
 }
 
 
