@@ -59,34 +59,31 @@ void initMenuEnigme(Menu *menus) {
 
 // Function to initialize enigme menu buttons
 void initMenuEnigmeButtons(Button *buttons) {
-    buttons[0].normalImage = load_image("./assets/buttons/quiz.png");
-    buttons[0].hoverImage = load_image("./assets/buttons/quizhov.png");
+    buttons[0].text = "Quiz";
     buttons[0].rect = (SDL_Rect){600, 200, 300, 40};
     buttons[0].selected = 0;
 
-    buttons[1].normalImage = load_image("./assets/buttons/puzzle.png");
-    buttons[1].hoverImage = load_image("./assets/buttons/puzzlehov.png");
+    buttons[1].text = "Puzzle";
     buttons[1].rect = (SDL_Rect){1000, 200, 300, 40};
     buttons[1].selected = 0;
 
     for (int i = 2; i < 5; i++) {
-        buttons[i].normalImage = load_image("./assets/buttons/butbase.png");
-        buttons[i].hoverImage = load_image("./assets/buttons/butbase.png");
+        
         buttons[i].rect = (SDL_Rect){400, 300 + (i - 2) * 200, 300, 40};
         buttons[i].selected = 0;
     }
 }
-void renderMenuEnigme(SDL_Surface *background, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns) {
+void renderMenuEnigme(SDL_Surface *background, SDL_Surface *butImage, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns) {
     SDL_BlitSurface(background, NULL, screen, NULL); // Render the background
 
     if (showSubButtons == 0) {
         // Render the main menu buttons (Quiz and Puzzle)
         for (int i = 0; i < 2; i++) {
-            renderButton(screen, font, textColor, buttons[i]);
+            renderButton(screen, butImage, font, textColor, buttons[i]);
         }
     } else if (showSubButtons == 1) {
         // Render the Quiz UI
-        renderQuizUI(screen, font, textColor, buttons, n_btns);
+        renderQuizUI(screen, butImage, font, textColor, buttons, n_btns);
     } else if (showSubButtons == 2) {
         // Render the Puzzle UI
         renderPuzzle(screen);
@@ -136,7 +133,7 @@ void loadQuestions(const char *filename, Question *questions, int *numQuestions)
 }
 
 // Function to render the quiz UI
-void renderQuizUI(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns) {
+void renderQuizUI(SDL_Surface *screen, SDL_Surface *butImage, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns) {
     if (currentQuestionIndex == -1) {
         currentQuestionIndex = 0;
     }
@@ -156,7 +153,7 @@ void renderQuizUI(SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Butt
 
     // Render the answer options
     for (int i = 2; i < n_btns; i++) {
-        renderButton(screen, font, textColor, buttons[i]);
+        renderButton(screen, butImage, font, textColor, buttons[i]);
     }
 
     renderText(screen, currentQuestion.options[0], font, textColor, 425, 300);
@@ -467,16 +464,6 @@ void handleEventEnigme(int *menuState, SDL_Event event, Button *buttons, int n_b
 }
 // Function to clean up the enigme menu
 void cleanupMenuEnigme(Menu *menu) {
-    for (int i = 0; i < menu->n_btns; i++) {
-        if (menu->buttons[i].normalImage) {
-            SDL_FreeSurface(menu->buttons[i].normalImage);
-            menu->buttons[i].normalImage = NULL;
-        }
-        if (menu->buttons[i].hoverImage) {
-            SDL_FreeSurface(menu->buttons[i].hoverImage);
-            menu->buttons[i].hoverImage = NULL;
-        }
-    }
     free(menu->buttons);
     menu->buttons = NULL;
 }
