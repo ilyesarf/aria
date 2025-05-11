@@ -9,6 +9,8 @@ typedef struct {
     int x, y; // Position
     SDL_Surface* frames[4]; // Animation frames
     int current_frame;
+    int dx, dy;       // Current direction of movement
+    int steps_left;
 } Enemy;
 
 typedef struct {

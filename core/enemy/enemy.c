@@ -54,10 +54,23 @@ void animate_enemy_move(Enemy *enemy) {
 }
 
 void move_enemy_randomly(Enemy *enemy, int level) {
-    int dx = (rand() % (level == 1 ? 3 : 5)) - (level == 1 ? 1 : 2);
-    int dy = (rand() % (level == 1 ? 3 : 5)) - (level == 1 ? 1 : 2);
-    enemy->x += dx;
-    enemy->y += dy;
+    if (enemy->steps_left <= 0) {
+        // Calculate a new random direction
+        do {
+            enemy->dx = (rand() % (level == 1 ? 3 : 5)) - (level == 1 ? 1 : 2);
+            enemy->dy = (rand() % (level == 1 ? 3 : 5)) - (level == 1 ? 1 : 2);
+        } while (enemy->dx == 0 && enemy->dy == 0); // Ensure non-zero movement
+
+        // Set steps_left to a random distance for continuous movement
+        enemy->steps_left = rand() % 10 + 5; // Move between 5 to 15 steps in the same direction
+    }
+
+    // Move the enemy in the current direction
+    enemy->x += enemy->dx;
+    enemy->y += enemy->dy;
+
+    // Decrease the steps remaining
+    enemy->steps_left--;
 }
 
 void move_enemy_ai(Enemy *enemy, int player_x, int player_y) {
