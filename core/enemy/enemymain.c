@@ -10,7 +10,7 @@ int main() {
     srand(time(NULL));
 
     // Load the background image
-    SDL_Surface* background = load_background("core/enemy/lastlvl.png");
+    SDL_Surface* background = load_background("shadowanim/lastlvl.png");
 
     Enemy shadow;
     init_enemy(&shadow, 100, 100, 100);
