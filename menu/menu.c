@@ -149,7 +149,7 @@ int main() {
     SDL_Color textColor = {255, 255, 255, 255}; // white text
     
     SDL_Surface *butImage = NULL;
-    butImage = load_image("./assets/buttons/button.jpg");
+    butImage = load_image("./assets/buttons/butbase.png");
     
     init_audio();
     Mix_Music *musique;
