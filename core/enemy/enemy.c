@@ -2,7 +2,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-
+/**
+ * @file enemy.c
+ * @brief Testing programm.
+ * @author Med Hedi Belaid
+ * @version 1.0
+ * @date may 12, 2025
+ *
+ *Testing program for enemy
+ *
+*/
+/**
+ *@brief to initialize the enemy
+ *@param enemy position x,y ; health value; enemy pointer on the enemy struct
+ *@return nothing
+*/
 void init_enemy(Enemy *enemy, int health, int x, int y) {
     enemy->health = health;
     enemy->x = x;
@@ -22,6 +36,11 @@ void init_enemy(Enemy *enemy, int health, int x, int y) {
         }
     }
 }
+/**
+ *@brief to initialize the background
+ *@param filename the path of the image file
+ *@return the image initialized
+*/
 
 SDL_Surface* load_background(const char* filename) {
     SDL_Surface* image = IMG_Load(filename);
@@ -31,12 +50,25 @@ SDL_Surface* load_background(const char* filename) {
     }
     return image;
 }
+/**
+ *@brief to show the enemy 
+ *@param pointer on the enemy struct
+ *@param screen the surface of the screen
+ *@return nothing
+*/
+
 
 void display_enemy(Enemy *enemy, SDL_Surface* screen) {
     SDL_Rect dstrect = { enemy->x, enemy->y, 0, 0 };
     SDL_BlitSurface(enemy->frames[enemy->current_frame], NULL, screen, &dstrect);
     draw_enemy_health_bar(screen, enemy);
 }
+/**
+ *@brief to draw the enemy health bar
+ *@param the screen;pointer on enemy
+ *@return nothing
+*/
+
 
 void draw_enemy_health_bar(SDL_Surface* screen, Enemy* enemy) {
     SDL_Rect bg = { enemy->x, enemy->y - 10, 50, 5 };
@@ -45,10 +77,22 @@ void draw_enemy_health_bar(SDL_Surface* screen, Enemy* enemy) {
     SDL_FillRect(screen, &bg, SDL_MapRGB(screen->format, 255, 0, 0));
     SDL_FillRect(screen, &fg, SDL_MapRGB(screen->format, 0, 255, 0));
 }
+/**
+ *@brief to animate the enemy
+ *@param pointer on the enemy struct 
+ *@return nothing
+*/
+
 
 void animate_enemy_move(Enemy *enemy) {
     enemy->current_frame = (enemy->current_frame + 1) % 4;
 }
+/**
+ *@brief to make the enemy move randomly
+ *@param pointer on enemy ; the number of the level
+ *@return nothing
+*/
+
 
 void move_enemy_randomly(Enemy *enemy, int level) {
     // Persistent direction tracking
@@ -95,6 +139,14 @@ void move_enemy_randomly(Enemy *enemy, int level) {
         enemy->dy = -1; // Force up movement
     }
 }
+
+/**
+ *@brief to move the enemy based on player's position (track him)
+ *@param pointer on enemy; players position x and y
+ *@param s1 enemy's vision range
+ *@param s2 enemy's attack range
+ *@return nothing
+*/
 
 
 void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int s1, int s2) {
@@ -151,6 +203,12 @@ void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int s1, int s2) {
             break;
     }
 }
+/**
+ *@brief to move the enemy randomly but faster
+ *@param pointer on enemy struct ; number of the level
+ *@return nothing
+*/
+
 
 void move_enemy_randomly2(Enemy *enemy, int level) {
     // Persistent direction tracking
@@ -197,6 +255,12 @@ void move_enemy_randomly2(Enemy *enemy, int level) {
         enemy->dy = -1; // Force up movement
     }
 }
+/**
+ *@brief to check if there is a collision between the enemy and the player
+ *@param player's hitbox ; pointer on enemy struct
+ *@return 1 if there is collision 0 if no
+*/
+
 
 int check_collision_player_enemy(SDL_Rect player_rect, Enemy *enemy) {
     SDL_Rect enemy_rect = { 
@@ -215,6 +279,12 @@ int check_collision_player_enemy(SDL_Rect player_rect, Enemy *enemy) {
     }
     return 1; // Collision detected
 }
+/**
+ *@brief to check collision between enemy and a platform
+ *@param enemy's hitbox; platform's hitbox
+ *@return 1 if there is collision 0 if no
+*/
+
 
 int check_collision_enemy_es(SDL_Rect enemy_rect, SDL_Rect es_rect) {
     if ((enemy_rect.x + enemy_rect.w < es_rect.x) || (enemy_rect.x > es_rect.x + es_rect.w) ||
@@ -223,6 +293,12 @@ int check_collision_enemy_es(SDL_Rect enemy_rect, SDL_Rect es_rect) {
     }
     return 1;
 }
+/**
+ *@brief to update the enemy's health 
+ *@param pointer on enemy struct; value of damage taken
+ *@return nothing
+*/
+
 
 void update_health(Enemy *enemy, int damage) {
     enemy->health -= damage;

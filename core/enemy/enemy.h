@@ -8,12 +8,21 @@
 #define S2 100  // Attack range
 #define SCREEN_WIDTH 800   // Your screen width
 #define SCREEN_HEIGHT 600  // Your screen height
-
+/**
+ *@struct EnemyState
+ *@brief struct for enemy state
+*/
 typedef enum {
     WAITING,
     FOLLOWING,
     ATTACKING
 } EnemyState;
+
+/**
+ *@struct Enemy
+ *@brief struct for enemy
+*/
+
 
 typedef struct {
     int health;
@@ -24,6 +33,10 @@ typedef struct {
     EnemyState state;
 } Enemy;
 
+/**
+ *@struct StaticEleme,t
+ *@brief struct for a static element (obstacle,character-like figure)
+*/
 
 typedef struct {
     SDL_Rect rect; // Position et taille de l'obstacle
