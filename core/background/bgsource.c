@@ -1,4 +1,6 @@
 #include "bgmain.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 void init_background(Background *bg, const char *image_path, int level) {
     bg->image = IMG_Load(image_path);
@@ -6,12 +8,6 @@ void init_background(Background *bg, const char *image_path, int level) {
         fprintf(stderr, "Failed to load background image '%s': %s\n", image_path, IMG_GetError());
         exit(EXIT_FAILURE);
     }
-    bg->platforms = malloc(bg->platform_count * sizeof(Platform));
-    if (!bg->platforms) {
-        fprintf(stderr, "Failed to allocate memory for platforms\n");
-        exit(EXIT_FAILURE);
-    }
-
     if (level == 1) {
         bg->platform_count = 3;
         bg->platforms = malloc(bg->platform_count * sizeof(Platform));
@@ -21,24 +17,21 @@ void init_background(Background *bg, const char *image_path, int level) {
     } else if (level == 2) {
         bg->platform_count = 5;
         bg->platforms = malloc(bg->platform_count * sizeof(Platform));
-        if (!bg->platforms) {
-            fprintf(stderr, "Failed to allocate memory for platforms\n");
-            exit(EXIT_FAILURE);
-        }
         for (int i = 0; i < bg->platform_count; i++) {
-            bg->platforms[i] = (Platform){0, 0, 100, 20, 'F'}; // Example initialization
+            bg->platforms[i] = (Platform){i*120, 200, 100, 20, 'F'};
         }
+    } else {
+        bg->platform_count = 0;
+        bg->platforms = NULL;
     }
+    bg->camera = (SDL_Rect){0, 0, 1280, 960};
+    bg->world_width = 8000;
+    bg->world_height = 1080;
 }
 
 void display_background(const Background *bg, SDL_Surface *screen) {
-    SDL_Rect dest = {0, 0, 0, 0};
-    SDL_BlitSurface(bg->image, NULL, screen, &dest);
-
-    for (int i = 0; i < bg->platform_count; i++) {
-        printf("Platform %d: Type=%c, Position=(%d, %d)\n",
-               i, bg->platforms[i].type, bg->platforms[i].x, bg->platforms[i].y);
-    }
+    SDL_BlitSurface(bg->image, &bg->camera, screen, NULL);
+    // Optionally: draw platforms here
 }
 
 void free_background(Background *bg) {
