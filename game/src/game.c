@@ -14,7 +14,7 @@ static SDL_Surface* enemy_frames[4] = {NULL, NULL, NULL, NULL};
 #define GRAVITY 0.5f
 #define JUMP_FORCE -15.0f
 #define MAX_FALL_SPEED 15.0f
-#define GROUND_Y (SCREEN_HEIGHT - 10)  // Almost at the bottom of the screen
+#define GROUND_Y 460  // Adjust to align with the visual ground in the background image
 
 // Enemy behavior constants
 #define PATROL_SPEED 2
@@ -30,20 +30,7 @@ static SDL_Surface* enemy_frames[4] = {NULL, NULL, NULL, NULL};
 #define BALL_INITIAL_SPEED 12.0f
 #define BALL_LIFETIME 2000 // milliseconds
 
-// Background functions
-SDL_Surface* load_background(const char* filename) {
-    SDL_Surface* image = IMG_Load(filename);
-    if (!image) {
-        printf("Failed to load background: %s\n", SDL_GetError());
-        exit(1);
-    }
-    return image;
-}
-
-void display_background(SDL_Surface* screen, SDL_Surface* background) {
-    SDL_Rect dest = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-    SDL_BlitSurface(background, NULL, screen, &dest);
-}
+// Background system is now handled in bgsource.c
 
 // Initialize game resources
 int init_game_resources(void) {
@@ -101,21 +88,28 @@ void init_enemy(Enemy *enemy, int health, int x) {
     }
 }
 
-void display_enemy(Enemy *enemy, SDL_Surface* screen) {
-    // Only display enemy if it has health
+void display_enemy(Enemy *enemy, SDL_Surface* screen, const SDL_Rect* camera) {
     if (enemy->health > 0) {
-        SDL_Rect dstrect = { enemy->x, enemy->y, 0, 0 };
-        SDL_BlitSurface(enemy->frames[enemy->current_frame], NULL, screen, &dstrect);
-        draw_enemy_health_bar(screen, enemy);
+        // Calculate enemy's screen position
+        SDL_Rect dstrect = {
+            .x = enemy->x - camera->x,
+            .y = enemy->y - camera->y,
+            .w = 0, .h = 0
+        };
+        
+        // Only draw if enemy is on screen
+        if (dstrect.x + enemy->frames[0]->w >= 0 && dstrect.x <= SCREEN_WIDTH &&
+            dstrect.y + enemy->frames[0]->h >= 0 && dstrect.y <= SCREEN_HEIGHT) {
+            
+            SDL_BlitSurface(enemy->frames[enemy->current_frame], NULL, screen, &dstrect);
+            
+            // Draw health bar above enemy
+            SDL_Rect bg = { dstrect.x, dstrect.y - 10, 50, 5 };
+            SDL_Rect fg = { dstrect.x, dstrect.y - 10, (enemy->health * 50) / 100, 5 };
+            SDL_FillRect(screen, &bg, SDL_MapRGB(screen->format, 255, 0, 0));
+            SDL_FillRect(screen, &fg, SDL_MapRGB(screen->format, 0, 255, 0));
+        }
     }
-}
-
-void draw_enemy_health_bar(SDL_Surface* screen, Enemy* enemy) {
-    SDL_Rect bg = { enemy->x, enemy->y - 10, 50, 5 };
-    SDL_Rect fg = { enemy->x, enemy->y - 10, (enemy->health * 50) / 100, 5 };
-
-    SDL_FillRect(screen, &bg, SDL_MapRGB(screen->format, 255, 0, 0));
-    SDL_FillRect(screen, &fg, SDL_MapRGB(screen->format, 0, 255, 0));
 }
 
 void animate_enemy_move(Enemy *enemy) {
@@ -276,24 +270,22 @@ void init_player(Player* player, const char* sprite_path, int x) {
     player->posSprite.h = 153;
 }
 
-void draw_player_health_bar(SDL_Surface* screen, Player* player) {
+void display_player(SDL_Surface* screen, Player* player, const SDL_Rect* camera) {
+    // Calculate player's screen position
+    SDL_Rect screen_pos = {
+        .x = player->pos.x - camera->x,
+        .y = player->pos.y - camera->y,
+        .w = player->pos.w,
+        .h = player->pos.h
+    };
+    
+    // Draw player
+    SDL_BlitSurface(player->img, &player->posSprite, screen, &screen_pos);
+    
     // Draw health bar above player
-    SDL_Rect bg = { 
-        player->pos.x, 
-        player->pos.y - 20, 
-        player->pos.w,
-        10 
-    };
-    SDL_Rect fg = { 
-        player->pos.x, 
-        player->pos.y - 20, 
-        (player->health * player->pos.w) / PLAYER_MAX_HEALTH,
-        10 
-    };
-
-    // Draw background (red)
+    SDL_Rect bg = { screen_pos.x, screen_pos.y - 20, player->pos.w, 10 };
+    SDL_Rect fg = { screen_pos.x, screen_pos.y - 20, (player->health * player->pos.w) / PLAYER_MAX_HEALTH, 10 };
     SDL_FillRect(screen, &bg, SDL_MapRGB(screen->format, 255, 0, 0));
-    // Draw foreground (green)
     SDL_FillRect(screen, &fg, SDL_MapRGB(screen->format, 0, 255, 0));
 }
 
@@ -310,11 +302,6 @@ void update_player_health(Player* player, int damage, Uint32 current_time) {
     }
 }
 
-void display_player(SDL_Surface* screen, Player* player) {
-    SDL_BlitSurface(player->img, &player->posSprite, screen, &player->pos);
-    draw_player_health_bar(screen, player);
-}
-
 void move_player(Input* input, Player* player, Uint32 dt) {
     float delta = dt / 16.667f; // Normalize for 60 FPS
     float movement_speed = player->velocity * delta;
@@ -328,12 +315,12 @@ void move_player(Input* input, Player* player, Uint32 dt) {
     
     movement_speed *= (1.0f + player->acc);
 
-    // Handle horizontal movement
+    // Handle horizontal movement - allow moving across the entire world
     if (input->left && player->pos.x >= 10) {
         player->pos.x -= movement_speed;
         player->facing_left = 1;
     }
-    if (input->right && player->pos.x <= SCREEN_WIDTH - player->pos.w) {
+    if (input->right && player->pos.x <= SCREEN_WIDTH * 3) { // Extended boundary for wide backgrounds
         player->pos.x += movement_speed;
         player->facing_left = 0;
     }
@@ -448,27 +435,37 @@ void update_balls(void) {
     }
 }
 
-void display_balls(SDL_Surface* screen) {
+void display_balls(SDL_Surface* screen, const SDL_Rect* camera) {
     for (int i = 0; i < MAX_BALLS; i++) {
         if (balls[i].active) {
-            // Draw a filled circle for each ball
-            SDL_Rect ball_rect = balls[i].pos;
-            Uint32 pink = SDL_MapRGB(screen->format, 255, 192, 203); // Pink color
+            // Calculate ball's screen position
+            SDL_Rect ball_screen_pos = {
+                .x = balls[i].pos.x - camera->x,
+                .y = balls[i].pos.y - camera->y,
+                .w = balls[i].pos.w,
+                .h = balls[i].pos.h
+            };
             
-            // Draw a filled circle using multiple horizontal lines
-            int radius = balls[i].radius;
-            int centerX = ball_rect.x + radius;
-            int centerY = ball_rect.y + radius;
-            
-            for (int dy = -radius; dy <= radius; dy++) {
-                int dx = sqrt(radius * radius - dy * dy);
-                SDL_Rect line = {
-                    centerX - dx,
-                    centerY + dy,
-                    dx * 2,
-                    1
-                };
-                SDL_FillRect(screen, &line, pink);
+            // Only draw if ball is on screen
+            if (ball_screen_pos.x + balls[i].pos.w >= 0 && ball_screen_pos.x <= SCREEN_WIDTH &&
+                ball_screen_pos.y + balls[i].pos.h >= 0 && ball_screen_pos.y <= SCREEN_HEIGHT) {
+                
+                int radius = balls[i].radius;
+                int centerX = ball_screen_pos.x + radius;
+                int centerY = ball_screen_pos.y + radius;
+                Uint32 pink = SDL_MapRGB(screen->format, 255, 192, 203);
+                
+                // Draw a filled circle
+                for (int dy = -radius; dy <= radius; dy++) {
+                    int dx = sqrt(radius * radius - dy * dy);
+                    SDL_Rect line = {
+                        centerX - dx,
+                        centerY + dy,
+                        dx * 2,
+                        1
+                    };
+                    SDL_FillRect(screen, &line, pink);
+                }
             }
         }
     }

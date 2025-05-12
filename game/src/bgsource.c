@@ -1,5 +1,4 @@
 #include "../include/game.h"
-#include "bgmain.h"
 #include <stdio.h>
 #include <stdlib.h>
 

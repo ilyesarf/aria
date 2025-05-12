@@ -16,6 +16,23 @@
 #define PLAYER_MAX_HEALTH 100
 #define DAMAGE_COOLDOWN 1000 // 1 second cooldown between damage
 
+// Platform structure for background
+typedef struct {
+    int x, y; // Position
+    int width, height; // Dimensions
+    char type; // 'F' = fixed, 'M' = mobile, 'D' = destructible
+} Platform;
+
+// Background structure
+typedef struct {
+    Platform *platforms;
+    int platform_count;
+    SDL_Surface *image; // Background image
+    SDL_Rect camera;
+    int world_width;
+    int world_height;
+} Background;
+
 // Game states
 typedef enum {
     GAME_STATE_MENU,
@@ -95,12 +112,15 @@ typedef struct {
 } Image;
 
 // Background functions
-SDL_Surface* load_background(const char* filename);
-void display_background(SDL_Surface* screen, SDL_Surface* background);
+void init_background(Background *bg, const char *image_path, int level);
+void display_background(const Background *bg, SDL_Surface *screen);
+void free_background(Background *bg);
+void scroll_background(Background *bg, int dx, int dy);
+void updateBackgroundCamera(Background *bg, const SDL_Rect *player, int screenWidth, int screenHeight, int margin);
 
 // Enemy functions
 void init_enemy(Enemy *enemy, int health, int x);
-void display_enemy(Enemy *enemy, SDL_Surface* screen);
+void display_enemy(Enemy *enemy, SDL_Surface* screen, const SDL_Rect* camera);
 void draw_enemy_health_bar(SDL_Surface* screen, Enemy* enemy);
 void animate_enemy_move(Enemy *enemy);
 void move_enemy_randomly(Enemy *enemy, int level);
@@ -110,7 +130,7 @@ void update_enemy_health(Enemy *enemy, int damage);
 
 // Player functions
 void init_player(Player* player, const char* sprite_path, int x);
-void display_player(SDL_Surface* screen, Player* player);
+void display_player(SDL_Surface* screen, Player* player, const SDL_Rect* camera);
 void move_player(Input* input, Player* player, Uint32 dt);
 void jump_player(Input* input, Player* player, int* jump_height);
 void animate_player(Player* player, Input input);
@@ -121,7 +141,7 @@ void update_player_health(Player* player, int damage, Uint32 current_time);
 void init_balls(void);
 void create_ball(Player* player);
 void update_balls(void);
-void display_balls(SDL_Surface* screen);
+void display_balls(SDL_Surface* screen, const SDL_Rect* camera);
 void free_balls(void);
 
 // Input functions

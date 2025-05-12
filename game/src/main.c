@@ -53,15 +53,9 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    // Load background
-    SDL_Surface* background = load_background("assets/lastlvl.png");
-    if (!background) {
-        cleanup_game_resources();
-        TTF_Quit();
-        IMG_Quit();
-        SDL_Quit();
-        return -1;
-    }
+    // Initialize background
+    Background background;
+    init_background(&background, "./assets/game/fantasyforest.png", 1);  // Use fantasyforest background
 
     // Initialize game objects
     Player player;
@@ -71,8 +65,11 @@ int main(int argc, char** argv) {
     GameState game_state = GAME_STATE_PLAYING;
 
     // Initialize player
-    init_player(&player, "assets/player/1.png", 200);  // Y position is set in init_player
-
+    init_player(&player, "assets/player/1.png", 400);  // Position player at a better starting point
+    
+    // Initial camera update to ensure proper world view from the start
+    updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
+    
     // Initialize enemies with different behaviors
     for (int i = 0; i < NUM_ENEMIES; i++) {
         int x = rand() % (SCREEN_WIDTH - 100);
@@ -181,17 +178,21 @@ int main(int argc, char** argv) {
 
         // Render game
         SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-        display_background(screen, background);
+        
+        // Update camera to follow player (placed here to ensure it happens for every frame)
+        updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
+        
+        display_background(&background, screen);
         
         // Only display player if alive
         if (player.health > 0) {
-            display_player(screen, &player);
+            display_player(screen, &player, &background.camera);
         }
-        display_balls(screen);
+        display_balls(screen, &background.camera);
         
         for (int i = 0; i < NUM_ENEMIES; i++) {
             if (enemies[i].health > 0) {  // Only display living enemies
-                display_enemy(&enemies[i], screen);
+                display_enemy(&enemies[i], screen, &background.camera);
             }
         }
 
@@ -212,13 +213,14 @@ int main(int argc, char** argv) {
     }
 
     // Cleanup
-    SDL_FreeSurface(background);
+    free_balls();
     free_player(&player);
     for (int i = 0; i < NUM_ENEMIES; i++) {
         free_enemy(&enemies[i]);
     }
-    free_balls();
+    free_background(&background);
     cleanup_game_resources();
+    SDL_FreeSurface(screen);
     TTF_Quit();
     IMG_Quit();
     SDL_Quit();
