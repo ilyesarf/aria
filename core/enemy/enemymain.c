@@ -1,8 +1,17 @@
 #include "enemy.h"
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
-#include <time.h> 
-
+#include <time.h>
+/**
+ * @file enemymain.c
+ * @brief Testing programm.
+ * @author Med Hedi Belaid
+ * @version 1.0
+ * @date may 12, 2025
+ *
+ *Testing program for enemy
+ *
+*/
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Surface* screen = SDL_SetVideoMode(800, 600, 32, SDL_SWSURFACE);
