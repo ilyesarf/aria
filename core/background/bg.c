@@ -3,7 +3,7 @@
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
 #include <time.h>
-
+ 
 #include "minimap.h"
 #include "background.h"
 #include "personnage.h"
