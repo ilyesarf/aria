@@ -43,6 +43,7 @@ typedef struct {
     int patrol_direction;
     Uint32 last_attack_time;
     Uint32 attack_cooldown;
+    int frame_counter;  // Add frame counter for animation timing
 } Enemy;
 
 // Player structure
@@ -98,7 +99,7 @@ SDL_Surface* load_background(const char* filename);
 void display_background(SDL_Surface* screen, SDL_Surface* background);
 
 // Enemy functions
-void init_enemy(Enemy *enemy, int health, int x, int y);
+void init_enemy(Enemy *enemy, int health, int x);
 void display_enemy(Enemy *enemy, SDL_Surface* screen);
 void draw_enemy_health_bar(SDL_Surface* screen, Enemy* enemy);
 void animate_enemy_move(Enemy *enemy);

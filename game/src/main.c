@@ -76,8 +76,7 @@ int main(int argc, char** argv) {
     // Initialize enemies with different behaviors
     for (int i = 0; i < NUM_ENEMIES; i++) {
         int x = rand() % (SCREEN_WIDTH - 100);
-        int y = rand() % (SCREEN_HEIGHT - 100);
-        init_enemy(&enemies[i], 100, x, y);
+        init_enemy(&enemies[i], 100, x);
     }
 
     // Initialize ball system
@@ -116,8 +115,7 @@ int main(int argc, char** argv) {
                 // Reset enemies
                 for (int i = 0; i < NUM_ENEMIES; i++) {
                     int x = rand() % (SCREEN_WIDTH - 100);
-                    int y = rand() % (SCREEN_HEIGHT - 100);
-                    init_enemy(&enemies[i], 100, x, y);
+                    init_enemy(&enemies[i], 100, x);
                 }
                 
                 game_state = GAME_STATE_PLAYING;

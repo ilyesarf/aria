@@ -81,10 +81,10 @@ void cleanup_game_resources(void) {
 }
 
 // Enemy implementation
-void init_enemy(Enemy *enemy, int health, int x, int y) {
+void init_enemy(Enemy *enemy, int health, int x) {
     enemy->health = health;
     enemy->x = x;
-    enemy->y = y;
+    enemy->y = GROUND_Y - 153;  // Place at ground level
     enemy->current_frame = 0;
     enemy->state = WAITING;
     enemy->dx = 0;
@@ -92,7 +92,8 @@ void init_enemy(Enemy *enemy, int health, int x, int y) {
     enemy->patrol_start_x = x;
     enemy->patrol_direction = 1;
     enemy->last_attack_time = 0;
-    enemy->attack_cooldown = 1000; // 1 second cooldown
+    enemy->attack_cooldown = 1000;
+    enemy->frame_counter = 0;  // Initialize frame counter
 
     // Use shared enemy frames
     for (int i = 0; i < 4; i++) {
@@ -118,7 +119,12 @@ void draw_enemy_health_bar(SDL_Surface* screen, Enemy* enemy) {
 }
 
 void animate_enemy_move(Enemy *enemy) {
-    enemy->current_frame = (enemy->current_frame + 1) % 4;
+    // Only update animation every 15 frames (makes it about 4 times slower)
+    enemy->frame_counter++;
+    if (enemy->frame_counter >= 15) {
+        enemy->current_frame = (enemy->current_frame + 1) % 4;
+        enemy->frame_counter = 0;
+    }
 }
 
 void move_enemy_randomly(Enemy *enemy, int level) {
