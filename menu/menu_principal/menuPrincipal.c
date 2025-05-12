@@ -70,7 +70,7 @@ void handleEventPrincipalMenu(int *menuState, Level level, SDL_Event event, Butt
                 for (int i = 0; i < n_btns; i++) {
                     if (buttons[i].selected) {
                         if (i == 0) {
-                            *menuState = MENU_SAVE; // First button
+                            *menuState = MENU_NEW_LOAD_SAVE; // First button
                         } else if (i == 1) {
                             *menuState = MENU_OPTION; // Options button
                         } else if (i == 2) {

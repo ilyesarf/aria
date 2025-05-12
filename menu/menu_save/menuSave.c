@@ -66,7 +66,7 @@ void renderMenuChooseSave(SDL_Surface *background, SDL_Surface *butImage, SDL_Su
     SDL_Flip(screen);
 }
 
-void handleEventSaveMenu(int *menuState, Level level, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
+void handleEventSaveMenu(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
     while (SDL_PollEvent(&event)) {
 
         if (event.type == SDL_QUIT) *menuState = QUIT_GAME;
@@ -87,7 +87,7 @@ void handleEventSaveMenu(int *menuState, Level level, SDL_Event event, Button *b
                 if (buttons[i].selected) {
                     if (i == 0) {
                         Mix_PlayChannel(-1, hoverSound, 0);
-                        //save_game("savegame.dat", level);
+                        save_game("savegame.dat", save);
                         *menuState = MENU_PRINCIPAL; // OUI -> Next menu
                     } else if (i == 1) { 
                         Mix_PlayChannel(-1, hoverSound, 0);
@@ -103,7 +103,7 @@ void cleanupMenuSave(Menu *menu) {
     menu->buttons = NULL;
 }
 
-void handleEventChooseSaveMenu(int *menuState, Level level, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
+void handleEventChooseSaveMenu(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_MOUSEMOTION) {
             for (int i = 0; i < n_btns; i++) {
@@ -121,7 +121,7 @@ void handleEventChooseSaveMenu(int *menuState, Level level, SDL_Event event, But
             for (int i = 0; i < 2; i++) {
                 if (buttons[i].selected) { 
                     if (i == 0) {
-                        //load_game("savegame.dat", level);
+                        load_game("savegame.dat", save);
                         *menuState = MAIN_GAME; // Charger jeu
                     }
                     else if (i == 1) *menuState = MENU_PLAYER; //Nouvelle jeu
@@ -143,23 +143,23 @@ void handleEventChooseSaveMenu(int *menuState, Level level, SDL_Event event, But
     }
 }
 
-void load_game(char *filename, Level level) {
+void load_game(char *filename, Save save) {
     FILE *file = fopen(filename, "rb");
     if (!file) {
         fprintf(stderr, "Failed to open file: %s\n", filename);
         return;
     }
-    fread(&level, sizeof(Level), 1, file);
+    fread(&save, sizeof(Save), 1, file);
     fclose(file);
 }
 
-void save_game(char *filename, Level level) {
+void save_game(char *filename, Save save) {
     FILE *file = fopen(filename, "wb");
     if (!file) {
         fprintf(stderr, "Failed to open file: %s\n", filename);
         return;
     }
-    fwrite(&level, sizeof(Level), 1, file);
+    fwrite(&save, sizeof(Save), 1, file);
     fclose(file);
     printf("Game saved to %s\n", filename); 
 }

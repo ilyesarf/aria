@@ -1,84 +1,66 @@
-#include<stdio.h>
-#include"SDL/SDL.h"
-#include<SDL/SDL_image.h>
-#include<SDL/SDL_mixer.h>
-#include <SDL/SDL_ttf.h>
-#include "time.h"
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
 #include "map.h"
-#include <string.h>
+#include "time.h"
+#include "pres.h"
 
-int main()
-{	
-		int continuer=1,done=1;
-	SDL_Surface *screen,*backg,*backgm;
-	SDL_Rect backg_pos,backgm_pos;
-	
-	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
+int main() {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
+        printf("Failed to initialize SDL: %s\n", SDL_GetError());
+        return 1;
+    }
 
-	screen=SDL_SetVideoMode(1500,1000,32,SDL_HWSURFACE|SDL_DOUBLEBUF);
-	if(screen==NULL)
-	{
-		printf("unable to set video mode:%s\n",SDL_GetError());
-		return 1;
-	}
-	
-	backg = SDL_LoadBMP("backgg1.bmp");
-	backg_pos.x = 0;
-	backg_pos.y = 0;
-	
-//initialisation du temps et de map et du perso 
+    SDL_Surface *screen = SDL_SetVideoMode(1500, 1000, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
+    if (!screen) {
+        printf("Failed to set video mode: %s\n", SDL_GetError());
+        SDL_Quit();
+        return 1;
+    }
 
-	Time temps;
-	map m;
-	personne p;
-	
-	inittemps(&temps);
-	initialiser_map (&m,screen,&p) ;
-	initialiserperso(&p);
-	
-	SDL_Event event;
-	
-	while (continuer)
-	{	
-	SDL_PollEvent(&event);
-	switch(event.type)
-        {
+    SDL_Surface *background = SDL_LoadBMP("backgg1.bmp");
+    if (!background) {
+        printf("Failed to load background: %s\n", SDL_GetError());
+        SDL_Quit();
+        return 1;
+    }
 
-        case SDL_QUIT:
-            continuer=0;
-            break;
-        case SDL_KEYUP:
-            switch(event.key.keysym.sym)
-            {
-            case SDLK_k:{
-		while(done){
-		
-		}}
-                break ;
-	case SDLK_c:
-		
-                break ;
-	
-	    
-	}}	
-		
-		update_time(&temps);
-		deplacer_perso(&p,event);
+    SDL_Rect background_pos = {0, 0};
 
-		perso_map(&m,&p);
-		SDL_BlitSurface(backg,NULL,screen,&backg_pos);
-		
-		displaytime(temps,screen);
-		
-		affiche_map(&m,screen,&p);
-		afficher_perso(screen,p);
-		SDL_Flip(screen);
-		SDL_Delay(100);
-	}
-	
-	freeTexttime(temps.temps);
-	free_perso(p);
-	SDL_Quit();
+    Time timer;
+    Map map;
+    personne player;
 
-	return 1;
+    inittemps(&timer);
+    init_map(&map, screen);
+    initialiserperso(&player);
+
+    int running = 1;
+    SDL_Event event;
+
+    while (running) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                running = 0;
+            }
+            deplacer_perso(&player, event);
+        }
+
+        update_time(&timer);
+        update_map_position(&map, &player);
+
+        SDL_BlitSurface(background, NULL, screen, &background_pos);
+        displaytime(timer, screen);
+        render_map(&map, screen);
+        afficher_perso(screen, player);
+
+        SDL_Flip(screen);
+        SDL_Delay(100);
+    }
+
+    freeTexttime(timer.temps);
+    free_perso(player);
+    SDL_FreeSurface(background);
+    SDL_Quit();
+
+    return 0;
 }

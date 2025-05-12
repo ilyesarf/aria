@@ -54,3 +54,10 @@ typedef struct {
     SDL_Rect pos2;
     SDL_Surface* img;
 } Image;
+
+typedef struct {
+    Player *players;
+    Level level;
+} Save;
+
+void renderSave(Save save);

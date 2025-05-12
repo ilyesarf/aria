@@ -41,7 +41,7 @@ typedef struct Menu {
     Button *buttons;
     void (*init_buttons)(Button *buttons);
     void (*render)(SDL_Surface *background, SDL_Surface *butImage, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns);
-    void (*handleEvent)(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
+    void (*handleEvent)(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
 } Menu;
 
 SDL_Surface* init_screen();

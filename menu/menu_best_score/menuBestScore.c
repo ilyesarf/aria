@@ -54,7 +54,7 @@ void renderMenuBestScore(SDL_Surface *background, SDL_Surface *butImage, SDL_Sur
     SDL_Flip(screen);
 }
 
-void handleEventBestScore(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
+void handleEventBestScore(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) *menuState = QUIT_GAME;
         if (event.type == SDL_MOUSEMOTION) {

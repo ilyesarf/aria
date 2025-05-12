@@ -20,7 +20,7 @@ typedef struct {
 void initMenuEnigme(Menu *menus);
 void initMenuEnigmeButtons(Button *buttons);
 void renderMenuEnigme(SDL_Surface *background, SDL_Surface *butImage, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns);
-void handleEventEnigme(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
+void handleEventEnigme(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
 void cleanupMenuEnigme(Menu *menu) ;
 
 // QuizEnigme Functions

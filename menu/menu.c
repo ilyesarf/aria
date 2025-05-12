@@ -165,6 +165,8 @@ int main() {
     Menu menus[N_MENUS];
     init_menus(menus);
 
+    Save save;
+
     int menuState = MENU_PRINCIPAL; // Changed initial menuState to MENU_PRINCIPAL
 
     while (menuState != QUIT_GAME) {
@@ -174,10 +176,11 @@ int main() {
         
         if (menuState == MAIN_GAME) {
             printf("MAIN GAME...\n");
-            menuState = -1;
+            renderSave(save);
+            //menuState = -1;
         } else {
             menus[menuState].render(background, butImage, screen, font, textColor, menus[menuState].buttons, menus[menuState].n_btns);
-            menus[menuState].handleEvent(&menuState, event, menus[menuState].buttons, menus[menuState].n_btns, hoverSound);
+            menus[menuState].handleEvent(&menuState, save, event, menus[menuState].buttons, menus[menuState].n_btns, hoverSound);
             //printf("menu state: %d\n", menuState);
         }
         SDL_Flip(screen); // Ensure the screen is updated

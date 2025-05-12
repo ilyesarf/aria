@@ -16,7 +16,7 @@ typedef struct {
 void initMenuBestScore(Menu *menus);
 void initMenuBestScoreButtons(Button *buttons);
 void renderMenuBestScore(SDL_Surface *background, SDL_Surface *butImage, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns);
-void handleEventBestScore(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
+void handleEventBestScore(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
 void renderInputBox(SDL_Surface *screen, TTF_Font *font, const char *inputText);
 void handleInput(SDL_Event event, char *inputText, int maxLength);
 void loadScores(ScoreEntry scores[]);

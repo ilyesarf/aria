@@ -18,8 +18,8 @@ void initMenuChooseSave(Menu *menus);
 void initMenuChooseSaveButtons(Button *buttons);
 void renderMenuSave(SDL_Surface *background, SDL_Surface *butImage, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns);
 void renderMenuChooseSave(SDL_Surface *background, SDL_Surface *butImage, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns);
-void handleEventSaveMenu(int *menuState, Level level, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
-void handleEventChooseSaveMenu(int *menuState, Level level, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
+void handleEventSaveMenu(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
+void handleEventChooseSaveMenu(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
 void cleanupMenuSave(Menu *menu) ;
 
 #endif

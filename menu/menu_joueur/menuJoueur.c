@@ -75,7 +75,7 @@ void renderMenuJoueur(SDL_Surface *background, SDL_Surface *butImage, SDL_Surfac
     SDL_Flip(screen);
 }
 
-void handleEventJoueurMenu(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
+void handleEventJoueurMenu(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) *menuState = QUIT_GAME;
         if (event.type == SDL_MOUSEMOTION) {
