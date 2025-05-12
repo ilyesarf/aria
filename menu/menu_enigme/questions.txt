@@ -1,10 +1,10 @@
-What is the capital of France?;Paris;London;Berlin;0
-What is 2 + 2?;3;4;5;1
-What is the color of the sky?;Blue;Green;Red;0
-What is the largest planet?;Earth;Mars;Jupiter;2
-Who wrote 'Hamlet'?;Shakespeare;Dickens;Austen;0
-What is the boiling point of water?;90C;100C;110C;1
-What is the speed of light?;300,000 km/s;150,000 km/s;450,000 km/s;0
-What is the currency of Japan?;Yen;Dollar;Euro;0
-What is the chemical symbol for water?;H2O;O2;CO2;0
-What is the tallest mountain?;K2;Everest;Kilimanjaro;1
+Where does Iris begin her journey?;In her messy studio;On a mountain;In a forest;0
+What is the first surreal place Iris visits?;A glowing meadow;A fragmented tower;A frozen lake;1
+Who is the mysterious guide Iris meets?;Lia, an orb of light;A shadowy figure;A talking cat;0
+What emotion does the tower represent for Iris?;Joy;Anxiety and self-doubt;Excitement;1
+Which enemy blocks Iris’s path in the tower?;The Whispering Shadow;The Silent Guardian;The Broken Mirror;0
+What is the second enemy Iris faces?;The Doubt Wraith;The Tower Keeper;The Lost Composer;0
+What must Iris solve to progress in the tower?;A musical puzzle;A riddle about colors;A math equation;0
+How does Iris overcome the Doubt Wraith?;By running away;By playing a powerful melody;By hiding;1
+Who is the hero of the story?;Lia;Iris;The Tower;1
+What happens when Iris lights the Beacon of Clarity?;The world fades and she wakes up inspired;She gets lost;The tower collapses;0

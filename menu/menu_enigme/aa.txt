@@ -1,7 +1,5 @@
 #include "menuEnigme.h"
 #include "../header.h"
-#include <SDL_gfxPrimitives.h>
-#include <SDL_rotozoom.h>
 
 // Global variables for quiz
 static int currentQuestionIndex = -1;
@@ -24,9 +22,6 @@ static SDL_Rect draggedPieceOffset = {0, 0, 0, 0}; // Offset for dragging
 
 // Puzzle assets
 static SDL_Surface *puzzleImage = NULL;
-static Uint32 puzzleStartTime = 0;
-static int puzzleSolved = 0;
-static int puzzleTimeout = 0;
 
 // Global variable for enigme menu
 int showSubButtons = 0;
@@ -92,42 +87,6 @@ void renderMenuEnigme(SDL_Surface *background, SDL_Surface *butImage, SDL_Surfac
     }
 
     SDL_Flip(screen); // Update the screen
-}
-
-void showRotozoomMessage(const char *message, SDL_Color color) {
-    screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 32, SDL_SWSURFACE);
-    if (!screen) {
-        fprintf(stderr, "Error: screen is NULL in showRotozoomMessage\n");
-        SDL_Delay(2000);
-        return;
-    }
-    TTF_Font *font = TTF_OpenFont("./assets/fonts/font.ttf", 60);
-    if (!font) {
-        fprintf(stderr, "Error: could not open font in showRotozoomMessage\n");
-        SDL_Delay(2000);
-        return;
-    }
-    SDL_Surface *msgSurface = TTF_RenderText_Solid(font, message, color);
-    if (!msgSurface) {
-        fprintf(stderr, "Error: could not render text in showRotozoomMessage\n");
-        TTF_CloseFont(font);
-        SDL_Delay(2000);
-        return;
-    }
-
-    double angle = 0;
-    Uint32 start = SDL_GetTicks();
-    while (SDL_GetTicks() - start < 2000) { // Show for 2 seconds
-        SDL_Surface *zoomed = rotozoomSurface(msgSurface, angle, 1.2, 1);
-        SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); // Clear screen
-        SDL_BlitSurface(zoomed, NULL, screen, &(SDL_Rect){(screen->w - zoomed->w)/2, (screen->h - zoomed->h)/2, 0, 0});
-        SDL_Flip(screen);
-        SDL_FreeSurface(zoomed);
-        angle += 5;
-        SDL_Delay(30);
-    }
-    SDL_FreeSurface(msgSurface);
-    TTF_CloseFont(font);
 }
 
 
@@ -217,31 +176,28 @@ void checkAnswer(int selectedOption, int correctOption, int *score, int *lives, 
             if (*score % 5 == 0) {
                 (*lives)++;
             }
-            // Show rotozoom "Correct answer"
-            SDL_Color green = {0, 255, 0, 0};
-            showRotozoomMessage("Correct answer!", green);
         } else {
             printf("Wrong answer!\n");
             printf("showbuttons: %d\n", showSubButtons);
             if (*lives > 0) {
                 (*lives)--;
             }
-            // Show rotozoom "Game Over"
-            SDL_Color red = {255, 0, 0, 0};
-            showRotozoomMessage("Game Over!", red);
-
             if (*lives == 0) {
                 printf("Returning to Menu Option...\n");
                 *score = 0;
                 *lives = 0;
                 showSubButtons = 0;
                 *menuState = MENU_OPTION;
+                
+                
             }
         }
         if (*score == 10) {
             *menuState = MENU_PRINCIPAL;
         }
         currentQuestionIndex++;
+        
+        
     }
 }
 
@@ -354,50 +310,39 @@ void renderPuzzle(SDL_Surface *screen) {
         SDL_BlitSurface(pieceImages[draggedPieceIndex], NULL, screen, &draggedPosition);
     }
 
-    // Check if the puzzle is completed
-    int tolerance = 20; // Allowable range for approximate placement
-    int piecesInPlace = 0;
-
-    for (int i = 0; i < 9; i++) {
-        // Check if the piece is inside the box and approximately in the correct position
-        if (piecePositions[i].x >= 600 && piecePositions[i].x <= 870 && // Inside the box horizontally
-            piecePositions[i].y >= 300 && piecePositions[i].y <= 570 && // Inside the box vertically
-            abs(piecePositions[i].x - correctPositions[i].x) <= tolerance &&
-            abs(piecePositions[i].y - correctPositions[i].y) <= tolerance) {
-            piecesInPlace++;
+        // Check if the puzzle is completed
+        int tolerance = 20; // Allowable range for approximate placement
+        int piecesInPlace = 0;
+    
+        for (int i = 0; i < 9; i++) {
+            // Check if the piece is inside the box and approximately in the correct position
+            if (piecePositions[i].x >= 600 && piecePositions[i].x <= 870 && // Inside the box horizontally
+                piecePositions[i].y >= 300 && piecePositions[i].y <= 570 && // Inside the box vertically
+                abs(piecePositions[i].x - correctPositions[i].x) <= tolerance &&
+                abs(piecePositions[i].y - correctPositions[i].y) <= tolerance) {
+                piecesInPlace++;
+            }
         }
-    }
+    
+        if (piecesInPlace == 9) { // All pieces are approximately in place
+            printf("Puzzle completed!\n");
 
-    Uint32 now = SDL_GetTicks();
-    Uint32 elapsed = (puzzleStartTime > 0) ? (now - puzzleStartTime) : 0;
-    int secondsLeft = 30 - (elapsed / 1000);
+            // Render "You Won" text
+            TTF_Font *font = TTF_OpenFont("./assets/fonts/font.ttf", 400); // Load a font
+            if (!font) {
+                fprintf(stderr, "Failed to load font: %s\n", TTF_GetError());
+                return;
+            }
+            SDL_Color textColor = {255, 0, 0, 0}; // Red color
+            renderText(screen, "You Won!", font, textColor, 250, 500); // Render text at the top
+            TTF_CloseFont(font); // Close the font
 
-    // Render timer
-    char timerText[32];
-    snprintf(timerText, sizeof(timerText), "Time left: %d", secondsLeft > 0 ? secondsLeft : 0);
-    TTF_Font *timerFont = TTF_OpenFont("./assets/fonts/font.ttf", 40);
-    if (timerFont) {
-        SDL_Color timerColor = {0, 0, 255, 0};
-        renderText(screen, timerText, timerFont, timerColor, 50, 200);
-        TTF_CloseFont(timerFont);
-    }
 
-    // Puzzle solved in time
-    if (!puzzleSolved && !puzzleTimeout && piecesInPlace == 9 && secondsLeft > 0) {
-        puzzleSolved = 1;
-        showRotozoomMessage("Correct answer!", (SDL_Color){0, 255, 0, 0});
-        showSubButtons = 0; // Return to menu
-    }
 
-    // Time out
-    if (!puzzleSolved && !puzzleTimeout && secondsLeft <= 0) {
-        puzzleTimeout = 1;
-        showRotozoomMessage("Game Over!", (SDL_Color){255, 0, 0, 0});
-        showSubButtons = 0; // Return to menu
-    }
+            /*showSubButtons = 0; // Reset to main menu or another state
+            menuState = MENU_OPTION; // Return to menu option*/
+        }
 }
-
-
 
 
 
@@ -460,9 +405,6 @@ void handleEventEnigme(int *menuState, SDL_Event event, Button *buttons, int n_b
                                 printf("Puzzle selected\n");
                                 showSubButtons = 2;
                                 initPuzzle();
-                                puzzleStartTime = SDL_GetTicks();
-                                puzzleSolved = 0;
-                                puzzleTimeout = 0;
                             }
                         } else if (showSubButtons == 1) { // Handle Quiz-specific buttons
                             printf("Answer selected: Option %d\n", i - 2);
