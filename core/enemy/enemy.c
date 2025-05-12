@@ -53,7 +53,7 @@ void animate_enemy_move(Enemy *enemy) {
 void move_enemy_randomly(Enemy *enemy, int level) {
     // Persistent direction tracking
     static int last_dir_change = 0;
-    const int dir_change_interval = 2000; // Time in milliseconds until direction change
+    const int dir_change_interval = 1000; // Time in milliseconds until direction change
     
     // Initialize directions if needed
     if (enemy->dx == 0 && enemy->dy == 0) {
