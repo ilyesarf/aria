@@ -71,7 +71,7 @@ void cleanup_game_resources(void) {
 void init_enemy(Enemy *enemy, int health, int x) {
     enemy->health = health;
     enemy->x = x;
-    enemy->y = GROUND_Y - 153;  // Place at ground level
+    enemy->y = GROUND_Y - 153;  // Default ground level position
     enemy->current_frame = 0;
     enemy->state = WAITING;
     enemy->dx = 0;
@@ -143,11 +143,11 @@ void move_enemy_randomly(Enemy *enemy, int level) {
         last_dir_change = current_time;
     }
     
-    int move_speed = 5;
+    int move_speed = 3; // Slightly slower for better control
     enemy->x += enemy->dx * move_speed;
     enemy->y += enemy->dy * move_speed;
     
-    // Screen boundary checks
+    // World boundary checks
     if (enemy->x < 0) {
         enemy->x = 0;
         enemy->dx = 1;
@@ -156,14 +156,16 @@ void move_enemy_randomly(Enemy *enemy, int level) {
         enemy->y = 0;
         enemy->dy = 1;
     }
-    if (enemy->x > SCREEN_WIDTH - enemy->frames[0]->w) {
-        enemy->x = SCREEN_WIDTH - enemy->frames[0]->w;
+    if (enemy->x > SCREEN_WIDTH * 3 - enemy->frames[0]->w) { // Use extended world width
+        enemy->x = SCREEN_WIDTH * 3 - enemy->frames[0]->w;
         enemy->dx = -1;
     }
     if (enemy->y > SCREEN_HEIGHT - enemy->frames[0]->h) {
         enemy->y = SCREEN_HEIGHT - enemy->frames[0]->h;
         enemy->dy = -1;
     }
+    
+    // Remove ground level restrictions to allow free movement
 }
 
 void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int vision_range, int attack_range) {
@@ -182,8 +184,28 @@ void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int vision_range, i
             } else {
                 // Patrol behavior
                 enemy->x += enemy->patrol_direction * PATROL_SPEED;
-                if (fabs(enemy->x - enemy->patrol_start_x) > PATROL_RANGE) {
+                
+                // Reverse direction at patrol limits or world boundaries
+                if (fabs(enemy->x - enemy->patrol_start_x) > PATROL_RANGE || 
+                    enemy->x <= 0 || 
+                    enemy->x >= SCREEN_WIDTH * 3 - enemy->frames[0]->w) {
+                    
                     enemy->patrol_direction *= -1;
+                }
+                
+                // Random vertical movement during patrol
+                if (rand() % 100 < 5) { // 5% chance to change vertical direction
+                    enemy->dy = (rand() % 3) - 1; // -1, 0, or 1
+                    enemy->y += enemy->dy * PATROL_SPEED;
+                    
+                    // Keep within screen height
+                    if (enemy->y < 0) {
+                        enemy->y = 0;
+                        enemy->dy = 1;
+                    } else if (enemy->y > SCREEN_HEIGHT - enemy->frames[0]->h) {
+                        enemy->y = SCREEN_HEIGHT - enemy->frames[0]->h;
+                        enemy->dy = -1;
+                    }
                 }
             }
             break;
@@ -191,31 +213,47 @@ void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int vision_range, i
         case FOLLOWING:
             if (distance <= attack_range) {
                 enemy->state = ATTACKING;
-            } else if (distance > vision_range) {
+            } else if (distance > vision_range * 1.5) { // Give more leeway before losing sight
                 enemy->state = WAITING;
             } else {
                 // Smooth pursuit movement
                 float angle = atan2(dy, dx);
-                enemy->x += cos(angle) * CHASE_SPEED;
-                enemy->y += sin(angle) * CHASE_SPEED;
+                float new_x = enemy->x + cos(angle) * CHASE_SPEED;
+                float new_y = enemy->y + sin(angle) * CHASE_SPEED;
+                
+                // Check world boundaries
+                if (new_x >= 0 && new_x <= SCREEN_WIDTH * 3 - enemy->frames[0]->w) {
+                    enemy->x = new_x;
+                }
+                
+                // Allow full vertical movement within screen bounds
+                if (new_y >= 0 && new_y <= SCREEN_HEIGHT - enemy->frames[0]->h) {
+                    enemy->y = new_y;
+                }
             }
             break;
 
         case ATTACKING:
-            if (distance > attack_range) {
+            if (distance > attack_range * 1.2) { // Give a bit more range before switching back
                 enemy->state = FOLLOWING;
             } else {
                 // Aggressive movement
                 float angle = atan2(dy, dx);
-                enemy->x += cos(angle) * ATTACK_SPEED;
-                enemy->y += sin(angle) * ATTACK_SPEED;
+                float new_x = enemy->x + cos(angle) * ATTACK_SPEED;
+                float new_y = enemy->y + sin(angle) * ATTACK_SPEED;
+                
+                // Check world boundaries
+                if (new_x >= 0 && new_x <= SCREEN_WIDTH * 3 - enemy->frames[0]->w) {
+                    enemy->x = new_x;
+                }
+                
+                // Allow full vertical movement within screen bounds
+                if (new_y >= 0 && new_y <= SCREEN_HEIGHT - enemy->frames[0]->h) {
+                    enemy->y = new_y;
+                }
             }
             break;
     }
-
-    // Keep enemy within screen bounds
-    enemy->x = fmax(0, fmin(enemy->x, SCREEN_WIDTH - enemy->frames[0]->w));
-    enemy->y = fmax(0, fmin(enemy->y, SCREEN_HEIGHT - enemy->frames[0]->h));
 }
 
 int check_collision_player_enemy(SDL_Rect player_rect, Enemy *enemy) {
@@ -394,14 +432,21 @@ void init_balls(void) {
 void create_ball(Player* player) {
     for (int i = 0; i < MAX_BALLS; i++) {
         if (!balls[i].active) {
-            balls[i].pos.x = player->pos.x + player->pos.w/2;
-            balls[i].pos.y = player->pos.y + player->pos.h/2;
-            balls[i].pos.w = BALL_WIDTH;
-            balls[i].pos.h = BALL_HEIGHT;
+            // Position the ball at the player's hand/front based on facing direction
+            if (player->facing_left) {
+                balls[i].pos.x = player->pos.x; // Left side of player
+            } else {
+                balls[i].pos.x = player->pos.x + player->pos.w; // Right side of player
+            }
             
-            // Calculate initial velocity based on player direction
+            balls[i].pos.y = player->pos.y + player->pos.h/3; // Approximately at hand height
+            balls[i].pos.w = BALL_WIDTH * 1.5; // Make ball bigger
+            balls[i].pos.h = BALL_HEIGHT * 1.5;
+            balls[i].radius = (BALL_WIDTH * 1.5) / 2;
+            
+            // Calculate initial velocity based on player direction - make it faster
             float angle = player->facing_left ? M_PI : 0;
-            balls[i].dx = cos(angle) * BALL_INITIAL_SPEED;
+            balls[i].dx = cos(angle) * (BALL_INITIAL_SPEED * 1.5);
             balls[i].dy = 0.0f; // Remove vertical movement
             
             balls[i].active = 1;
@@ -426,8 +471,9 @@ void update_balls(void) {
                 continue;
             }
             
-            // Check screen bounds
-            if (balls[i].pos.x < 0 || balls[i].pos.x > SCREEN_WIDTH ||
+            // Check world bounds instead of screen bounds
+            // Balls should only deactivate if they leave the world, not just the screen
+            if (balls[i].pos.x < 0 || balls[i].pos.x > SCREEN_WIDTH * 3 ||
                 balls[i].pos.y < 0 || balls[i].pos.y > SCREEN_HEIGHT) {
                 balls[i].active = 0;
             }
@@ -453,7 +499,9 @@ void display_balls(SDL_Surface* screen, const SDL_Rect* camera) {
                 int radius = balls[i].radius;
                 int centerX = ball_screen_pos.x + radius;
                 int centerY = ball_screen_pos.y + radius;
-                Uint32 pink = SDL_MapRGB(screen->format, 255, 192, 203);
+                
+                // Use a brighter color for better visibility - bright red
+                Uint32 ballColor = SDL_MapRGB(screen->format, 255, 0, 0);
                 
                 // Draw a filled circle
                 for (int dy = -radius; dy <= radius; dy++) {
@@ -464,7 +512,21 @@ void display_balls(SDL_Surface* screen, const SDL_Rect* camera) {
                         dx * 2,
                         1
                     };
-                    SDL_FillRect(screen, &line, pink);
+                    SDL_FillRect(screen, &line, ballColor);
+                }
+                
+                // Add a white center for a glowing effect
+                int innerRadius = radius / 3;
+                Uint32 innerColor = SDL_MapRGB(screen->format, 255, 255, 255);
+                for (int dy = -innerRadius; dy <= innerRadius; dy++) {
+                    int dx = sqrt(innerRadius * innerRadius - dy * dy);
+                    SDL_Rect line = {
+                        centerX - dx,
+                        centerY + dy,
+                        dx * 2,
+                        1
+                    };
+                    SDL_FillRect(screen, &line, innerColor);
                 }
             }
         }
@@ -556,8 +618,16 @@ void check_ball_enemy_collisions(Enemy enemies[], int num_enemies) {
         if (balls[i].active) {
             for (int j = 0; j < num_enemies; j++) {
                 if (enemies[j].health > 0 && check_collision_ball_enemy(balls[i].pos, &enemies[j])) {
-                    // Ball hits enemy
-                    update_enemy_health(&enemies[j], 20); // Each hit does 20 damage
+                    // Ball hits enemy - increased damage from 20 to 50 for more effective attacks
+                    update_enemy_health(&enemies[j], 50);
+                    
+                    // Visual feedback - push the enemy back slightly in the direction of the ball
+                    if (balls[i].dx > 0) {
+                        enemies[j].x += 20; // Push right
+                    } else {
+                        enemies[j].x -= 20; // Push left
+                    }
+                    
                     balls[i].active = 0; // Deactivate the ball
                     break;
                 }

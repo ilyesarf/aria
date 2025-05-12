@@ -70,10 +70,23 @@ int main(int argc, char** argv) {
     // Initial camera update to ensure proper world view from the start
     updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
     
-    // Initialize enemies with different behaviors
+    // Initialize enemies with different behaviors spread across the world
     for (int i = 0; i < NUM_ENEMIES; i++) {
-        int x = rand() % (SCREEN_WIDTH - 100);
+        // Spread enemies throughout the world, not just visible area
+        int x = rand() % (SCREEN_WIDTH * 3 - 100);
+        
+        // Vary enemy heights throughout the screen
+        int y = rand() % (SCREEN_HEIGHT - 200);
+        
+        // Make sure some enemies are near the player's starting area
+        if (i == 0) {
+            // First enemy within visible range of player start position
+            x = player.pos.x + SCREEN_WIDTH/2 + rand() % 300;
+            y = player.pos.y - 100 - rand() % 200; // Position above the player
+        }
+        
         init_enemy(&enemies[i], 100, x);
+        enemies[i].y = y; // Set custom y position
     }
 
     // Initialize ball system
@@ -169,9 +182,22 @@ int main(int argc, char** argv) {
             for (int i = 0; i < NUM_ENEMIES; i++) {
                 if (enemies[i].health <= 0) {
                     player.score += 100;
-                    // Don't respawn enemy, just make it invisible
-                    enemies[i].x = -1000;  // Move far off screen
-                    enemies[i].y = -1000;
+                    
+                    // Respawn enemy in a random location ahead of the player
+                    int new_x;
+                    if (rand() % 2 == 0) {
+                        // Respawn ahead of player
+                        new_x = player.pos.x + SCREEN_WIDTH + rand() % (int)(SCREEN_WIDTH * 1.5);
+                    } else {
+                        // Respawn behind player (further back)
+                        new_x = fmax(0, player.pos.x - SCREEN_WIDTH - rand() % SCREEN_WIDTH);
+                    }
+                    
+                    // Cap the position to world bounds
+                    new_x = fmin(new_x, SCREEN_WIDTH * 3 - 100);
+                    
+                    // Reset the enemy with full health at the new position
+                    init_enemy(&enemies[i], 100, new_x);
                 }
             }
         }
