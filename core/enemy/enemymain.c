@@ -48,13 +48,16 @@ int main() {
 
         SDL_Rect enemy_rect = {shadow.x, shadow.y, 128, 128};
         if (check_collision_enemy_es(enemy_rect, wall.rect)) {
-            shadow.x -= 50; shadow.y -=2; // Step back if collision
-        }
+    // Calculate the reverse direction based on the enemy's movement
+    shadow.x -= (shadow.dx * 50); // Step back in the opposite X-direction
+    shadow.y -= (shadow.dy * 50); // Step back in the opposite Y-direction
+}
 
-        if(check_collision_player_enemy(wall2.rect, &shadow)){
-            shadow.x -= 2; shadow.y -=2; // Step back if collision
-        }
-
+if (check_collision_player_enemy(wall2.rect, &shadow)) {
+    // Calculate the reverse direction based on the enemy's movement
+    shadow.x -= (shadow.dx * 50); // Step back in the opposite X-direction
+    shadow.y -= (shadow.dy * 50); // Step back in the opposite Y-direction
+}
         animate_enemy_move(&shadow);
         display_enemy(&shadow, screen);
 
