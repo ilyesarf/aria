@@ -140,9 +140,10 @@ int main(int argc, char** argv) {
         get_input(&input);
         printf("menuState: %d\n", menuState);
         // Handle global controls
-        if (input.escape && menuState != MENU_BEST_SCORE) {
-            menuState = (menuState == MAIN_GAME) ? MENU_SAVE : MAIN_GAME;
+        if (input.escape && menuState == MAIN_GAME) {
+            menuState = MENU_SAVE;
             input.escape = 0;
+            SDL_Delay(200); // Add a small delay to prevent immediate state toggle
         }
         
         if (menuState == MENU_BEST_SCORE) {
