@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
 
         // Handle input
         get_input(&input);
-        
+        printf("menuState: %d\n", menuState);
         // Handle global controls
         if (input.escape && menuState != MENU_BEST_SCORE) {
             menuState = (menuState == MAIN_GAME) ? MENU_SAVE : MAIN_GAME;
@@ -162,7 +162,7 @@ int main(int argc, char** argv) {
                 
                 menuState = MAIN_GAME;
             } else if (input.q) {
-                running = 0;
+                menu(screen, background.image, font, textColor, butImage, hoverSound, musique, menuState, save, menus);
             }
         } else if (menuState == MENU_SAVE) {
             menu(screen, background.image, font, textColor, butImage, hoverSound, musique, menuState, save, menus);
