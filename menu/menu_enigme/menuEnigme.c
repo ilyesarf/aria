@@ -279,7 +279,7 @@ void initPuzzle() {
         for (int col = 0; col < 3; col++) {
             int index = row * 3 + col;
             pieceRects[index] = (SDL_Rect){col * pieceWidth, row * pieceHeight, pieceWidth, pieceHeight};
-            correctPositions[index] = (SDL_Rect){640 + col * pieceWidth, 50 + row * pieceHeight, pieceWidth, pieceHeight};
+            correctPositions[index] = (SDL_Rect){640 +  pieceWidth, 50 +  pieceHeight, pieceWidth, pieceHeight};
         }
     }
 
