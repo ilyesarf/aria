@@ -144,6 +144,10 @@ int main(int argc, char** argv) {
             menuState = MENU_SAVE;
             input.escape = 0;
             SDL_Delay(200); // Add a small delay to prevent immediate state toggle
+        } else if (input.escape && menuState == MENU_SAVE) {
+            menuState = MAIN_GAME;
+            input.escape = 0;
+            SDL_Delay(200); // Add a small delay to prevent immediate state toggle
         }
         
         if (menuState == MENU_BEST_SCORE) {
