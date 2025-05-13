@@ -261,9 +261,9 @@ void initPuzzle() {
         return;
     }
 
-    // Create surfaces for the pieces
-    int pieceWidth = puzzleImage->w / 3;  // Divide the image width into 3 pieces
-    int pieceHeight = puzzleImage->h / 3; // Divide the image height into 3 pieces
+    // Adjust piece dimensions to fit the new box size
+    int pieceWidth = 270 / 3;  // Each piece is one-third of the box width
+    int pieceHeight = 270 / 3; // Each piece is one-third of the box height
 
     for (int i = 0; i < 9; i++) {
         pieceImages[i] = SDL_CreateRGBSurface(0, pieceWidth, pieceHeight, 32, 0, 0, 0, 0);
