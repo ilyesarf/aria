@@ -167,7 +167,7 @@ int main(int argc, char** argv) {
                 running = 0;
             }
         } else if (game_state == GAME_STATE_PAUSED) {
-            menuState = MENU_OPTION;
+            menuState = MENU_SAVE;
             menu(screen, background.image, font, textColor, butImage, hoverSound, musique, menuState, save, menus);
         }
 
