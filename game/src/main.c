@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
     Enemy enemies[NUM_ENEMIES];
     Input input = {0}; // Initialize all input values to 0
     int jump_height = 150;
-    GameState game_state = GAME_STATE_PLAYING;
+    int menuState = MAIN_GAME; // Start in main game state
 
     // Initialize player
     init_player(&player, "./game/assets/player/1.png", SCREEN_WIDTH / 4);  // Start at 1/4 of screen width
@@ -122,7 +122,6 @@ int main(int argc, char** argv) {
     save.players = &player;
     save.level.n = 1; //level 1
 
-    int menuState = MAIN_GAME; // Changed initial menuState to MENU_PRINCIPAL
     menu(screen, background.image, font, textColor, butImage, hoverSound, musique, menuState, save, menus);
 
 
@@ -141,13 +140,12 @@ int main(int argc, char** argv) {
         get_input(&input);
         
         // Handle global controls
-        if (input.escape && game_state != GAME_STATE_GAME_OVER) {
-            game_state = (game_state == GAME_STATE_PLAYING) ? 
-                        GAME_STATE_PAUSED : GAME_STATE_PLAYING;
+        if (input.escape && menuState != MENU_BEST_SCORE) {
+            menuState = (menuState == MAIN_GAME) ? MENU_SAVE : MAIN_GAME;
             input.escape = 0;
         }
         
-        if (game_state == GAME_STATE_GAME_OVER) {
+        if (menuState == MENU_BEST_SCORE) {
             if (input.space) {
                 // Reset game
                 player.health = PLAYER_MAX_HEALTH;
@@ -162,16 +160,15 @@ int main(int argc, char** argv) {
                     init_enemy(&enemies[i], 100, x);
                 }
                 
-                game_state = GAME_STATE_PLAYING;
+                menuState = MAIN_GAME;
             } else if (input.q) {
                 running = 0;
             }
-        } else if (game_state == GAME_STATE_PAUSED) {
-            menuState = MENU_SAVE;
+        } else if (menuState == MENU_SAVE) {
             menu(screen, background.image, font, textColor, butImage, hoverSound, musique, menuState, save, menus);
         }
 
-        if (game_state == GAME_STATE_PLAYING) {
+        if (menuState == MAIN_GAME) {
             // Create ball when 'H' is pressed
             if (input.h) {
                 create_ball(&player);
@@ -198,81 +195,80 @@ int main(int argc, char** argv) {
                     enemy_can_attack(&enemies[i], current_time)) {
                     update_player_health(&player, ENEMY_DAMAGE, current_time);
                     enemies[i].last_attack_time = current_time;
-                    
-                    // Check for game over
-                    if (player.health <= 0) {
-                        game_state = GAME_STATE_GAME_OVER;
-                        player.pos.w = 0;  // Make player invisible
-                        player.pos.h = 0;
-                    }
                 }
             }
 
-            // Check ball-enemy collisions
+            // Check ball collisions with enemies
             check_ball_enemy_collisions(enemies, NUM_ENEMIES);
 
-            // Update score based on defeated enemies
-            for (int i = 0; i < NUM_ENEMIES; i++) {
-                if (enemies[i].health <= 0) {
-                    player.score += 100;
-                    
-                    // Respawn enemy in a random location ahead of the player
-                    int new_x;
-                    if (rand() % 2 == 0) {
-                        // Respawn ahead of player
-                        new_x = player.pos.x + SCREEN_WIDTH + rand() % (int)(SCREEN_WIDTH * 1.5);
-                    } else {
-                        // Respawn behind player (further back)
-                        new_x = fmax(0, player.pos.x - SCREEN_WIDTH - rand() % SCREEN_WIDTH);
-                    }
-                    
-                    // Cap the position to world bounds
-                    new_x = fmin(new_x, SCREEN_WIDTH * 3 - 100);
-                    
-                    // Reset the enemy with full health at the new position
-                    init_enemy(&enemies[i], 100, new_x);
+            // Update camera to follow player
+            updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
+
+            // Check game over condition
+            if (player.health <= 0) {
+                if (player.lives > 0) {
+                    player.lives--;
+                    player.health = PLAYER_MAX_HEALTH;
+                } else {
+                    menuState = MENU_BEST_SCORE;
                 }
             }
-        }
 
-        // Render game
-        SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-        
-        // Update camera to follow player (placed here to ensure it happens for every frame)
-        updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
-        
-        display_background(&background, screen);
-        
-        // Only display player if alive
-        if (player.health > 0) {
+            // Clear screen and render
+            SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+
+            // Display background
+            display_background(&background, screen);
+
+            // Display game objects
+            display_balls(screen, &background.camera);
             display_player(screen, &player, &background.camera);
-        }
-        display_balls(screen, &background.camera);
-        
-        for (int i = 0; i < NUM_ENEMIES; i++) {
-            if (enemies[i].health > 0) {  // Only display living enemies
+            
+            for (int i = 0; i < NUM_ENEMIES; i++) {
                 display_enemy(&enemies[i], screen, &background.camera);
             }
+
+            // Display HUD
+            char score_text[32];
+            sprintf(score_text, "Score: %d", player.score);
+            SDL_Color white = {255, 255, 255};
+            render_text_centered(screen, score_text, font, white, 10);
+
+            char lives_text[32];
+            sprintf(lives_text, "Lives: %d", player.lives);
+            render_text_centered(screen, lives_text, font, white, 40);
+
+            char health_text[32];
+            sprintf(health_text, "Health: %d", player.health);
+            render_text_centered(screen, health_text, font, white, 70);
         }
 
+        // Display appropriate menu screens
+        if (menuState == MENU_BEST_SCORE) {
+            display_game_over(screen, player.score);
+        }
+
+        // Update screen
         SDL_Flip(screen);
 
         // Cap frame rate
-        Uint32 frame_duration = SDL_GetTicks() - current_time;
-        if (frame_duration < frame_time) {
-            SDL_Delay(frame_time - frame_duration);
+        if (dt < frame_time) {
+            SDL_Delay(frame_time - dt);
         }
     }
 
     // Cleanup
-    free_balls();
+    cleanup_game_resources();
     free_player(&player);
     for (int i = 0; i < NUM_ENEMIES; i++) {
         free_enemy(&enemies[i]);
     }
+    free_balls();
     free_background(&background);
-    cleanup_game_resources();
-    SDL_FreeSurface(screen);
+    Mix_FreeChunk(hoverSound);
+    Mix_FreeMusic(musique);
+    TTF_CloseFont(font);
+    SDL_FreeSurface(butImage);
     TTF_Quit();
     IMG_Quit();
     SDL_Quit();
