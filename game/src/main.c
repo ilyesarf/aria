@@ -158,7 +158,7 @@ int main(int argc, char** argv) {
             SDL_Delay(200); // Add a small delay to prevent immediate state toggle
         }
 
-        if (player.pos.x >= SCREEN_WIDTH){
+        if (player.pos.x >= SCREEN_WIDTH*3){
             menuState = MENU_ENIGME;
         } 
 
