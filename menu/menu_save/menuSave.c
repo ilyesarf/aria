@@ -68,8 +68,8 @@ void renderMenuChooseSave(SDL_Surface *background, SDL_Surface *butImage, SDL_Su
 
 void handleEventSaveMenu(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
     while (SDL_PollEvent(&event)) {
-
         if (event.type == SDL_QUIT) *menuState = QUIT_GAME;
+        
         if (event.type == SDL_MOUSEMOTION) {
             for (int i = 0; i < n_btns; i++) {
                 if (event.motion.x >= buttons[i].rect.x && event.motion.x <= buttons[i].rect.x + buttons[i].rect.w &&
@@ -80,18 +80,19 @@ void handleEventSaveMenu(int *menuState, Save save, SDL_Event event, Button *but
                 }
             }
         }
-    }
-    if (event.type == SDL_MOUSEBUTTONDOWN) {
-        if (event.button.button == SDL_BUTTON_LEFT) {
-            for (int i = 0; i < 2; i++) {
-                if (buttons[i].selected) {
-                    if (i == 0) {
-                        Mix_PlayChannel(-1, hoverSound, 0);
-                        save_game("savegame.dat", save);
-                        *menuState = MENU_PRINCIPAL; // OUI -> Next menu
-                    } else if (i == 1) { 
-                        Mix_PlayChannel(-1, hoverSound, 0);
-                        *menuState = MAIN_GAME; // NON -> Exit
+        
+        if (event.type == SDL_MOUSEBUTTONDOWN) {
+            if (event.button.button == SDL_BUTTON_LEFT) {
+                for (int i = 0; i < 2; i++) {
+                    if (buttons[i].selected) {
+                        if (i == 0) {
+                            Mix_PlayChannel(-1, hoverSound, 0);
+                            save_game("savegame.dat", save);
+                            *menuState = MENU_PRINCIPAL; // OUI -> Next menu
+                        } else if (i == 1) { 
+                            Mix_PlayChannel(-1, hoverSound, 0);
+                            *menuState = MAIN_GAME; // NON -> Exit
+                        }
                     }
                 }
             }
