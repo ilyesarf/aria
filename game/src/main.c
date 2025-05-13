@@ -1,4 +1,5 @@
 #include "../include/game.h"
+#include "../include/minimap.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
