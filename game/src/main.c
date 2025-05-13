@@ -231,7 +231,7 @@ int main(int argc, char** argv) {
             // Display HUD
             char score_text[32];
             sprintf(score_text, "Score: %d", player.score);
-            SDL_Color white = {255, 255, 255};
+            SDL_Color white = {255, 255, 255, 255};
             render_text_centered(screen, score_text, font, white, 10);
 
             char lives_text[32];
