@@ -153,6 +153,7 @@ int main(int argc, char** argv) {
             SDL_Delay(200); // Add a small delay to prevent immediate state toggle
         } else if (input.escape && menuState == MENU_SAVE) {
             menuState = MAIN_GAME;
+
             input.escape = 0;
             SDL_Delay(200); // Add a small delay to prevent immediate state toggle
         }
@@ -186,6 +187,13 @@ int main(int argc, char** argv) {
 
         if (menuState == MAIN_GAME) {
             // Create ball when 'H' is pressed
+            player = save.players[0];
+            enemies[0] = save.level.enemies[0];
+            enemies[1] = save.level.enemies[1];
+            enemies[2] = save.level.enemies[2];
+
+            background = *save.level.background;
+
             if (input.h) {
                 create_ball(&player);
                 input.h = 0;
