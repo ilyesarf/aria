@@ -203,7 +203,7 @@ int main(int argc, char** argv) {
             } else if (input.q) {
                 menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
             }
-        } else if (menuState == MENU_SAVE || menuState == MENU_ENIGME) {
+        } else if (menuState == MENU_SAVE || menuState == MENU_ENIGME || menuState == MENU_BEST_SCORE) {
             menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
         }
 
