@@ -150,6 +150,9 @@ void load_game(char *filename, Save save) {
         return;
     }
     fread(&save, sizeof(Save), 1, file);
+    printf("Game loaded from %s\n", filename);
+    printf("Player position: %d, %d\n", save.players->pos.x, save.players->pos.y);
+    printf("Level: %d\n", save.level.n);
     fclose(file);
 }
 
