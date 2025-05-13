@@ -413,7 +413,7 @@ void renderPuzzle(SDL_Surface *screen) {
 
 //--------------------------------------handle events----------------------------------------------------
 // Function to handle enigme menu events
-void handleEventEnigme(int *menuState, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
+void handleEventEnigme(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
             *menuState = QUIT_GAME;

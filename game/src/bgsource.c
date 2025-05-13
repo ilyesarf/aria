@@ -49,7 +49,7 @@ void init_background(Background *bg, const char *image_path, int level) {
     bg->world_height = bg->image->h;
 }
 
-void display_background(const Background *bg, SDL_Surface *screen) {
+void display_background(Background *bg, SDL_Surface *screen) {
     // Draw the background image
     SDL_BlitSurface(bg->image, &bg->camera, screen, NULL);
     

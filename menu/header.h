@@ -1,18 +1,11 @@
 #ifndef HEADER_H
 #define HEADER_H
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_mixer.h>
-#include <SDL/SDL_ttf.h>
-#include <SDL/SDL_image.h>
-#include "../core/header.h"
 
+#include "../helpers.h"
 
-#define SCREEN_WIDTH 1920
-#define SCREEN_HEIGHT 1080
 #define N_BTNS 4
 #define N_MENUS 8
-
 
 // Menu States
 #define QUIT_GAME -1
@@ -44,16 +37,13 @@ typedef struct Menu {
     void (*handleEvent)(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
 } Menu;
 
-SDL_Surface* init_screen();
-void init_audio();
-SDL_Surface* load_image(char *filename);
-Mix_Chunk* load_sound(char *filename);
-TTF_Font* load_font(char *filename);
 void renderText(SDL_Surface *screen, const char *text, TTF_Font *font, SDL_Color textColor, int x, int y);
 void renderButton(SDL_Surface *screen, SDL_Surface *butImage, TTF_Font *font, SDL_Color textColor, Button button);
 
 void init_menus(Menu *menus);
 
-void cleanup(Mix_Chunk *hoverSound, Mix_Music *musique, SDL_Surface *background, TTF_Font *font , Menu *menus);
+int menu(SDL_Surface *screen, SDL_Surface *background, TTF_Font *font, SDL_Color textColor, SDL_Surface *butImage, Mix_Chunk *hoverSound, Mix_Music *musique, int menuState, Save save, Menu *menus);
+
+void cleanup(Mix_Chunk *hoverSound, Mix_Music *musique, SDL_Surface *background, TTF_Font *font, Menu *menus);
 
 #endif

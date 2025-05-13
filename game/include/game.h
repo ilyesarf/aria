@@ -6,9 +6,9 @@
 #include <SDL/SDL_mixer.h>
 #include <SDL/SDL_ttf.h>
 #include <math.h>
+#include "../helpers.h"
+#include "../menu/header.h"
 
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 512
 #define GROUND_Y (SCREEN_HEIGHT - 10)  // Ground level, 100 pixels from bottom
 #define GRAVITY 0.5f
 #define JUMP_FORCE -15.0f
@@ -23,6 +23,7 @@
 #define BALL_LIFETIME 2000 // 2 seconds
 
 // Platform structure for background
+
 typedef struct {
     int x, y; // Position
     int width, height; // Dimensions
@@ -30,7 +31,7 @@ typedef struct {
 } Platform;
 
 // Background structure
-typedef struct {
+typedef struct Background {
     Platform *platforms;
     int platform_count;
     SDL_Surface *image; // Background image
@@ -53,9 +54,9 @@ typedef enum {
     FOLLOWING,
     ATTACKING
 } EnemyState;
-
+/**/
 // Enemy structure
-typedef struct {
+typedef struct Enemy {
     int health;
     float x, y;
     SDL_Surface* frames[4];
@@ -66,9 +67,9 @@ typedef struct {
     int patrol_direction;
     Uint32 last_attack_time;
     Uint32 attack_cooldown;
-    int frame_counter;  // Add frame counter for animation timing
+    int frame_counter;
 } Enemy;
-
+/*
 // Player structure
 typedef struct {
     SDL_Surface* img;
@@ -86,7 +87,7 @@ typedef struct {
     int is_jumping;        // Jump state
     int facing_left;       // Direction facing
 } Player;
-
+*/
 // Ball structure
 typedef struct {
     SDL_Rect pos;
@@ -116,10 +117,25 @@ typedef struct {
     SDL_Rect pos2;
     SDL_Surface* img;
 } Image;
+/*
+typedef struct {
+    int n;
+    Background *background;
+    Enemy *enemies;
+//    StaticElement *static_elements;
+} Level;
+
+typedef struct {
+    Player *players;
+    Level level;
+} Save;
+*/
+// Function declarations
+
 
 // Background functions
 void init_background(Background *bg, const char *image_path, int level);
-void display_background(const Background *bg, SDL_Surface *screen);
+void display_background(Background *bg, SDL_Surface *screen);
 void free_background(Background *bg);
 void scroll_background(Background *bg, int dx, int dy);
 void updateBackgroundCamera(Background *bg, const SDL_Rect *player, int screenWidth, int screenHeight, int margin);

@@ -40,8 +40,30 @@ int main(int argc, char** argv) {
         SDL_Quit();
         return -1;
     }
+    TTF_Init();
+    TTF_Font *font;
+    font = load_font("./assets/fonts/font.ttf");
+    SDL_Color textColor = {255, 255, 255, 255}; // white text
+    
+    SDL_Surface *butImage = NULL;
+    butImage = load_image("./assets/buttons/butbase.png");
+    
+    init_audio();
+    Mix_Music *musique;
+    Mix_Chunk *hoverSound;
+    musique = load_music("./assets/music/30-hours.mp3");;
+    hoverSound = load_sound("./assets/sounds/beep.wav"); 
+    int volume = 50; // Initial volume (50%)
 
-    // Initialize random seed
+    Mix_PlayMusic(musique, -1);
+    Mix_VolumeMusic(volume); // Set initial volume
+
+
+    Menu menus[N_MENUS];
+    init_menus(menus);
+
+
+        // Initialize random seed
     srand(time(NULL));
 
     // Initialize game resources
@@ -92,6 +114,16 @@ int main(int argc, char** argv) {
 
     // Initialize ball system
     init_balls();
+    Save save;
+    save.level.enemies = enemies;
+    save.level.background = &background;
+    //save.level.static_elements = NULL;
+    save.players = &player;
+    save.level.n = 1; //level 1
+
+    int menuState = MENU_PRINCIPAL; // Changed initial menuState to MENU_PRINCIPAL
+    menu(screen, background.image, font, textColor, butImage, hoverSound, musique, menuState, save, menus);
+
 
     // Game loop variables
     int running = 1;
@@ -134,9 +166,8 @@ int main(int argc, char** argv) {
                 running = 0;
             }
         } else if (game_state == GAME_STATE_PAUSED) {
-            if (input.q) {
-                running = 0;
-            }
+            menuState = MENU_OPTION;
+            menu(screen, background.image, font, textColor, butImage, hoverSound, musique, menuState, save, menus);
         }
 
         if (game_state == GAME_STATE_PLAYING) {

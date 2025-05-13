@@ -21,6 +21,7 @@ void renderMenuChooseSave(SDL_Surface *background, SDL_Surface *butImage, SDL_Su
 void handleEventSaveMenu(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
 void handleEventChooseSaveMenu(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
 void cleanupMenuSave(Menu *menu) ;
-
+void load_game(char *filename, Save save);
+void save_game(char *filename, Save save);
 #endif
 

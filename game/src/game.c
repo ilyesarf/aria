@@ -14,7 +14,7 @@ static SDL_Surface* enemy_frames[4] = {NULL, NULL, NULL, NULL};
 #define GRAVITY 0.5f
 #define JUMP_FORCE -15.0f
 #define MAX_FALL_SPEED 15.0f
-#define GROUND_Y 460  // Adjust to align with the visual ground in the background image
+//#define GROUND_Y 460  // Adjust to align with the visual ground in the background image
 
 // Enemy behavior constants
 #define PATROL_SPEED 2
@@ -27,8 +27,9 @@ static SDL_Surface* enemy_frames[4] = {NULL, NULL, NULL, NULL};
 
 // Ball physics constants
 #define BALL_GRAVITY 0.2f
-#define BALL_INITIAL_SPEED 12.0f
+//#define BALL_INITIAL_SPEED 12.0f
 #define BALL_LIFETIME 2000 // milliseconds
+
 
 // Background system is now handled in bgsource.c
 
@@ -36,10 +37,10 @@ static SDL_Surface* enemy_frames[4] = {NULL, NULL, NULL, NULL};
 int init_game_resources(void) {
     // Load shared enemy frames
     const char* enemy_frame_paths[] = {
-        "assets/enemy/shadowf1t.png",
-        "assets/enemy/shadowf2t.png",
-        "assets/enemy/shadowf3t.png",
-        "assets/enemy/shadowf4t.png"
+        "./game/assets/enemy/shadowf1t.png",
+        "./game/assets/enemy/shadowf2t.png",
+        "./game/assets/enemy/shadowf3t.png",
+        "./game/assets/enemy/shadowf4t.png"
     };
 
     for (int i = 0; i < 4; i++) {
