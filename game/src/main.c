@@ -87,9 +87,16 @@ int main(int argc, char** argv) {
     int jump_height = 150;
     int menuState = MAIN_GAME; // Start in main game state
 
+    // Initialize minimap
+    Minimap minimap;
+    if (!initialiserMinimapAssets(&minimap)) {
+        printf("Failed to initialize minimap!\n");
+        return -1;
+    }
+
     // Initialize player
-    init_player(&player, "./game/assets/player/1.png", SCREEN_WIDTH / 4);  // Start at 1/4 of screen width
-    player.pos.y = GROUND_Y - player.pos.h;  // Ensure correct initial Y position
+    init_player(&player, "./game/assets/player/1.png", SCREEN_WIDTH / 4);
+    player.pos.y = GROUND_Y - player.pos.h;
     
     // Initial camera update to ensure proper world view from the start
     updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
@@ -219,6 +226,9 @@ int main(int argc, char** argv) {
                 }
             }
 
+            // Update minimap with player position
+            MAJMinimap(player.pos, &minimap, 0.1f); // Scale factor of 0.1 for minimap
+
             // Clear screen and render
             SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 
@@ -232,6 +242,9 @@ int main(int argc, char** argv) {
             for (int i = 0; i < NUM_ENEMIES; i++) {
                 display_enemy(&enemies[i], screen, &background.camera);
             }
+
+            // Display minimap
+            dessinerJoueurMinimap(screen, &minimap);
 
             // Display HUD
             char score_text[32];
@@ -248,10 +261,6 @@ int main(int argc, char** argv) {
             render_text_centered(screen, health_text, font, white, 70);
         }
 
-        // Display appropriate menu screens
-        if (menuState == MENU_BEST_SCORE) {
-            display_game_over(screen, player.score);
-        }
 
         // Update screen
         SDL_Flip(screen);
@@ -277,6 +286,9 @@ int main(int argc, char** argv) {
     TTF_Quit();
     IMG_Quit();
     SDL_Quit();
+
+    // Add minimap cleanup
+    libererMinimapAssets(&minimap);
 
     return 0;
 } 
