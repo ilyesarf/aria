@@ -279,7 +279,7 @@ void initPuzzle() {
         for (int col = 0; col < 3; col++) {
             int index = row * 3 + col;
             pieceRects[index] = (SDL_Rect){col * pieceWidth, row * pieceHeight, pieceWidth, pieceHeight};
-            correctPositions[index] = (SDL_Rect){600 + col * pieceWidth, 300 + row * pieceHeight, pieceWidth, pieceHeight};
+            correctPositions[index] = (SDL_Rect){640 + col * pieceWidth, 50 + row * pieceHeight, pieceWidth, pieceHeight};
         }
     }
 
@@ -309,7 +309,7 @@ void initPuzzle() {
 void renderPuzzle(SDL_Surface *screen) {
 
     // Define the box dimensions with the new resolution
-    SDL_Rect boxRect = {640, 480, 540, 540}; // Updated position and size of the box
+    SDL_Rect boxRect = {640, 50, 540, 540}; // Updated position and size of the box
 
     // Draw the white box
     SDL_FillRect(screen, &boxRect, SDL_MapRGB(screen->format, 255, 255, 255)); // White fill
@@ -506,14 +506,14 @@ void handleEventEnigme(int *menuState, Save save, SDL_Event event, Button *butto
 
                         // Check if the center of the piece is inside the box
                         if (pieceCenterX >= 640 && pieceCenterX <= 1180 &&
-                            pieceCenterY >= 480 && pieceCenterY <= 1020) {
+                            pieceCenterY >= 50 && pieceCenterY <= 590) {
                             // Calculate the grid cell (0-2 for both X and Y)
                             int gridX = (pieceCenterX - 640) / cellWidth;
-                            int gridY = (pieceCenterY - 480) / cellHeight;
+                            int gridY = (pieceCenterY - 50) / cellHeight;
 
                             // Snap the piece to the grid
                             piecePositions[draggedPieceIndex].x = 640 + gridX * cellWidth;
-                            piecePositions[draggedPieceIndex].y = 480 + gridY * cellHeight;
+                            piecePositions[draggedPieceIndex].y = 50 + gridY * cellHeight;
                         }
                     }
 
