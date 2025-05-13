@@ -147,7 +147,7 @@ void handleEventChooseSaveMenu(int *menuState, Save save, SDL_Event event, Butto
 void load_game(char *filename, Save save) {
     FILE *file = fopen(filename, "rb");
     if (!file) {
-        fprintf(stderr, "Failed to open file: %s\n", filename);
+        //fprintf(stderr, "Failed to open file: %s\n", filename);
         return;
     }
     fread(&save, sizeof(Save), 1, file);

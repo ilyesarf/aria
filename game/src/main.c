@@ -140,6 +140,15 @@ int main(int argc, char** argv) {
     // Initialize ball system
     init_balls();
     Save save;
+    if (!fopen("savegame.dat", "rb")) {
+        save.level.enemies = enemies;
+        save.level.background = &background;
+        //save.level.static_elements = NULL;
+        save.players = &player;
+        save.level.n = 1; //level 1
+    } else {
+        load_game("savegame.dat", save);
+    }
     save.level.enemies = enemies;
     save.level.background = &background;
     //save.level.static_elements = NULL;
