@@ -235,7 +235,7 @@ void checkAnswer(int selectedOption, int correctOption, int *score, int *lives, 
                 *score = 0;
                 *lives = 0;
                 showSubButtons = 0;
-                *menuState = MENU_OPTION;
+                *menuState = MAIN_GAME;
             }
         }
         if (*score == 10) {
@@ -378,7 +378,7 @@ void renderPuzzle(SDL_Surface *screen) {
     TTF_Font *timerFont = TTF_OpenFont("./assets/fonts/font.ttf", 40);
     if (timerFont) {
         SDL_Color timerColor = {0, 0, 255, 0};
-        renderText(screen, timerText, timerFont, timerColor, 50, 200);
+        renderText(screen, timerText, timerFont, timerColor, 50, 50);
         TTF_CloseFont(timerFont);
     }
 
@@ -395,6 +395,17 @@ void renderPuzzle(SDL_Surface *screen) {
         showRotozoomMessage("Game Over!", (SDL_Color){255, 0, 0, 0});
         showSubButtons = 0; // Return to menu
     }
+}
+
+// Add this helper function to check if all pieces are in correct position
+static int isPuzzleComplete() {
+    for (int i = 0; i < 9; i++) {
+        if (piecePositions[i].x != correctPositions[i].x ||
+            piecePositions[i].y != correctPositions[i].y) {
+            return 0;
+        }
+    }
+    return 1;
 }
 
 
@@ -495,28 +506,44 @@ void handleEventEnigme(int *menuState, Save save, SDL_Event event, Button *butto
                 if (event.button.button == SDL_BUTTON_LEFT && isDragging) {
                     isDragging = 0;
 
-                    // Snap the dragged piece to the nearest grid position if inside the box
                     if (draggedPieceIndex != -1) {
-                        int cellWidth = 540 / 3; // Updated width of each grid cell (180)
-                        int cellHeight = 540 / 3; // Updated height of each grid cell (180)
-
-                        // Calculate the center of the piece
+                        // Get piece center
                         int pieceCenterX = piecePositions[draggedPieceIndex].x + piecePositions[draggedPieceIndex].w / 2;
                         int pieceCenterY = piecePositions[draggedPieceIndex].y + piecePositions[draggedPieceIndex].h / 2;
 
-                        // Check if the center of the piece is inside the box
-                        if (pieceCenterX >= 640 && pieceCenterX <= 1180 &&
-                            pieceCenterY >= 50 && pieceCenterY <= 590) {
-                            // Calculate the grid cell (0-2 for both X and Y)
-                            int gridX = (pieceCenterX - 640) / cellWidth;
-                            int gridY = (pieceCenterY - 50) / cellHeight;
+                        // Check if piece is within box boundaries
+                        SDL_Rect boxRect = {640, 50, 270, 270}; // Keep box size consistent
+                        int cellWidth = boxRect.w / 3;
+                        int cellHeight = boxRect.h / 3;
 
-                            // Snap the piece to the grid
-                            piecePositions[draggedPieceIndex].x = 640 + gridX * cellWidth;
-                            piecePositions[draggedPieceIndex].y = 50 + gridY * cellHeight;
+                        if (pieceCenterX >= boxRect.x && pieceCenterX <= boxRect.x + boxRect.w &&
+                            pieceCenterY >= boxRect.y && pieceCenterY <= boxRect.y + boxRect.h) {
+                            
+                            // Calculate grid position
+                            int gridX = (pieceCenterX - boxRect.x) / cellWidth;
+                            int gridY = (pieceCenterY - boxRect.y) / cellHeight;
+                            
+                            // Snap to grid
+                            piecePositions[draggedPieceIndex].x = boxRect.x + (gridX * cellWidth);
+                            piecePositions[draggedPieceIndex].y = boxRect.y + (gridY * cellHeight);
+
+                            // Check if piece is in correct position
+                            if (piecePositions[draggedPieceIndex].x == correctPositions[draggedPieceIndex].x &&
+                                piecePositions[draggedPieceIndex].y == correctPositions[draggedPieceIndex].y) {
+                                // Piece is in correct position
+                                printf("Piece %d in correct position!\n", draggedPieceIndex);
+                                
+                                // Check if all pieces are in correct position
+                                if (isPuzzleComplete()) {
+                                    SDL_Color green = {0, 255, 0, 0};
+                                    showRotozoomMessage("Puzzle Complete!", green);
+                                    puzzleSolved = 1;
+                                    showSubButtons = 0; // Return to main menu
+                                    *menuState = MAIN_GAME; // Return to game
+                                }
+                            }
                         }
                     }
-
                     draggedPieceIndex = -1;
                 }
             }
