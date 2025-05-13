@@ -5,6 +5,7 @@
 
 #define NUM_ENEMIES 3
 #define ENEMY_DAMAGE 10
+#define NUM_PLATFORMS 3  // Reduced from 5 to 3 platforms
 
 int main(int argc, char** argv) {
     (void)argc;  // Silence unused parameter warning
@@ -82,6 +83,14 @@ int main(int argc, char** argv) {
     // Initialize ball system
     init_balls();
 
+    // Initialize platforms
+    Platform platforms[NUM_PLATFORMS];
+    
+    // Create smaller platforms at different positions
+    init_platform(&platforms[0], 300, SCREEN_HEIGHT - 250, 120, 15, "assets/game/castleplatform.png");  // Left platform
+    init_platform(&platforms[1], 600, SCREEN_HEIGHT - 350, 120, 15, "assets/game/castleplatform.png");  // Middle platform
+    init_platform(&platforms[2], 900, SCREEN_HEIGHT - 450, 120, 15, "assets/game/castleplatform.png");  // Right platform
+
     // Game loop variables
     int running = 1;
     Uint32 last_time = SDL_GetTicks();
@@ -137,16 +146,16 @@ int main(int argc, char** argv) {
 
             // Update game state
             move_player(&input, &player, dt);
-            jump_player(&input, &player, &jump_height);
+            jump_player(&input, &player, &jump_height, platforms, NUM_PLATFORMS);
             animate_player(&player, input);
             update_balls();
 
             // Update enemies and check collisions
             for (int i = 0; i < NUM_ENEMIES; i++) {
                 if (i % 2 == 0) {
-                    move_enemy_randomly(&enemies[i], 1);
+                    move_enemy_randomly(&enemies[i], 1, platforms, NUM_PLATFORMS);
                 } else {
-                    move_enemy_ai(&enemies[i], player.pos.x, player.pos.y, 300, 100);
+                    move_enemy_ai(&enemies[i], player.pos.x, player.pos.y, 300, 100, platforms, NUM_PLATFORMS);
                 }
                 animate_enemy_move(&enemies[i]);
 
@@ -175,11 +184,28 @@ int main(int argc, char** argv) {
                     enemies[i].y = -1000;
                 }
             }
+
+            // Check platform collisions for player
+            for (int i = 0; i < NUM_PLATFORMS; i++) {
+                if (check_collision_with_platform(player.pos, &platforms[i])) {
+                    // If player is falling and hits platform from above
+                    if (player.vy > 0 && player.pos.y + player.pos.h > platforms[i].rect.y) {
+                        player.pos.y = platforms[i].rect.y - player.pos.h;
+                        player.vy = 0;
+                        player.is_jumping = 0;
+                    }
+                }
+            }
         }
 
         // Render game
         SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
         display_background(screen, background);
+        
+        // Display platforms
+        for (int i = 0; i < NUM_PLATFORMS; i++) {
+            display_platform(screen, &platforms[i]);
+        }
         
         // Display player if not game over
         if (game_state != GAME_STATE_GAME_OVER) {
@@ -220,6 +246,11 @@ int main(int argc, char** argv) {
     TTF_Quit();
     IMG_Quit();
     SDL_Quit();
+
+    // Free platforms
+    for (int i = 0; i < NUM_PLATFORMS; i++) {
+        free_platform(&platforms[i]);
+    }
 
     return 0;
 } 
