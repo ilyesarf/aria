@@ -255,13 +255,6 @@ int main(int argc, char** argv) {
             }
         }
 
-        // Display game state overlays
-        if (game_state == GAME_STATE_PAUSED) {
-            display_pause_menu(screen);
-        } else if (game_state == GAME_STATE_GAME_OVER) {
-            display_game_over(screen, player.score);
-        }
-
         SDL_Flip(screen);
 
         // Cap frame rate
