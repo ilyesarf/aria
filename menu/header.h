@@ -5,7 +5,7 @@
 #include "../helpers.h"
 
 #define N_BTNS 4
-#define N_MENUS 8
+#define N_MENUS 11
 
 // Menu States
 #define QUIT_GAME -1
