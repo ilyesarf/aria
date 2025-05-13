@@ -341,7 +341,7 @@ void update_player_health(Player* player, int damage, Uint32 current_time) {
     }
 }
 
-void move_player(Input* input, Player* player, Uint32 dt) {
+void move_player(Input* input, Player* player, Background background, Uint32 dt) {
     float delta = dt / 16.667f; // Normalize for 60 FPS
     float movement_speed = player->velocity * delta;
     
@@ -359,7 +359,7 @@ void move_player(Input* input, Player* player, Uint32 dt) {
         player->pos.x -= movement_speed;
         player->facing_left = 1;
     }
-    if (input->right && player->pos.x <= SCREEN_WIDTH * 3) { // Extended boundary for wide backgrounds
+    if (input->right && player->pos.x <= background.world_width) { // Extended boundary for wide backgrounds
         player->pos.x += movement_speed;
         player->facing_left = 0;
     }
