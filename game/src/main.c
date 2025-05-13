@@ -200,7 +200,7 @@ int main(int argc, char** argv) {
             }
 
             // Update game state
-            move_player(&input, &player, dt);
+            move_player(&input, &player, background, dt);
             jump_player(&input, &player, &jump_height);
             animate_player(&player, input);
             update_balls();

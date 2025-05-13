@@ -153,7 +153,7 @@ void update_enemy_health(Enemy *enemy, int damage);
 // Player functions
 void init_player(Player* player, const char* sprite_path, int x);
 void display_player(SDL_Surface* screen, Player* player, const SDL_Rect* camera);
-void move_player(Input* input, Player* player, Uint32 dt);
+void move_player(Input* input, Player* player, Background background, Uint32 dt);
 void jump_player(Input* input, Player* player, int* jump_height);
 void animate_player(Player* player, Input input);
 void draw_player_health_bar(SDL_Surface* screen, Player* player);
