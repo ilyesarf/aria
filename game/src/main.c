@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
     save.players = &player;
     save.level.n = 1; //level 1
 
-    int menuState = MENU_PRINCIPAL; // Changed initial menuState to MENU_PRINCIPAL
+    int menuState = MAIN_GAME; // Changed initial menuState to MENU_PRINCIPAL
     menu(screen, background.image, font, textColor, butImage, hoverSound, musique, menuState, save, menus);
 
 

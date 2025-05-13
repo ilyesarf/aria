@@ -95,6 +95,8 @@ int menu(SDL_Surface *screen, SDL_Surface *background, TTF_Font *font, SDL_Color
         //SDL_Delay(16);
     }
 
-    cleanup(hoverSound, musique, background, font, menus);
-    return 0;
+    if (menuState == QUIT_GAME){
+        cleanup(hoverSound, musique, background, font, menus);
+        return 0;
+    } 
 }
