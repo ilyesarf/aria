@@ -205,7 +205,7 @@ int main(int argc, char** argv) {
                 menu(screen, background.image, font, textColor, butImage, hoverSound, musique, menuState, save, menus);
             }
         } else if (menuState == MENU_SAVE || menuState == MENU_ENIGME) {
-            menu(screen, background.image, font, textColor, butImage, hoverSound, musique, menuState, save, menus);
+            menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
         }
 
         if (menuState == MAIN_GAME) {
