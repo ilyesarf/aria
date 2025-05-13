@@ -1,7 +1,7 @@
 # Doxyfile for Game Project
 
 # Project information
-PROJECT_NAME           = "Fantasy Forest Game"
+PROJECT_NAME           = "Aria"
 PROJECT_BRIEF          = "A 2D platform game with enemies, minimap, and menus"
 OUTPUT_DIRECTORY       = ./docs
 
