@@ -279,7 +279,7 @@ void initPuzzle() {
         for (int col = 0; col < 3; col++) {
             int index = row * 3 + col;
             pieceRects[index] = (SDL_Rect){col * pieceWidth, row * pieceHeight, pieceWidth, pieceHeight};
-            correctPositions[index] = (SDL_Rect){640 +  pieceWidth, 50 +  pieceHeight, pieceWidth, pieceHeight};
+            correctPositions[index] = (SDL_Rect){640 + col * pieceWidth, 50 + row * pieceHeight, pieceWidth, pieceHeight};
         }
     }
 
@@ -309,7 +309,7 @@ void initPuzzle() {
 void renderPuzzle(SDL_Surface *screen) {
 
     // Define the box dimensions with the new resolution
-    SDL_Rect boxRect = {640, 50, 540, 540}; // Updated position and size of the box
+    SDL_Rect boxRect = {640, 50, 270, 270}; // Updated position and size of the box
 
     // Draw the white box
     SDL_FillRect(screen, &boxRect, SDL_MapRGB(screen->format, 255, 255, 255)); // White fill
