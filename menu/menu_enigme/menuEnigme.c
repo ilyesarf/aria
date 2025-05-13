@@ -309,7 +309,7 @@ void initPuzzle() {
 void renderPuzzle(SDL_Surface *screen) {
 
     // Define the box dimensions with the new resolution
-    SDL_Rect boxRect = {640, 50, 540, 540}; // Updated position and size of the box
+    SDL_Rect boxRect = {640, 50, 270, 270}; // Updated position and size of the box
 
     // Draw the white box
     SDL_FillRect(screen, &boxRect, SDL_MapRGB(screen->format, 255, 255, 255)); // White fill
