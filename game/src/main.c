@@ -261,7 +261,7 @@ int main(int argc, char** argv) {
             }
 
             // Update minimap with player position
-            MAJMinimap(player.pos, &minimap, 0.1f); // Scale factor of 0.1 for minimap
+            MAJMinimap(player.pos, &minimap, 0.05f); // Reduced scale factor to make minimap smaller
 
             // Clear screen and render
             SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
@@ -325,4 +325,4 @@ int main(int argc, char** argv) {
     libererMinimapAssets(&minimap);
 
     return 0;
-} 
+}
