@@ -13,7 +13,7 @@ void init_background(Background *bg, const char *image_path, int level) {
     
     // Load platform image
     if (!platform_image) {
-        platform_image = IMG_Load("assets/platforms/castleplatform.png");
+        platform_image = IMG_Load("./game/assets/platforms/castleplatform.png");
         if (!platform_image) {
             fprintf(stderr, "Failed to load platform image: %s\n", IMG_GetError());
             exit(EXIT_FAILURE);
