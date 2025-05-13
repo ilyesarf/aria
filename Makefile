@@ -22,6 +22,12 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+# Doxygen documentation target
+docs:
+	doxygen Doxyfile
+
+.PHONY: docs
+
 .PHONY: clean
 clean:
 	rm -rf $(OBJDIR) $(TARGET)

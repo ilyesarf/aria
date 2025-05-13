@@ -1,12 +1,29 @@
+/**
+ * @file main.c
+ * @brief Main entry point for the Fantasy Forest game
+ *
+ * This file contains the main game loop and initialization logic for the game.
+ * It handles SDL setup, game resource initialization, player/enemy creation,
+ * input processing, and rendering.
+ */
+
 #include "../include/game.h"
 #include "../include/minimap.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
+/** @brief Number of enemies to create in the game world */
 #define NUM_ENEMIES 3
+/** @brief Damage dealt by enemy attacks */
 #define ENEMY_DAMAGE 10
 
+/**
+ * @brief Main entry point for the game
+ * @param argc Number of command-line arguments
+ * @param argv Array of command-line arguments
+ * @return 0 on successful exit, -1 on error
+ */
 int main(int argc, char** argv) {
     (void)argc;  // Silence unused parameter warning
     (void)argv;  // Silence unused parameter warning
