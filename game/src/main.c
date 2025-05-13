@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
 
     // Initialize background
     Background background;
-    init_background(&background, "./assets/game/fantasyforest.png", 1);  // Use fantasyforest background
+    init_background(&background, "../assets/game/fantasyforest.png", 1);  // Use fantasyforest background
 
     // Initialize game objects
     Player player;
@@ -65,7 +65,8 @@ int main(int argc, char** argv) {
     GameState game_state = GAME_STATE_PLAYING;
 
     // Initialize player
-    init_player(&player, "assets/player/1.png", 400);  // Position player at a better starting point
+    init_player(&player, "assets/player/1.png", SCREEN_WIDTH / 4);  // Start at 1/4 of screen width
+    player.pos.y = GROUND_Y - player.pos.h;  // Ensure correct initial Y position
     
     // Initial camera update to ensure proper world view from the start
     updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);

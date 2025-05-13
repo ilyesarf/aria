@@ -9,12 +9,18 @@
 
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
+#define GROUND_Y (SCREEN_HEIGHT - 100)  // Ground level, 100 pixels from bottom
+#define GRAVITY 0.5f
+#define JUMP_FORCE -15.0f
+#define MAX_FALL_SPEED 15.0f
 #define MAX_BALLS 10
 #define BALL_SPEED 8
 #define BALL_WIDTH 30
 #define BALL_HEIGHT 30
 #define PLAYER_MAX_HEALTH 100
 #define DAMAGE_COOLDOWN 1000 // 1 second cooldown between damage
+#define BALL_INITIAL_SPEED 15.0f
+#define BALL_LIFETIME 2000 // 2 seconds
 
 // Platform structure for background
 typedef struct {
