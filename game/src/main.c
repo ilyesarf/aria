@@ -171,6 +171,7 @@ int main(int argc, char** argv) {
         // Handle global controls
         if (input.escape && menuState == MAIN_GAME) {
             menuState = MENU_SAVE;
+            printf("Entering menu save\n");
             input.escape = 0;
             SDL_Delay(200); // Add a small delay to prevent immediate state toggle
         } else if (input.escape && menuState == MENU_SAVE) {
