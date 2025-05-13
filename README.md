@@ -1,4 +1,3 @@
-
 ## Structure of repo
 
 - **./** (directory): contains all directories and core files to run the whole game.
@@ -23,6 +22,10 @@
         - ./assets/music: contains music mp3 files
         - ./assets/game: contains background & characters jpeg & png files
         - ./assets/fonts: contains fonts ttf files
+        
+    - **./docs** (directory): contains Doxygen-generated documentation
+        - ./docs/html: HTML documentation files
+        - See docs/README.md for more information
 
 ## Compilation notes
 * every directory has a Makefile. you have to make it from "./"
@@ -31,3 +34,12 @@ Example: compiling menus
 ```
 $ make -C ./menu
 ```
+
+## Documentation
+The project includes comprehensive Doxygen documentation for all code components. To generate the documentation:
+
+```
+$ make docs
+```
+
+After generating, view the documentation by opening `docs/html/index.html` in a web browser.
