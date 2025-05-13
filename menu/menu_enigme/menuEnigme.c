@@ -308,17 +308,17 @@ void initPuzzle() {
 
 void renderPuzzle(SDL_Surface *screen) {
 
-    // Define the box dimensions
-    SDL_Rect boxRect = {400, 300, 270 , 270}; // Position and size of the box
+    // Define the box dimensions with the new resolution
+    SDL_Rect boxRect = {640, 480, 540, 540}; // Updated position and size of the box
 
     // Draw the white box
     SDL_FillRect(screen, &boxRect, SDL_MapRGB(screen->format, 255, 255, 255)); // White fill
 
     // Draw the black edges
-    SDL_Rect topEdge = {boxRect.x, boxRect.y, boxRect.w, 5}; // Top edge
-    SDL_Rect bottomEdge = {boxRect.x, boxRect.y + boxRect.h - 5, boxRect.w, 5}; // Bottom edge
-    SDL_Rect leftEdge = {boxRect.x, boxRect.y, 5, boxRect.h}; // Left edge
-    SDL_Rect rightEdge = {boxRect.x + boxRect.w - 5, boxRect.y, 5, boxRect.h}; // Right edge
+    SDL_Rect topEdge = {boxRect.x, boxRect.y, boxRect.w, 10}; // Top edge
+    SDL_Rect bottomEdge = {boxRect.x, boxRect.y + boxRect.h - 10, boxRect.w, 10}; // Bottom edge
+    SDL_Rect leftEdge = {boxRect.x, boxRect.y, 10, boxRect.h}; // Left edge
+    SDL_Rect rightEdge = {boxRect.x + boxRect.w - 10, boxRect.y, 10, boxRect.h}; // Right edge
 
     SDL_FillRect(screen, &topEdge, SDL_MapRGB(screen->format, 0, 0, 0)); // Black top edge
     SDL_FillRect(screen, &bottomEdge, SDL_MapRGB(screen->format, 0, 0, 0)); // Black bottom edge
@@ -497,23 +497,23 @@ void handleEventEnigme(int *menuState, Save save, SDL_Event event, Button *butto
 
                     // Snap the dragged piece to the nearest grid position if inside the box
                     if (draggedPieceIndex != -1) {
-                        int cellWidth = 270 / 3; // Width of each grid cell (90)
-                        int cellHeight = 270 / 3; // Height of each grid cell (90)
+                        int cellWidth = 540 / 3; // Updated width of each grid cell (180)
+                        int cellHeight = 540 / 3; // Updated height of each grid cell (180)
 
                         // Calculate the center of the piece
                         int pieceCenterX = piecePositions[draggedPieceIndex].x + piecePositions[draggedPieceIndex].w / 2;
                         int pieceCenterY = piecePositions[draggedPieceIndex].y + piecePositions[draggedPieceIndex].h / 2;
 
                         // Check if the center of the piece is inside the box
-                        if (pieceCenterX >= 600 && pieceCenterX <= 870 &&
-                            pieceCenterY >= 300 && pieceCenterY <= 570) {
+                        if (pieceCenterX >= 640 && pieceCenterX <= 1180 &&
+                            pieceCenterY >= 480 && pieceCenterY <= 1020) {
                             // Calculate the grid cell (0-2 for both X and Y)
-                            int gridX = (pieceCenterX - 600) / cellWidth;
-                            int gridY = (pieceCenterY - 300) / cellHeight;
+                            int gridX = (pieceCenterX - 640) / cellWidth;
+                            int gridY = (pieceCenterY - 480) / cellHeight;
 
                             // Snap the piece to the grid
-                            piecePositions[draggedPieceIndex].x = 600 + gridX * cellWidth;
-                            piecePositions[draggedPieceIndex].y = 300 + gridY * cellHeight;
+                            piecePositions[draggedPieceIndex].x = 640 + gridX * cellWidth;
+                            piecePositions[draggedPieceIndex].y = 480 + gridY * cellHeight;
                         }
                     }
 
