@@ -94,6 +94,13 @@ typedef struct {
     SDL_Surface* img;
 } Image;
 
+// Platform structure
+typedef struct {
+    SDL_Rect rect;
+    SDL_Surface* texture;
+    int is_solid;  // Whether player can stand on it
+} Platform;
+
 // Background functions
 SDL_Surface* load_background(const char* filename);
 void display_background(SDL_Surface* screen, SDL_Surface* background);
@@ -103,8 +110,8 @@ void init_enemy(Enemy *enemy, int health, int x);
 void display_enemy(Enemy *enemy, SDL_Surface* screen);
 void draw_enemy_health_bar(SDL_Surface* screen, Enemy* enemy);
 void animate_enemy_move(Enemy *enemy);
-void move_enemy_randomly(Enemy *enemy, int level);
-void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int vision_range, int attack_range);
+void move_enemy_randomly(Enemy *enemy, int level, Platform platforms[], int num_platforms);
+void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int vision_range, int attack_range, Platform platforms[], int num_platforms);
 int check_collision_player_enemy(SDL_Rect player_rect, Enemy *enemy);
 void update_enemy_health(Enemy *enemy, int damage);
 
@@ -112,7 +119,7 @@ void update_enemy_health(Enemy *enemy, int damage);
 void init_player(Player* player, const char* sprite_path, int x);
 void display_player(SDL_Surface* screen, Player* player);
 void move_player(Input* input, Player* player, Uint32 dt);
-void jump_player(Input* input, Player* player, int* jump_height);
+void jump_player(Input* input, Player* player, int* jump_height, Platform platforms[], int num_platforms);
 void animate_player(Player* player, Input input);
 void draw_player_health_bar(SDL_Surface* screen, Player* player);
 void update_player_health(Player* player, int damage, Uint32 current_time);
@@ -146,5 +153,11 @@ void check_ball_enemy_collisions(Enemy enemies[], int num_enemies);
 void render_text_centered(SDL_Surface* screen, const char* text, TTF_Font* font, SDL_Color color, int y);
 void display_pause_menu(SDL_Surface* screen);
 void display_game_over(SDL_Surface* screen, int score);
+
+// Platform functions
+void init_platform(Platform* platform, int x, int y, int width, int height, const char* texture_path);
+void display_platform(SDL_Surface* screen, Platform* platform);
+int check_collision_with_platform(SDL_Rect object_rect, Platform* platform);
+void free_platform(Platform* platform);
 
 #endif // GAME_H 

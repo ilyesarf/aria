@@ -127,7 +127,7 @@ void animate_enemy_move(Enemy *enemy) {
     }
 }
 
-void move_enemy_randomly(Enemy *enemy, int level) {
+void move_enemy_randomly(Enemy *enemy, int level, Platform platforms[], int num_platforms) {
     // Only move if enemy has health
     if (enemy->health <= 0) {
         return;
@@ -150,8 +150,35 @@ void move_enemy_randomly(Enemy *enemy, int level) {
     }
     
     int move_speed = 5;
-    enemy->x += enemy->dx * move_speed;
-    enemy->y += enemy->dy * move_speed;
+    float new_x = enemy->x + enemy->dx * move_speed;
+    float new_y = enemy->y + enemy->dy * move_speed;
+    
+    // Create a temporary rect for collision checking
+    SDL_Rect enemy_rect = {
+        (int)new_x,
+        (int)new_y,
+        enemy->frames[0]->w,
+        enemy->frames[0]->h
+    };
+    
+    // Check platform collisions
+    int can_move_x = 1;
+    int can_move_y = 1;
+    
+    for (int i = 0; i < num_platforms; i++) {
+        if (check_collision_with_platform(enemy_rect, &platforms[i])) {
+            // If collision detected, reverse direction and prevent movement
+            enemy->dx *= -1;
+            enemy->dy *= -1;
+            can_move_x = 0;
+            can_move_y = 0;
+            break;
+        }
+    }
+    
+    // Apply movement if allowed
+    if (can_move_x) enemy->x = new_x;
+    if (can_move_y) enemy->y = new_y;
     
     // Screen boundary checks
     if (enemy->x < 0) {
@@ -172,12 +199,15 @@ void move_enemy_randomly(Enemy *enemy, int level) {
     }
 }
 
-void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int vision_range, int attack_range) {
+void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int vision_range, int attack_range, Platform platforms[], int num_platforms) {
     if (enemy->health <= 0) return;
 
     float dx = player_x - enemy->x;
     float dy = player_y - enemy->y;
     float distance = sqrt(dx * dx + dy * dy);
+    
+    float new_x = enemy->x;
+    float new_y = enemy->y;
     
     // Update enemy state based on distance
     switch (enemy->state) {
@@ -186,9 +216,9 @@ void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int vision_range, i
                 enemy->state = FOLLOWING;
                 enemy->patrol_direction = (dx > 0) ? 1 : -1;
             } else {
-                // Patrol behavior
-                enemy->x += enemy->patrol_direction * PATROL_SPEED;
-                if (fabs(enemy->x - enemy->patrol_start_x) > PATROL_RANGE) {
+                // Simple patrol behavior
+                new_x = enemy->x + enemy->patrol_direction * PATROL_SPEED;
+                if (fabs(new_x - enemy->patrol_start_x) > PATROL_RANGE) {
                     enemy->patrol_direction *= -1;
                 }
             }
@@ -200,10 +230,20 @@ void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int vision_range, i
             } else if (distance > vision_range) {
                 enemy->state = WAITING;
             } else {
-                // Smooth pursuit movement
+                // Improved tracking movement
                 float angle = atan2(dy, dx);
-                enemy->x += cos(angle) * CHASE_SPEED;
-                enemy->y += sin(angle) * CHASE_SPEED;
+                
+                // Move faster vertically to better track player on platforms
+                float vertical_speed = CHASE_SPEED * 2.0f;
+                float horizontal_speed = CHASE_SPEED;
+                
+                // If player is above, increase vertical speed even more
+                if (player_y < enemy->y) {
+                    vertical_speed *= 1.5f;
+                }
+                
+                new_x = enemy->x + cos(angle) * horizontal_speed;
+                new_y = enemy->y + sin(angle) * vertical_speed;
             }
             break;
 
@@ -211,13 +251,47 @@ void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int vision_range, i
             if (distance > attack_range) {
                 enemy->state = FOLLOWING;
             } else {
-                // Aggressive movement
+                // Direct attack movement
                 float angle = atan2(dy, dx);
-                enemy->x += cos(angle) * ATTACK_SPEED;
-                enemy->y += sin(angle) * ATTACK_SPEED;
+                new_x = enemy->x + cos(angle) * ATTACK_SPEED;
+                new_y = enemy->y + sin(angle) * ATTACK_SPEED;
             }
             break;
     }
+
+    // Create a temporary rect for collision checking
+    SDL_Rect enemy_rect = {
+        (int)new_x,
+        (int)new_y,
+        enemy->frames[0]->w,
+        enemy->frames[0]->h
+    };
+    
+    // Check platform collisions
+    int can_move_x = 1;
+    int can_move_y = 1;
+    
+    for (int i = 0; i < num_platforms; i++) {
+        if (check_collision_with_platform(enemy_rect, &platforms[i])) {
+            // Try to move around platforms
+            SDL_Rect test_x = enemy_rect;
+            test_x.y = enemy->y;
+            
+            SDL_Rect test_y = enemy_rect;
+            test_y.x = enemy->x;
+            
+            if (check_collision_with_platform(test_x, &platforms[i])) {
+                can_move_x = 0;
+            }
+            if (check_collision_with_platform(test_y, &platforms[i])) {
+                can_move_y = 0;
+            }
+        }
+    }
+    
+    // Apply movement separately for X and Y
+    if (can_move_x) enemy->x = new_x;
+    if (can_move_y) enemy->y = new_y;
 
     // Keep enemy within screen bounds
     enemy->x = fmax(0, fmin(enemy->x, SCREEN_WIDTH - enemy->frames[0]->w));
@@ -358,7 +432,7 @@ void move_player(Input* input, Player* player, Uint32 dt) {
     }
 }
 
-void jump_player(Input* input, Player* player, int* jump_height) {
+void jump_player(Input* input, Player* player, int* jump_height, Platform platforms[], int num_platforms) {
     (void)jump_height; // Silence unused parameter warning
     
     // Apply gravity
@@ -372,15 +446,35 @@ void jump_player(Input* input, Player* player, int* jump_height) {
     // Update vertical position
     player->pos.y += player->vy;
     
+    // Check if player is on any platform or ground
+    int on_platform = 0;
+    
     // Ground collision
     if (player->pos.y >= GROUND_Y - player->pos.h) {
         player->pos.y = GROUND_Y - player->pos.h;
         player->vy = 0;
         player->is_jumping = 0;
+        on_platform = 1;
     }
     
-    // Jump input
-    if (input->jump && !player->is_jumping && player->pos.y >= GROUND_Y - player->pos.h) {
+    // Platform collision
+    for (int i = 0; i < num_platforms; i++) {
+        if (check_collision_with_platform(player->pos, &platforms[i])) {
+            // Only count as landing if player is falling and above the platform
+            if (player->vy > 0 && 
+                player->pos.y + player->pos.h > platforms[i].rect.y && 
+                player->pos.y < platforms[i].rect.y) {
+                player->pos.y = platforms[i].rect.y - player->pos.h;
+                player->vy = 0;
+                player->is_jumping = 0;
+                on_platform = 1;
+                break;
+            }
+        }
+    }
+    
+    // Jump input - now can jump if on any platform or ground
+    if (input->jump && !player->is_jumping && on_platform) {
         player->vy = JUMP_FORCE;
         player->is_jumping = 1;
     }
@@ -670,4 +764,55 @@ void display_game_over(SDL_Surface* screen, int score) {
 
     TTF_CloseFont(large_font);
     TTF_CloseFont(small_font);
+}
+
+// Platform implementation
+void init_platform(Platform* platform, int x, int y, int width, int height, const char* texture_path) {
+    platform->rect.x = x;
+    platform->rect.y = y;
+    platform->rect.w = width;
+    platform->rect.h = height;
+    platform->is_solid = 1;  // Default to solid platform
+    
+    // Load platform texture if path is provided
+    if (texture_path) {
+        platform->texture = IMG_Load(texture_path);
+        if (!platform->texture) {
+            printf("Failed to load platform texture: %s\n", SDL_GetError());
+            // Use a default color if texture fails to load
+        }
+    } else {
+        platform->texture = NULL;
+    }
+}
+
+void display_platform(SDL_Surface* screen, Platform* platform) {
+    if (platform->texture) {
+        // If we have a texture, use it
+        SDL_BlitSurface(platform->texture, NULL, screen, &platform->rect);
+    } else {
+        // Otherwise, draw a solid rectangle
+        SDL_FillRect(screen, &platform->rect, SDL_MapRGB(screen->format, 139, 69, 19));  // Brown color
+    }
+}
+
+int check_collision_with_platform(SDL_Rect object_rect, Platform* platform) {
+    // Only check collision if platform is solid
+    if (!platform->is_solid) return 0;
+    
+    // Check for intersection between object and platform
+    if (object_rect.x + object_rect.w <= platform->rect.x ||    // object is to the left
+        object_rect.x >= platform->rect.x + platform->rect.w ||  // object is to the right
+        object_rect.y + object_rect.h <= platform->rect.y ||    // object is above
+        object_rect.y >= platform->rect.y + platform->rect.h) { // object is below
+        return 0;
+    }
+    return 1;
+}
+
+void free_platform(Platform* platform) {
+    if (platform->texture) {
+        SDL_FreeSurface(platform->texture);
+        platform->texture = NULL;
+    }
 } 
