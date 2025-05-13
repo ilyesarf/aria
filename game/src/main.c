@@ -151,7 +151,7 @@ int main(int argc, char** argv) {
     }
     
 
-    menu(screen, background.image, font, textColor, butImage, hoverSound, musique, menuState, save, menus);
+    menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
 
 
     // Game loop variables
@@ -202,7 +202,7 @@ int main(int argc, char** argv) {
                 
                 menuState = MAIN_GAME;
             } else if (input.q) {
-                menu(screen, background.image, font, textColor, butImage, hoverSound, musique, menuState, save, menus);
+                menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
             }
         } else if (menuState == MENU_SAVE || menuState == MENU_ENIGME) {
             menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);

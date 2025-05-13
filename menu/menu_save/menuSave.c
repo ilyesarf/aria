@@ -92,7 +92,7 @@ void handleEventSaveMenu(int *menuState, Save save, SDL_Event event, Button *but
                         } else if (i == 1) { 
                             Mix_PlayChannel(-1, hoverSound, 0);
                             *menuState = MAIN_GAME; // NON -> Exit
-                            printf("Resume game. menuState = %d\n", *menuState);
+                            printf("Resume game. menuState = %d\n", menuState);
                         }
                     }
                 }
