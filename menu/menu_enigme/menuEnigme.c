@@ -298,8 +298,8 @@ void initPuzzle() {
     }
 
     // Set the shuffled positions for the pieces
-    int startX = 200; // Starting X position for the pieces
-    int startY = 300; // Starting Y position for the pieces
+    int startX = 100; // Starting X position for the pieces
+    int startY = 200; // Starting Y position for the pieces
     for (int i = 0; i < 9; i++) {
         int index = indices[i];
         piecePositions[index] = (SDL_Rect){startX + (i % 3) * (pieceWidth + 10), startY + (i / 3) * (pieceHeight + 10), pieceWidth, pieceHeight};
@@ -309,7 +309,7 @@ void initPuzzle() {
 void renderPuzzle(SDL_Surface *screen) {
 
     // Define the box dimensions
-    SDL_Rect boxRect = {600, 300, 270 , 270}; // Position and size of the box
+    SDL_Rect boxRect = {400, 300, 270 , 270}; // Position and size of the box
 
     // Draw the white box
     SDL_FillRect(screen, &boxRect, SDL_MapRGB(screen->format, 255, 255, 255)); // White fill
