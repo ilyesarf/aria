@@ -156,7 +156,11 @@ int main(int argc, char** argv) {
             input.escape = 0;
             SDL_Delay(200); // Add a small delay to prevent immediate state toggle
         }
-        
+
+        if (player.pos.x == background.world_width){
+            menuState = MENU_ENIGME;
+        } 
+
         if (menuState == MENU_BEST_SCORE) {
             if (input.space) {
                 // Reset game
@@ -176,7 +180,7 @@ int main(int argc, char** argv) {
             } else if (input.q) {
                 menu(screen, background.image, font, textColor, butImage, hoverSound, musique, menuState, save, menus);
             }
-        } else if (menuState == MENU_SAVE) {
+        } else if (menuState == MENU_SAVE || menuState == MENU_ENIGME) {
             menu(screen, background.image, font, textColor, butImage, hoverSound, musique, menuState, save, menus);
         }
 
