@@ -8,8 +8,8 @@
 #include <math.h>
 
 #define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
-#define GROUND_Y (SCREEN_HEIGHT - 100)  // Ground level, 100 pixels from bottom
+#define SCREEN_HEIGHT 512
+#define GROUND_Y (SCREEN_HEIGHT - 10)  // Ground level, 100 pixels from bottom
 #define GRAVITY 0.5f
 #define JUMP_FORCE -15.0f
 #define MAX_FALL_SPEED 15.0f
