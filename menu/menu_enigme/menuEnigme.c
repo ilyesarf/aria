@@ -1,0 +1,562 @@
+#include "menuEnigme.h"
+#include "../header.h"
+#include <SDL_gfxPrimitives.h>
+#include <SDL_rotozoom.h>
+
+// Global variables for quiz
+static int currentQuestionIndex = -1;
+static int score = 0;
+static int lives = 1;
+static int level = 1;
+static Question questions[MAX_QUESTIONS];
+static int numQuestions = 0;
+
+
+// Global variables for puzzle
+//static SDL_Rect puzzlePosition = {800, 500, 300, 300}; // Position of the puzzle
+static SDL_Rect piecePositions[9]; // Positions of the nine pieces
+static SDL_Rect correctPositions[9]; // Correct positions of the nine pieces
+static SDL_Surface *pieceImages[9] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+static int isDragging = 0; // Whether the player is dragging a piece
+static int draggedPieceIndex = -1; // Index of the currently dragged piece
+static SDL_Rect draggedPieceOffset = {0, 0, 0, 0}; // Offset for dragging
+
+
+// Puzzle assets
+static SDL_Surface *puzzleImage = NULL;
+static Uint32 puzzleStartTime = 0;
+static int puzzleSolved = 0;
+static int puzzleTimeout = 0;
+
+// Global variable for enigme menu
+int showSubButtons = 0;
+SDL_Surface *screen = NULL;
+int menuState = MENU_OPTION; // Initialize to MENU_OPTION or any default state
+
+
+
+//--------------------------------------------Enigme Menu Functions-------------------------------------------
+void initMenuEnigme(Menu *menus) {
+    printf("Init Menu Enigme\n");
+    menus[MENU_ENIGME].n_btns = 5;
+    menus[MENU_ENIGME].buttons = malloc(menus[MENU_ENIGME].n_btns * sizeof(Button));
+    if (!menus[MENU_ENIGME].buttons) {
+        fprintf(stderr, "Failed to allocate memory for buttons\n");
+        exit(EXIT_FAILURE);
+    }
+    loadQuestions("./menu/menu_enigme/questions.txt", questions, &numQuestions);
+    menus[MENU_ENIGME].init_buttons = initMenuEnigmeButtons;
+    menus[MENU_ENIGME].render = renderMenuEnigme;
+    menus[MENU_ENIGME].handleEvent = handleEventEnigme;
+    menus[MENU_ENIGME].init_buttons(menus[MENU_ENIGME].buttons);
+
+    srand(time(NULL)); // Seed the random number generator
+    loadQuestions("./menu/menu_enigme/questions.txt", questions, &numQuestions);
+    if (numQuestions == 0) {
+        fprintf(stderr, "No questions loaded. Exiting.\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+
+// Function to initialize enigme menu buttons
+void initMenuEnigmeButtons(Button *buttons) {
+    buttons[0].text = "Quiz";
+    buttons[0].rect = (SDL_Rect){600, 200, 300, 40};
+    buttons[0].selected = 0;
+
+    buttons[1].text = "Puzzle";
+    buttons[1].rect = (SDL_Rect){1000, 200, 300, 40};
+    buttons[1].selected = 0;
+
+    for (int i = 2; i < 5; i++) {
+        
+        buttons[i].rect = (SDL_Rect){400, 300 + (i - 2) * 200, 300, 40};
+        buttons[i].selected = 0;
+    }
+}
+void renderMenuEnigme(SDL_Surface *background, SDL_Surface *butImage, SDL_Surface *screen, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns) {
+    SDL_BlitSurface(background, NULL, screen, NULL); // Render the background
+
+    if (showSubButtons == 0) {
+        // Render the main menu buttons (Quiz and Puzzle)
+        for (int i = 0; i < 2; i++) {
+            renderButton(screen, butImage, font, textColor, buttons[i]);
+        }
+    } else if (showSubButtons == 1) {
+        // Render the Quiz UI
+        renderQuizUI(screen, butImage, font, textColor, buttons, n_btns);
+    } else if (showSubButtons == 2) {
+        // Render the Puzzle UI
+        renderPuzzle(screen);
+    }
+
+    SDL_Flip(screen); // Update the screen
+}
+
+void showRotozoomMessage(const char *message, SDL_Color color) {
+    screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 32, SDL_SWSURFACE);
+    if (!screen) {
+        fprintf(stderr, "Error: screen is NULL in showRotozoomMessage\n");
+        SDL_Delay(2000);
+        return;
+    }
+    TTF_Font *font = TTF_OpenFont("./assets/fonts/font.ttf", 60);
+    if (!font) {
+        fprintf(stderr, "Error: could not open font in showRotozoomMessage\n");
+        SDL_Delay(2000);
+        return;
+    }
+    SDL_Surface *msgSurface = TTF_RenderText_Solid(font, message, color);
+    if (!msgSurface) {
+        fprintf(stderr, "Error: could not render text in showRotozoomMessage\n");
+        TTF_CloseFont(font);
+        SDL_Delay(2000);
+        return;
+    }
+
+    double angle = 0;
+    Uint32 start = SDL_GetTicks();
+    while (SDL_GetTicks() - start < 2000) { // Show for 2 seconds
+        SDL_Surface *zoomed = rotozoomSurface(msgSurface, angle, 1.2, 1);
+        SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); // Clear screen
+        SDL_BlitSurface(zoomed, NULL, screen, &(SDL_Rect){(screen->w - zoomed->w)/2, (screen->h - zoomed->h)/2, 0, 0});
+        SDL_Flip(screen);
+        SDL_FreeSurface(zoomed);
+        angle += 5;
+        SDL_Delay(30);
+    }
+    SDL_FreeSurface(msgSurface);
+    TTF_CloseFont(font);
+}
+
+
+
+
+
+//----------------------------------------------------quiz functions----------------------------------------------------
+// Function to load quiz questions
+void loadQuestions(const char *filename, Question *questions, int *numQuestions) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        fprintf(stderr, "Failed to open questions file: %s\n", filename);
+        return;
+    }
+
+    char line[256];
+    int questionIndex = 0;
+
+    while (fgets(line, sizeof(line), file) && questionIndex < MAX_QUESTIONS) {
+        if (sscanf(line, "%255[^;];%255[^;];%255[^;];%255[^;];%d",
+                   questions[questionIndex].question,
+                   questions[questionIndex].options[0],
+                   questions[questionIndex].options[1],
+                   questions[questionIndex].options[2],
+                   &questions[questionIndex].correctOption) == 5) {
+            questionIndex++;
+        } else {
+            fprintf(stderr, "Failed to parse line: %s\n", line);
+        }
+    }
+
+    *numQuestions = questionIndex;
+    fclose(file);
+
+    /*for (int i = 0; i < *numQuestions; i++) {
+        int j = rand() % *numQuestions;
+        Question temp = questions[i];
+        questions[i] = questions[j];
+        questions[j] = temp;
+    }*/
+}
+
+// Function to render the quiz UI
+void renderQuizUI(SDL_Surface *screen, SDL_Surface *butImage, TTF_Font *font, SDL_Color textColor, Button *buttons, int n_btns) {
+    if (currentQuestionIndex == -1) {
+        currentQuestionIndex = 0;
+    }
+
+    if (currentQuestionIndex >= numQuestions) {
+        printf("All questions answered. Resetting...\n");
+        currentQuestionIndex = 0;
+    }
+
+    Question currentQuestion = questions[currentQuestionIndex];
+
+    // Render the quiz title
+    renderText(screen, "Quiz", font, textColor, 600, 100);
+
+    // Render the current question
+    renderText(screen, currentQuestion.question, font, textColor, 400, 200);
+
+    // Render the answer options
+
+    for (int i = 2; i < n_btns; i++) {
+        buttons[i].text = currentQuestion.options[i - 2];
+        renderButton(screen, butImage, font, textColor, buttons[i]);
+    }
+    
+    // Render the score and lives
+    char scoreText[50];
+    char livesText[50];
+    snprintf(scoreText, sizeof(scoreText), "Score: %d", score);
+    snprintf(livesText, sizeof(livesText), "Lives: %d", lives);
+
+    renderText(screen, scoreText, font, textColor, 50, 50);  // Display score at the top-left corner
+    renderText(screen, livesText, font, textColor, 50, 100); // Display lives below the score
+
+    SDL_Flip(screen);
+}
+
+// Function to check quiz answers
+void checkAnswer(int selectedOption, int correctOption, int *score, int *lives, int *level, int *menuState) {
+    if (selectedOption > -1) {
+        if (selectedOption == correctOption) {
+            printf("Correct answer!\n");
+            (*score)++;
+            if (*score % 5 == 0) {
+                (*lives)++;
+            }
+            // Show rotozoom "Correct answer"
+            SDL_Color green = {0, 255, 0, 0};
+            showRotozoomMessage("Correct answer!", green);
+        } else {
+            printf("Wrong answer!\n");
+            printf("showbuttons: %d\n", showSubButtons);
+            if (*lives > 0) {
+                (*lives)--;
+            }
+            // Show rotozoom "Game Over"
+            SDL_Color red = {255, 0, 0, 0};
+            showRotozoomMessage("Game Over!", red);
+
+            if (*lives == 0) {
+                printf("Returning to Menu Option...\n");
+                *score = 0;
+                *lives = 0;
+                showSubButtons = 0;
+                *menuState = MAIN_GAME;
+            }
+        }
+        if (*score == 10) {
+            *menuState = MENU_PRINCIPAL;
+        }
+        currentQuestionIndex++;
+    }
+}
+
+
+
+
+
+
+//---------------------------------------------Puzzle Functions----------------------------------------------------
+// Function to initialize the puzzle
+void initPuzzle() {
+    // Load the full puzzle image
+    printf("Initializing puzzle...\n"); // Debug print
+    puzzleImage = load_image("./assets/game/aria.png");
+    if (!puzzleImage) {
+        fprintf(stderr, "Failed to load puzzle image!\n");
+        return;
+    }
+
+    // Adjust piece dimensions to fit the new box size
+    int pieceWidth = 270 / 3;  // Each piece is one-third of the box width
+    int pieceHeight = 270 / 3; // Each piece is one-third of the box height
+
+    for (int i = 0; i < 9; i++) {
+        pieceImages[i] = SDL_CreateRGBSurface(0, pieceWidth, pieceHeight, 32, 0, 0, 0, 0);
+        if (!pieceImages[i]) {
+            fprintf(stderr, "Failed to create surface for piece %d\n", i);
+            return;
+        }
+    }
+
+    // Define the correct positions of the pieces in the puzzle image
+    SDL_Rect pieceRects[9];
+    for (int row = 0; row < 3; row++) {
+        for (int col = 0; col < 3; col++) {
+            int index = row * 3 + col;
+            pieceRects[index] = (SDL_Rect){col * pieceWidth, row * pieceHeight, pieceWidth, pieceHeight};
+            correctPositions[index] = (SDL_Rect){640 + col * pieceWidth, 50 + row * pieceHeight, pieceWidth, pieceHeight};
+        }
+    }
+
+    // Extract the pieces from the puzzle image
+    for (int i = 0; i < 9; i++) {
+        SDL_BlitSurface(puzzleImage, &pieceRects[i], pieceImages[i], NULL);
+    }
+
+    // Shuffle the pieces
+    int indices[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    for (int i = 0; i < 9; i++) {
+        int j = rand() % 9;
+        int temp = indices[i];
+        indices[i] = indices[j];
+        indices[j] = temp;
+    }
+
+    // Set the shuffled positions for the pieces
+    int startX = 100; // Starting X position for the pieces
+    int startY = 200; // Starting Y position for the pieces
+    for (int i = 0; i < 9; i++) {
+        int index = indices[i];
+        piecePositions[index] = (SDL_Rect){startX + (i % 3) * (pieceWidth + 10), startY + (i / 3) * (pieceHeight + 10), pieceWidth, pieceHeight};
+    }
+}
+
+void renderPuzzle(SDL_Surface *screen) {
+
+    // Define the box dimensions with the new resolution
+    SDL_Rect boxRect = {640, 50, 270, 270}; // Updated position and size of the box
+
+    // Draw the white box
+    SDL_FillRect(screen, &boxRect, SDL_MapRGB(screen->format, 255, 255, 255)); // White fill
+
+    // Draw the black edges
+    SDL_Rect topEdge = {boxRect.x, boxRect.y, boxRect.w, 10}; // Top edge
+    SDL_Rect bottomEdge = {boxRect.x, boxRect.y + boxRect.h - 10, boxRect.w, 10}; // Bottom edge
+    SDL_Rect leftEdge = {boxRect.x, boxRect.y, 10, boxRect.h}; // Left edge
+    SDL_Rect rightEdge = {boxRect.x + boxRect.w - 10, boxRect.y, 10, boxRect.h}; // Right edge
+
+    SDL_FillRect(screen, &topEdge, SDL_MapRGB(screen->format, 0, 0, 0)); // Black top edge
+    SDL_FillRect(screen, &bottomEdge, SDL_MapRGB(screen->format, 0, 0, 0)); // Black bottom edge
+    SDL_FillRect(screen, &leftEdge, SDL_MapRGB(screen->format, 0, 0, 0)); // Black left edge
+    SDL_FillRect(screen, &rightEdge, SDL_MapRGB(screen->format, 0, 0, 0)); // Black right edge
+
+    // Draw the 3x3 grid inside the box
+    int cellWidth = boxRect.w / 3;
+    int cellHeight = boxRect.h / 3;
+    for (int row = 1; row < 3; row++) {
+        SDL_Rect horizontalLine = {boxRect.x, boxRect.y + row * cellHeight, boxRect.w, 2};
+        SDL_FillRect(screen, &horizontalLine, SDL_MapRGB(screen->format, 0, 0, 0)); // Black horizontal line
+    }
+    for (int col = 1; col < 3; col++) {
+        SDL_Rect verticalLine = {boxRect.x + col * cellWidth, boxRect.y, 2, boxRect.h};
+        SDL_FillRect(screen, &verticalLine, SDL_MapRGB(screen->format, 0, 0, 0)); // Black vertical line
+    }
+
+    // Render the pieces
+    for (int i = 0; i < 9; i++) {
+        if (i != draggedPieceIndex) {
+            SDL_BlitSurface(pieceImages[i], NULL, screen, &piecePositions[i]);
+        }
+    }
+
+    // Render the dragged piece
+    if (isDragging && draggedPieceIndex != -1) {
+        SDL_Rect draggedPosition = {
+            piecePositions[draggedPieceIndex].x + draggedPieceOffset.x,
+            piecePositions[draggedPieceIndex].y + draggedPieceOffset.y,
+            0, 0
+        };
+        SDL_BlitSurface(pieceImages[draggedPieceIndex], NULL, screen, &draggedPosition);
+    }
+
+    // Check if the puzzle is completed
+    int tolerance = 20; // Allowable range for approximate placement
+    int piecesInPlace = 0;
+
+    for (int i = 0; i < 9; i++) {
+        // Check if the piece is inside the box and approximately in the correct position
+        if (piecePositions[i].x >= 600 && piecePositions[i].x <= 870 && // Inside the box horizontally
+            piecePositions[i].y >= 300 && piecePositions[i].y <= 570 && // Inside the box vertically
+            abs(piecePositions[i].x - correctPositions[i].x) <= tolerance &&
+            abs(piecePositions[i].y - correctPositions[i].y) <= tolerance) {
+            piecesInPlace++;
+        }
+    }
+
+    Uint32 now = SDL_GetTicks();
+    Uint32 elapsed = (puzzleStartTime > 0) ? (now - puzzleStartTime) : 0;
+    int secondsLeft = 30 - (elapsed / 1000);
+
+    // Render timer
+    char timerText[32];
+    snprintf(timerText, sizeof(timerText), "Time left: %d", secondsLeft > 0 ? secondsLeft : 0);
+    TTF_Font *timerFont = TTF_OpenFont("./assets/fonts/font.ttf", 40);
+    if (timerFont) {
+        SDL_Color timerColor = {0, 0, 255, 0};
+        renderText(screen, timerText, timerFont, timerColor, 50, 50);
+        TTF_CloseFont(timerFont);
+    }
+
+    // Puzzle solved in time
+    if (!puzzleSolved && !puzzleTimeout && piecesInPlace == 9 && secondsLeft > 0) {
+        puzzleSolved = 1;
+        showRotozoomMessage("Correct answer!", (SDL_Color){0, 255, 0, 0});
+        showSubButtons = 0; // Return to menu
+    }
+
+    // Time out
+    if (!puzzleSolved && !puzzleTimeout && secondsLeft <= 0) {
+        puzzleTimeout = 1;
+        showRotozoomMessage("Game Over!", (SDL_Color){255, 0, 0, 0});
+        showSubButtons = 0; // Return to menu
+    }
+}
+
+// Add this helper function to check if all pieces are in correct position
+static int isPuzzleComplete() {
+    for (int i = 0; i < 9; i++) {
+        if (piecePositions[i].x != correctPositions[i].x ||
+            piecePositions[i].y != correctPositions[i].y) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//--------------------------------------handle events----------------------------------------------------
+// Function to handle enigme menu events
+void handleEventEnigme(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
+    printf("Handling event in enigme menu\n");
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
+            *menuState = QUIT_GAME;
+        }
+
+        if (event.type == SDL_MOUSEMOTION) {
+            // Highlight buttons on hover
+            for (int i = 0; i < n_btns; i++) {
+                if (showSubButtons == 0 && i < 2) { // Only highlight main buttons when in main menu
+                    if (event.motion.x >= buttons[i].rect.x && event.motion.x <= buttons[i].rect.x + buttons[i].rect.w &&
+                        event.motion.y >= buttons[i].rect.y && event.motion.y <= buttons[i].rect.y + buttons[i].rect.h) {
+                        buttons[i].selected = 1;
+                    } else {
+                        buttons[i].selected = 0;
+                    }
+                } else if (showSubButtons == 1 && i >= 2) { // Highlight quiz answer buttons
+                    if (event.motion.x >= buttons[i].rect.x && event.motion.x <= buttons[i].rect.x + buttons[i].rect.w &&
+                        event.motion.y >= buttons[i].rect.y && event.motion.y <= buttons[i].rect.y + buttons[i].rect.h) {
+                        buttons[i].selected = 1;
+                    } else {
+                        buttons[i].selected = 0;
+                    }
+                } else {
+                    buttons[i].selected = 0; // Disable hover for other buttons
+                }
+            }
+        }
+
+        if (event.type == SDL_MOUSEBUTTONDOWN) {
+            if (event.button.button == SDL_BUTTON_LEFT) {
+                for (int i = 0; i < n_btns; i++) {
+                    if (buttons[i].selected) {
+                        if (showSubButtons == 0) { // Only handle main buttons when in main menu
+                            if (i == 0) {
+                                printf("Quiz selected\n");
+                                showSubButtons = 1;
+                                if (numQuestions > 0) {
+                                    int randomIndex = rand() % numQuestions;
+                                    questions[0] = questions[randomIndex]; // Copy the random question to index 0
+                                    numQuestions = 1; // Only one question will be used
+                                    currentQuestionIndex = 0;
+                                }
+                            } else if (i == 1) {
+                                printf("Puzzle selected\n");
+                                showSubButtons = 2;
+                                initPuzzle();
+                                puzzleStartTime = SDL_GetTicks();
+                                puzzleSolved = 0;
+                                puzzleTimeout = 0;
+                            }
+                        } else if (showSubButtons == 1) { // Handle Quiz-specific buttons
+                            printf("Answer selected: Option %d\n", i - 2);
+                            checkAnswer(i - 2, questions[currentQuestionIndex].correctOption, &score, &lives, &level, menuState);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Handle puzzle-specific events
+        if (showSubButtons == 2) { // Puzzle mode
+            if (event.type == SDL_MOUSEBUTTONDOWN) {
+                if (event.button.button == SDL_BUTTON_LEFT) {
+                    for (int i = 0; i < 9; i++) {
+                        if (event.button.x >= piecePositions[i].x &&
+                            event.button.x <= piecePositions[i].x + piecePositions[i].w &&
+                            event.button.y >= piecePositions[i].y &&
+                            event.button.y <= piecePositions[i].y + piecePositions[i].h) {
+                            isDragging = 1;
+                            draggedPieceIndex = i;
+                            draggedPieceOffset.x = event.button.x - piecePositions[i].x;
+                            draggedPieceOffset.y = event.button.y - piecePositions[i].y;
+                            break;
+                        }
+                    }
+                }
+            } else if (event.type == SDL_MOUSEBUTTONUP) {
+                if (event.button.button == SDL_BUTTON_LEFT && isDragging) {
+                    isDragging = 0;
+
+                    if (draggedPieceIndex != -1) {
+                        // Get piece center
+                        int pieceCenterX = piecePositions[draggedPieceIndex].x + piecePositions[draggedPieceIndex].w / 2;
+                        int pieceCenterY = piecePositions[draggedPieceIndex].y + piecePositions[draggedPieceIndex].h / 2;
+
+                        // Check if piece is within box boundaries
+                        SDL_Rect boxRect = {640, 50, 270, 270}; // Keep box size consistent
+                        int cellWidth = boxRect.w / 3;
+                        int cellHeight = boxRect.h / 3;
+
+                        if (pieceCenterX >= boxRect.x && pieceCenterX <= boxRect.x + boxRect.w &&
+                            pieceCenterY >= boxRect.y && pieceCenterY <= boxRect.y + boxRect.h) {
+                            
+                            // Calculate grid position
+                            int gridX = (pieceCenterX - boxRect.x) / cellWidth;
+                            int gridY = (pieceCenterY - boxRect.y) / cellHeight;
+                            
+                            // Snap to grid
+                            piecePositions[draggedPieceIndex].x = boxRect.x + (gridX * cellWidth);
+                            piecePositions[draggedPieceIndex].y = boxRect.y + (gridY * cellHeight);
+
+                            // Check if piece is in correct position
+                            if (piecePositions[draggedPieceIndex].x == correctPositions[draggedPieceIndex].x &&
+                                piecePositions[draggedPieceIndex].y == correctPositions[draggedPieceIndex].y) {
+                                // Piece is in correct position
+                                printf("Piece %d in correct position!\n", draggedPieceIndex);
+                                
+                                // Check if all pieces are in correct position
+                                if (isPuzzleComplete()) {
+                                    SDL_Color green = {0, 255, 0, 0};
+                                    showRotozoomMessage("Puzzle Complete!", green);
+                                    puzzleSolved = 1;
+                                    showSubButtons = 0; // Return to main menu
+                                    *menuState = MAIN_GAME; // Return to game
+                                }
+                            }
+                        }
+                    }
+                    draggedPieceIndex = -1;
+                }
+            }
+
+            if (event.type == SDL_MOUSEMOTION && isDragging) {
+                piecePositions[draggedPieceIndex].x = event.motion.x - draggedPieceOffset.x;
+                piecePositions[draggedPieceIndex].y = event.motion.y - draggedPieceOffset.y;
+            }
+        }
+    }
+}
+// Function to clean up the enigme menu
+void cleanupMenuEnigme(Menu *menu) {
+    free(menu->buttons);
+    menu->buttons = NULL;
+}

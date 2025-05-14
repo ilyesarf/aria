@@ -1,48 +1,37 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -Wno-error=unused-parameter `sdl-config --cflags` -g
-LDLIBS = `sdl-config --libs` -lSDL_mixer -lSDL_ttf -lSDL_image
+CFLAGS = -Wall -Wextra $(shell pkg-config --cflags sdl SDL_image SDL_ttf SDL_mixer) -I./core
+LDFLAGS = $(shell pkg-config --libs sdl SDL_image SDL_ttf SDL_mixer) -lm
 
-# Directories
-SRC_DIR = .
-MENU_SAVE_DIR = menu_save
-MENU_BEST_SCORE_DIR = menu_best_score
-MENU_PLAYER_DIR = menu_joueur
-MENU_PRINCIPAL_DIR = menu_principal
-MENU_OPTION_DIR = menu_option
-MENU_ENIGME_DIR = menu_enigme
-BIN_DIR = bin
+SRCDIR = core
+OBJDIR = obj
 
-# Source files
-SRCS = $(SRC_DIR)/main.c \
-       $(MENU_SAVE_DIR)/menuSave.c \
-       $(MENU_BEST_SCORE_DIR)/menuBestScore.c \
-	   $(MENU_PLAYER_DIR)/menuJoueur.c \
-	   $(MENU_PRINCIPAL_DIR)/menuPrincipal.c \
-	   $(MENU_OPTION_DIR)/menuOption.c \
-       $(MENU_ENIGME_DIR)/menuEnigme.c
+# Main source files
+SOURCES = $(SRCDIR)/main.c \
+         $(SRCDIR)/background/bgmain.c \
+         $(SRCDIR)/background/bgsource.c
 
-# Object files
-OBJS = $(SRCS:.c=.o)
+OBJECTS = $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
-# Executable
-TARGET = $(BIN_DIR)/main
+TARGET = core/game
 
-all: $(TARGET)
+$(TARGET): $(OBJECTS)
+	@mkdir -p $(dir $@)
+	$(CC) $(OBJECTS) -o $(TARGET) $(LDFLAGS)
 
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
-
-%.o: %.c %.h
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(SRC_DIR)/main.o: $(SRC_DIR)/main.c $(MENU_SAVE_DIR)/menuSave.h $(MENU_BEST_SCORE_DIR)/menuBestScore.h $(MENU_PLAYER_DIR)/menuJoueur.h $(MENU_PRINCIPAL_DIR)/menuPrincipal.h $(MENU_OPTION_DIR)/menuOption.h $(MENU_ENIGME_DIR)/menuEnigme.h $(SRC_DIR)/header.h
+# Doxygen documentation target
+docs:
+	doxygen Doxyfile
 
+.PHONY: docs
+
+.PHONY: clean
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -rf $(OBJDIR) $(TARGET)
 
-fclean: clean
-	rm -f $(MENU_SAVE_DIR)/bin/menu
-
-re: fclean all
-
-
+.PHONY: run
+run: $(TARGET)
+	./$(TARGET) 

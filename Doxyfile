@@ -1,0 +1,42 @@
+# Doxyfile for Game Project
+
+# Project information
+PROJECT_NAME           = "Aria"
+PROJECT_BRIEF          = "A 2D platform game with enemies, minimap, and menus"
+OUTPUT_DIRECTORY       = ./docs
+
+# Input files
+INPUT                  = ./game/src ./game/include ./menu ./helpers.c ./helpers.h
+FILE_PATTERNS          = *.c *.h
+RECURSIVE              = YES
+
+# Output format
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+HTML_OUTPUT            = html
+
+# Extraction settings
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+
+# Diagrams and graphics
+HAVE_DOT               = YES
+UML_LOOK               = YES
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = YES
+GROUP_GRAPHS           = YES
+INCLUDE_GRAPH          = YES
+INCLUDED_BY_GRAPH      = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+
+# Other options
+OPTIMIZE_OUTPUT_FOR_C  = YES
+BUILTIN_STL_SUPPORT    = NO
+QUIET                  = NO
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+SOURCE_BROWSER         = YES
+REFERENCED_BY_RELATION = YES
+REFERENCES_RELATION    = YES 
