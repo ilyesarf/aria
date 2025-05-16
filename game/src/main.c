@@ -85,6 +85,7 @@ int main(int argc, char** argv) {
     srand(time(NULL));
 
     Background background;
+    init_background(&background, "./assets/game/fantasyforest.png", 1);  // Use fantasyforest background
     Player player;
     Enemy enemies[NUM_ENEMIES];
     Input input = {0}; // Initialize all input values to 0
@@ -95,7 +96,7 @@ int main(int argc, char** argv) {
     
     if (fopen("savegame.dat", "rb")) {
        menuState = MENU_NEW_LOAD_SAVE;
-        menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
+       menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
     } else {
         // Initialize game resources
         if (!init_game_resources()) {
@@ -106,10 +107,6 @@ int main(int argc, char** argv) {
             return -1;
         }
 
-        // Initialize background
-        init_background(&background, "./assets/game/fantasyforest.png", 1);  // Use fantasyforest background
-
-        // Initialize game objects
         
         // Initialize minimap
         if (!initialiserMinimapAssets(&minimap)) {
@@ -297,7 +294,7 @@ int main(int argc, char** argv) {
             }
 
             // Display minimap
-            dessinerJoueurMinimap(screen, &minimap);
+           // dessinerJoueurMinimap(screen, &minimap);
 
             // Display HUD
             char score_text[32];
