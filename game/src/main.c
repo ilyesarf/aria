@@ -88,6 +88,8 @@ int main(int argc, char** argv) {
     init_background(&background, "./assets/game/fantasyforest.png", 1);  // Use fantasyforest background
     Player player;
     Enemy enemies[NUM_ENEMIES];
+    // Initialize enemies with different behaviors spread across the world
+    
     Input input = {0}; // Initialize all input values to 0
     int jump_height = 150;
     int menuState = MAIN_GAME; // Start in main game state
@@ -97,6 +99,7 @@ int main(int argc, char** argv) {
     if (fopen("savegame.dat", "rb")) {
        menuState = MENU_NEW_LOAD_SAVE;
        menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
+       
     } else {
         // Initialize game resources
         if (!init_game_resources()) {
@@ -121,24 +124,7 @@ int main(int argc, char** argv) {
         // Initial camera update to ensure proper world view from the start
         updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
         
-        // Initialize enemies with different behaviors spread across the world
-        for (int i = 0; i < NUM_ENEMIES; i++) {
-            // Spread enemies throughout the world, not just visible area
-            int x = rand() % (SCREEN_WIDTH * 3 - 100);
-            
-            // Vary enemy heights throughout the screen
-            int y = rand() % (SCREEN_HEIGHT - 200);
-            
-            // Make sure some enemies are near the player's starting area
-            if (i == 0) {
-                // First enemy within visible range of player start position
-                x = player.pos.x + SCREEN_WIDTH/2 + rand() % 300;
-                y = player.pos.y - 100 - rand() % 200; // Position above the player
-            }
-            
-            init_enemy(&enemies[i], 100, x);
-            enemies[i].y = y; // Set custom y position
-        }
+        
 
         // Initialize ball system
         init_balls();
@@ -149,6 +135,24 @@ int main(int argc, char** argv) {
         save.level.n = 1; //level 1
     }
     
+    // Initialize enemies
+    for (int i = 0; i < NUM_ENEMIES; i++) {
+        // Spread enemies throughout the world, not just visible area
+        int x = rand() % (SCREEN_WIDTH * 3 - 100);
+        
+        // Vary enemy heights throughout the screen
+        int y = rand() % (SCREEN_HEIGHT - 200);
+        
+        // Make sure some enemies are near the player's starting area
+        if (i == 0) {
+            // First enemy within visible range of player start position
+            x = player.pos.x + SCREEN_WIDTH/2 + rand() % 300;
+            y = player.pos.y - 100 - rand() % 200; // Position above the player
+        }
+        
+        init_enemy(&enemies[i], 100, x);
+        enemies[i].y = y; // Set custom y position
+    }
 
     // Game loop variables
     int running = 1;
@@ -253,7 +257,7 @@ int main(int argc, char** argv) {
                     }
                 }
             }
-            
+
             for (int i = 0; i < background.platform_count; i++) {
                 if (check_collision_with_platform(player.pos, &background.platforms[i])) {
                     // If player is falling and hits platform from above
