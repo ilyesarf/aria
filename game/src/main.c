@@ -76,14 +76,22 @@ int main(int argc, char** argv) {
     Mix_PlayMusic(musique, -1);
     Mix_VolumeMusic(volume); // Set initial volume
 
-
+    // Initialize game resources
+    if (!init_game_resources()) {
+        printf("Failed to initialize game resources!\n");
+        TTF_Quit();
+        IMG_Quit();
+        SDL_Quit();
+        return -1;
+    }
+    
     Menu menus[N_MENUS];
     init_menus(menus);
 
 
-        // Initialize random seed
+    // Initialize random seed
     srand(time(NULL));
-
+    
     Background background;
     init_background(&background, "./assets/game/fantasyforest.png", 1);  // Use fantasyforest background
     Player player;
@@ -101,15 +109,6 @@ int main(int argc, char** argv) {
        menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
        
     } else {
-        // Initialize game resources
-        if (!init_game_resources()) {
-            printf("Failed to initialize game resources!\n");
-            TTF_Quit();
-            IMG_Quit();
-            SDL_Quit();
-            return -1;
-        }
-
         
         // Initialize minimap
         if (!initialiserMinimapAssets(&minimap)) {
@@ -123,8 +122,6 @@ int main(int argc, char** argv) {
         
         // Initial camera update to ensure proper world view from the start
         updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
-        
-        
 
         // Initialize ball system
         init_balls();
