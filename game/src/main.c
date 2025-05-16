@@ -98,7 +98,23 @@ int main(int argc, char** argv) {
     init_player(&player, "./game/assets/player/1.png", SCREEN_WIDTH / 4);
     Enemy enemies[NUM_ENEMIES];
     // Initialize enemies with different behaviors spread across the world
-    
+    for (int i = 0; i < NUM_ENEMIES; i++) {
+        // Spread enemies throughout the world, not just visible area
+        int x = rand() % (SCREEN_WIDTH * 3 - 100);
+        
+        // Vary enemy heights throughout the screen
+        int y = rand() % (SCREEN_HEIGHT - 200);
+        
+        // Make sure some enemies are near the player's starting area
+        if (i == 0) {
+            // First enemy within visible range of player start position
+            x = player.pos.x + SCREEN_WIDTH/2 + rand() % 300;
+            y = player.pos.y - 100 - rand() % 200; // Position above the player
+        }
+        
+        init_enemy(&enemies[i], 100, x);
+        enemies[i].y = y; // Set custom y position
+    }
     Input input = {0}; // Initialize all input values to 0
 
     init_balls();
@@ -134,25 +150,6 @@ int main(int argc, char** argv) {
         save.level.n = 1; //level 1
     }
     
-    // Initialize enemies
-    for (int i = 0; i < NUM_ENEMIES; i++) {
-        // Spread enemies throughout the world, not just visible area
-        int x = rand() % (SCREEN_WIDTH * 3 - 100);
-        
-        // Vary enemy heights throughout the screen
-        int y = rand() % (SCREEN_HEIGHT - 200);
-        
-        // Make sure some enemies are near the player's starting area
-        if (i == 0) {
-            // First enemy within visible range of player start position
-            x = player.pos.x + SCREEN_WIDTH/2 + rand() % 300;
-            y = player.pos.y - 100 - rand() % 200; // Position above the player
-        }
-        
-        init_enemy(&enemies[i], 100, x);
-        enemies[i].y = y; // Set custom y position
-    }
-
     // Game loop variables
     int running = 1;
     Uint32 last_time = SDL_GetTicks();
