@@ -91,12 +91,40 @@ int main(int argc, char** argv) {
 
     // Initialize random seed
     srand(time(NULL));
-    
+    // Initialize game resources
+    if (!init_game_resources()) {
+        printf("Failed to initialize game resources!\n");
+        TTF_Quit();
+        IMG_Quit();
+        SDL_Quit();
+        return -1;
+    }
+
+    // Initialize background
     Background background;
     init_background(&background, "./assets/game/fantasyforest.png", 1);  // Use fantasyforest background
+
+    // Initialize game objects
     Player player;
-    init_player(&player, "./game/assets/player/1.png", SCREEN_WIDTH / 4);
     Enemy enemies[NUM_ENEMIES];
+    Input input = {0}; // Initialize all input values to 0
+    int jump_height = 150;
+    int menuState = MAIN_GAME; // Start in main game state
+
+    // Initialize minimap
+    Minimap minimap;
+    if (!initialiserMinimapAssets(&minimap)) {
+        printf("Failed to initialize minimap!\n");
+        return -1;
+    }
+
+    // Initialize player
+    init_player(&player, "./game/assets/player/1.png", SCREEN_WIDTH / 4);
+    player.pos.y = GROUND_Y - player.pos.h;
+    
+    // Initial camera update to ensure proper world view from the start
+    updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
+    
     // Initialize enemies with different behaviors spread across the world
     for (int i = 0; i < NUM_ENEMIES; i++) {
         // Spread enemies throughout the world, not just visible area
@@ -115,41 +143,22 @@ int main(int argc, char** argv) {
         init_enemy(&enemies[i], 100, x);
         enemies[i].y = y; // Set custom y position
     }
-    Input input = {0}; // Initialize all input values to 0
 
+    // Initialize ball system
     init_balls();
-    
-    int jump_height = 150;
-    int menuState = MAIN_GAME; // Start in main game state
-    Minimap minimap;
     Save save;
-    
+    save.level.enemies = enemies;
+    save.level.background = &background;
+        //save.level.static_elements = NULL;
+    save.players = &player;
+    save.level.n = 1; //level 1
     if (fopen("savegame.dat", "rb")) {
        menuState = MENU_NEW_LOAD_SAVE;
        menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
-       
-    } else {
-        
-        // Initialize minimap
-        if (!initialiserMinimapAssets(&minimap)) {
-            printf("Failed to initialize minimap!\n");
-            return -1;
-        }
-
-        // Initialize player
-        player.pos.y = GROUND_Y - player.pos.h;
-        
-        // Initial camera update to ensure proper world view from the start
-        updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
-
-        // Initialize ball system
-        save.level.enemies = enemies;
-        save.level.background = &background;
-            //save.level.static_elements = NULL;
-        save.players = &player;
-        save.level.n = 1; //level 1
     }
     
+
+
     // Game loop variables
     int running = 1;
     Uint32 last_time = SDL_GetTicks();
