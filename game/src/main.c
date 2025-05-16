@@ -84,74 +84,74 @@ int main(int argc, char** argv) {
         // Initialize random seed
     srand(time(NULL));
 
-    // Initialize game resources
-    if (!init_game_resources()) {
-        printf("Failed to initialize game resources!\n");
-        TTF_Quit();
-        IMG_Quit();
-        SDL_Quit();
-        return -1;
-    }
-
-    // Initialize background
     Background background;
-    init_background(&background, "./assets/game/fantasyforest.png", 1);  // Use fantasyforest background
-
-    // Initialize game objects
     Player player;
     Enemy enemies[NUM_ENEMIES];
     Input input = {0}; // Initialize all input values to 0
     int jump_height = 150;
     int menuState = MAIN_GAME; // Start in main game state
-
-    // Initialize minimap
     Minimap minimap;
-    if (!initialiserMinimapAssets(&minimap)) {
-        printf("Failed to initialize minimap!\n");
-        return -1;
-    }
-
-    // Initialize player
-    init_player(&player, "./game/assets/player/1.png", SCREEN_WIDTH / 4);
-    player.pos.y = GROUND_Y - player.pos.h;
-    
-    // Initial camera update to ensure proper world view from the start
-    updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
-    
-    // Initialize enemies with different behaviors spread across the world
-    for (int i = 0; i < NUM_ENEMIES; i++) {
-        // Spread enemies throughout the world, not just visible area
-        int x = rand() % (SCREEN_WIDTH * 3 - 100);
-        
-        // Vary enemy heights throughout the screen
-        int y = rand() % (SCREEN_HEIGHT - 200);
-        
-        // Make sure some enemies are near the player's starting area
-        if (i == 0) {
-            // First enemy within visible range of player start position
-            x = player.pos.x + SCREEN_WIDTH/2 + rand() % 300;
-            y = player.pos.y - 100 - rand() % 200; // Position above the player
-        }
-        
-        init_enemy(&enemies[i], 100, x);
-        enemies[i].y = y; // Set custom y position
-    }
-
-    // Initialize ball system
-    init_balls();
     Save save;
-    save.level.enemies = enemies;
-    save.level.background = &background;
-        //save.level.static_elements = NULL;
-    save.players = &player;
-    save.level.n = 1; //level 1
+    
     if (fopen("savegame.dat", "rb")) {
        menuState = MENU_NEW_LOAD_SAVE;
+        menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
+    } else {
+        // Initialize game resources
+        if (!init_game_resources()) {
+            printf("Failed to initialize game resources!\n");
+            TTF_Quit();
+            IMG_Quit();
+            SDL_Quit();
+            return -1;
+        }
+
+        // Initialize background
+        init_background(&background, "./assets/game/fantasyforest.png", 1);  // Use fantasyforest background
+
+        // Initialize game objects
+        
+        // Initialize minimap
+        if (!initialiserMinimapAssets(&minimap)) {
+            printf("Failed to initialize minimap!\n");
+            return -1;
+        }
+
+        // Initialize player
+        init_player(&player, "./game/assets/player/1.png", SCREEN_WIDTH / 4);
+        player.pos.y = GROUND_Y - player.pos.h;
+        
+        // Initial camera update to ensure proper world view from the start
+        updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
+        
+        // Initialize enemies with different behaviors spread across the world
+        for (int i = 0; i < NUM_ENEMIES; i++) {
+            // Spread enemies throughout the world, not just visible area
+            int x = rand() % (SCREEN_WIDTH * 3 - 100);
+            
+            // Vary enemy heights throughout the screen
+            int y = rand() % (SCREEN_HEIGHT - 200);
+            
+            // Make sure some enemies are near the player's starting area
+            if (i == 0) {
+                // First enemy within visible range of player start position
+                x = player.pos.x + SCREEN_WIDTH/2 + rand() % 300;
+                y = player.pos.y - 100 - rand() % 200; // Position above the player
+            }
+            
+            init_enemy(&enemies[i], 100, x);
+            enemies[i].y = y; // Set custom y position
+        }
+
+        // Initialize ball system
+        init_balls();
+        save.level.enemies = enemies;
+        save.level.background = &background;
+            //save.level.static_elements = NULL;
+        save.players = &player;
+        save.level.n = 1; //level 1
     }
     
-
-    menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
-
 
     // Game loop variables
     int running = 1;
@@ -246,8 +246,27 @@ int main(int argc, char** argv) {
 
             // Check ball collisions with enemies
             check_ball_enemy_collisions(enemies, NUM_ENEMIES);
+            for (int i = 0; i < NUM_ENEMIES; i++) {
+                if (enemies[i].health <= 0) {
+                    player.score += 100;
+                    // Don't respawn enemy, just make it invisible
+                    enemies[i].x = -1000;  // Move far off screen
+                    enemies[i].y = -1000;
+                }
+            }
 
-            // Update camera to follow player
+            for (int i = 0; i < background.platform_count; i++) {
+                if (check_collision_with_platform(player.pos, &background.platforms[i])) {
+                    // If player is falling and hits platform from above
+                    if (player.vy > 0 && player.pos.y + player.pos.h > background.platforms[i].y) {
+                        player.pos.y = background.platforms[i].y - player.pos.h;
+                        player.vy = 0;
+                        player.is_jumping = 0;
+                    }
+                }
+            }
+
+            // Update camera to follow playerviv
             updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
 
             // Check game over condition
