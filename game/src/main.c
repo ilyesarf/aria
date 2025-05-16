@@ -95,10 +95,14 @@ int main(int argc, char** argv) {
     Background background;
     init_background(&background, "./assets/game/fantasyforest.png", 1);  // Use fantasyforest background
     Player player;
+    init_player(&player, "./game/assets/player/1.png", SCREEN_WIDTH / 4);
     Enemy enemies[NUM_ENEMIES];
     // Initialize enemies with different behaviors spread across the world
     
     Input input = {0}; // Initialize all input values to 0
+
+    init_balls();
+    
     int jump_height = 150;
     int menuState = MAIN_GAME; // Start in main game state
     Minimap minimap;
@@ -117,14 +121,12 @@ int main(int argc, char** argv) {
         }
 
         // Initialize player
-        init_player(&player, "./game/assets/player/1.png", SCREEN_WIDTH / 4);
         player.pos.y = GROUND_Y - player.pos.h;
         
         // Initial camera update to ensure proper world view from the start
         updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
 
         // Initialize ball system
-        init_balls();
         save.level.enemies = enemies;
         save.level.background = &background;
             //save.level.static_elements = NULL;
