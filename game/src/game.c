@@ -637,6 +637,20 @@ void check_ball_enemy_collisions(Enemy enemies[], int num_enemies) {
     }
 }
 
+int check_collision_with_platform(SDL_Rect object_rect, Platform* platform) {
+    // Only check collision if platform is solid
+    if (platform->type!='F') return 0;
+    
+    // Check for intersection between object and platform
+    if (object_rect.x + object_rect.w <= platform->x ||    // object is to the left
+        object_rect.x >= platform->x + platform->w ||  // object is to the right
+        object_rect.y + object_rect.h <= platform->y ||    // object is above
+        object_rect.y >= platform->y + platform->h) { // object is below
+        return 0;
+    }
+    return 1;
+}
+
 // Add new function for enemy attacks
 int enemy_can_attack(Enemy* enemy, Uint32 current_time) {
     return (current_time - enemy->last_attack_time >= enemy->attack_cooldown);

@@ -49,7 +49,7 @@
  */
 typedef struct {
     int x, y;            /**< Position coordinates */
-    int width, height;   /**< Dimensions */
+    int w, h;   /**< Dimensions */
     char type;           /**< 'F' = fixed, 'M' = mobile, 'D' = destructible */
 } Platform;
 
@@ -381,7 +381,9 @@ int check_collision_ball_enemy(SDL_Rect ball_rect, Enemy *enemy);
  */
 void check_ball_enemy_collisions(Enemy enemies[], int num_enemies);
 
-/**
+int check_collision_with_platform(SDL_Rect object_rect, Platform* platform);
+
+    /**
  * @brief Render text centered horizontally
  * @param screen Surface to draw on
  * @param text Text to render

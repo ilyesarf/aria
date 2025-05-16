@@ -56,9 +56,9 @@ void display_background(Background *bg, SDL_Surface *screen) {
     // Draw platforms
     for (int i = 0; i < bg->platform_count; i++) {
         // Only draw platforms that are within the visible area
-        if (bg->platforms[i].x + bg->platforms[i].width >= bg->camera.x && 
+        if (bg->platforms[i].x + bg->platforms[i].w >= bg->camera.x && 
             bg->platforms[i].x <= bg->camera.x + bg->camera.w &&
-            bg->platforms[i].y + bg->platforms[i].height >= bg->camera.y && 
+            bg->platforms[i].y + bg->platforms[i].h >= bg->camera.y && 
             bg->platforms[i].y <= bg->camera.y + bg->camera.h) {
             
             // Calculate platform's screen position
