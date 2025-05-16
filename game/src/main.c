@@ -242,16 +242,18 @@ int main(int argc, char** argv) {
             }
 
             // Check ball collisions with enemies
-            check_ball_enemy_collisions(enemies, NUM_ENEMIES);
-            for (int i = 0; i < NUM_ENEMIES; i++) {
-                if (enemies[i].health <= 0) {
-                    player.score += 100;
-                    // Don't respawn enemy, just make it invisible
-                    enemies[i].x = -1000;  // Move far off screen
-                    enemies[i].y = -1000;
+            if(sizeof(enemies)/sizeof(Enemy)>0){
+                check_ball_enemy_collisions(enemies, NUM_ENEMIES);
+                for (int i = 0; i < NUM_ENEMIES; i++) {
+                    if (enemies[i].health <= 0) {
+                        player.score += 100;
+                        // Don't respawn enemy, just make it invisible
+                        enemies[i].x = -1000;  // Move far off screen
+                        enemies[i].y = -1000;
+                    }
                 }
             }
-
+            
             for (int i = 0; i < background.platform_count; i++) {
                 if (check_collision_with_platform(player.pos, &background.platforms[i])) {
                     // If player is falling and hits platform from above
