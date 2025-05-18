@@ -251,15 +251,13 @@ int main(int argc, char** argv) {
             }
 
             // Check ball collisions with enemies
-            if(sizeof(enemies)/sizeof(Enemy)>0){
-                check_ball_enemy_collisions(enemies, NUM_ENEMIES);
-                for (int i = 0; i < NUM_ENEMIES; i++) {
-                    if (enemies[i].health <= 0) {
-                        player.score += 100;
-                        // Don't respawn enemy, just make it invisible
-                        enemies[i].x = -1000;  // Move far off screen
-                        enemies[i].y = -1000;
-                    }
+            check_ball_enemy_collisions(enemies, NUM_ENEMIES);
+            for (int i = 0; i < NUM_ENEMIES; i++) {
+                if (enemies[i].health <= 0) {
+                    player.score += 100;
+                    // Don't respawn enemy, just make it invisible
+                    enemies[i].x = -1000;  // Move far off screen
+                    enemies[i].y = -1000;
                 }
             }
 

@@ -25,20 +25,20 @@ void init_background(Background *bg, const char *image_path, int level) {
         bg->platforms = malloc(bg->platform_count * sizeof(Platform));
         
         // Create platforms at different positions across the world
-        bg->platforms[0] = (Platform){200, 300, platform_image->w, platform_image->h, 'F'};
-        bg->platforms[1] = (Platform){600, 250, platform_image->w, platform_image->h, 'F'};
-        bg->platforms[2] = (Platform){1000, 350, platform_image->w, platform_image->h, 'F'};
-        bg->platforms[3] = (Platform){1400, 200, platform_image->w, platform_image->h, 'F'};
-        bg->platforms[4] = (Platform){1800, 300, platform_image->w, platform_image->h, 'F'};
-        bg->platforms[5] = (Platform){2200, 250, platform_image->w, platform_image->h, 'F'};
-        bg->platforms[6] = (Platform){2600, 400, platform_image->w, platform_image->h, 'F'};
-        bg->platforms[7] = (Platform){3000, 350, platform_image->w, platform_image->h, 'F'};
-        
+        bg->platforms[0] = (Platform){200, 300, platform_image->w-20, platform_image->h-35, 'F'};
+        bg->platforms[1] = (Platform){600, 250, platform_image->w-20, platform_image->h-35, 'F'};
+        bg->platforms[2] = (Platform){1000, 350, platform_image->w-20, platform_image->h-35, 'F'};
+        bg->platforms[3] = (Platform){1400, 200, platform_image->w-20, platform_image->h-35, 'F'};
+        bg->platforms[4] = (Platform){1800, 300, platform_image->w-20, platform_image->h-35, 'F'};
+        bg->platforms[5] = (Platform){2200, 250, platform_image->w-20, platform_image->h-35, 'F'};
+        bg->platforms[6] = (Platform){2600, 400, platform_image->w-20, platform_image->h-35, 'F'};
+        bg->platforms[7] = (Platform){3000, 350, platform_image->w-20, platform_image->h-35, 'F'};
+
     } else if (level == 2) {
         bg->platform_count = 5;
         bg->platforms = malloc(bg->platform_count * sizeof(Platform));
         for (int i = 0; i < bg->platform_count; i++) {
-            bg->platforms[i] = (Platform){i*400, 200 + i*50, platform_image->w, platform_image->h, 'F'};
+            bg->platforms[i] = (Platform){i*400, 200 + i*50, platform_image->w-20, platform_image->h-35, 'F'};
         }
     } else {
         bg->platform_count = 0;
