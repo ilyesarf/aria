@@ -1,12 +1,11 @@
 #ifndef MENUBESTSCORE_H
 #define MENUBESTSCORE_H
 
-
 #include <stdio.h>
-#include <unistd.h>
-
-
+#include <string.h>
 #include "../header.h"
+
+#define MAX_SCORES 3
 
 typedef struct {
     char name[50];
@@ -22,5 +21,6 @@ void handleInput(SDL_Event event, char *inputText, int maxLength);
 void loadScores(ScoreEntry scores[]);
 void saveScores(ScoreEntry scores[]);
 void addScore(ScoreEntry scores[], const char *name, int score);
-void cleanupMenuBestScore(Menu *menu) ;
+void cleanupMenuBestScore(Menu *menu);
+
 #endif
