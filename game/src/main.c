@@ -281,7 +281,7 @@ int main(int argc, char** argv) {
             updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
 
             // Update minimap with player position
-            MAJMinimap(player.pos, &minimap, 0.05f); // Reduced scale factor to make minimap smaller
+            MAJMinimap(player.pos, &minimap, 0.02f); // Reduced scale factor to make minimap smaller
 
             // Clear screen and render
             SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
