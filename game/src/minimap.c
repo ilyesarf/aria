@@ -7,7 +7,7 @@ int initialiserMinimapAssets(Minimap *m) {
     if (!m) return 0;
 
     // Load the minimap background image
-    m->fond = IMG_Load("./assets/game/minimap.png");
+    m->fond = IMG_Load("./assets/game/minimap2.png");
     if (!m->fond) {
         printf("Failed to load minimap background: %s\n", IMG_GetError());
         return 0;
