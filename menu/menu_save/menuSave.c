@@ -66,7 +66,7 @@ void renderMenuChooseSave(SDL_Surface *background, SDL_Surface *butImage, SDL_Su
     SDL_Flip(screen);
 }
 
-void handleEventSaveMenu(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
+void handleEventSaveMenu(int *menuState, Save *save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) *menuState = QUIT_GAME;
         
@@ -105,7 +105,7 @@ void cleanupMenuSave(Menu *menu) {
     menu->buttons = NULL;
 }
 
-void handleEventChooseSaveMenu(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
+void handleEventChooseSaveMenu(int *menuState, Save* save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_MOUSEMOTION) {
             for (int i = 0; i < n_btns; i++) {
@@ -145,26 +145,26 @@ void handleEventChooseSaveMenu(int *menuState, Save save, SDL_Event event, Butto
     }
 }
 
-void load_game(char *filename, Save save) {
+void load_game(char *filename, Save *save) {
     FILE *file = fopen(filename, "rb");
     if (!file) {
         //fprintf(stderr, "Failed to open file: %s\n", filename);
         return;
     }
-    fread(&save, sizeof(Save), 1, file);
+    fread(save, sizeof(Save), 1, file);
     printf("Game loaded from %s\n", filename);
-    printf("Player position: %d, %d\n", save.players->pos.x, save.players->pos.y);
-    printf("Level: %d\n", save.level.n);
+    printf("Player position: %d, %d\n", save->players->pos.x, save->players->pos.y);
+    printf("Level: %d\n", save->level.n);
     fclose(file);
 }
 
-void save_game(char *filename, Save save) {
+void save_game(char *filename, Save *save) {
     FILE *file = fopen(filename, "wb");
     if (!file) {
         fprintf(stderr, "Failed to open file: %s\n", filename);
         return;
     }
-    fwrite(&save, sizeof(Save), 1, file);
+    fwrite(save, sizeof(Save), 1, file);
     fclose(file);
     printf("Game saved to %s\n", filename); 
 }

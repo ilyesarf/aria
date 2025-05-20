@@ -150,7 +150,7 @@ int main(int argc, char** argv) {
     }
     
 
-    menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
+    menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, &save, menus);
 
 
     // Game loop variables
@@ -191,11 +191,11 @@ int main(int argc, char** argv) {
                     running = 0;
                 }
                 // Pass the event to the menu system
-                menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
+                menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, &save, menus);
             }
             continue; // Skip the rest of the game loop when in high score menu
         } else if (menuState == MENU_SAVE || menuState == MENU_ENIGME) {
-            menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
+            menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, &save, menus);
         }
 
         if (menuState == MAIN_GAME) {
@@ -273,7 +273,7 @@ int main(int argc, char** argv) {
                 } else {
                     menuState = MENU_BEST_SCORE;
                     // Immediately call menu to show high score screen
-                    menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
+                    menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, &save, menus);
                 }
             }
 
@@ -298,7 +298,7 @@ int main(int argc, char** argv) {
             }
 
             // Display minimap
-            dessinerJoueurMinimap(screen, &minimap);
+            //dessinerJoueurMinimap(screen, &minimap);
 
             // Display HUD
             char score_text[32];

@@ -84,7 +84,7 @@ void renderMenuBestScore(SDL_Surface *background, SDL_Surface *butImage, SDL_Sur
     SDL_Flip(screen);
 }
 
-void handleEventBestScore(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
+void handleEventBestScore(int *menuState, Save *save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
             *menuState = QUIT_GAME;
@@ -109,7 +109,7 @@ void handleEventBestScore(int *menuState, Save save, SDL_Event event, Button *bu
                     inputText[strlen(inputText) - 1] = '\0';
                 } else if (event.key.keysym.sym == SDLK_RETURN) {
                     if (strlen(inputText) > 0) {
-                        addScore(scores, inputText, save.players->score);
+                        addScore(scores, inputText, save->players->score);
                         saveScores(scores);
                         inputActive = 0;
                         memset(inputText, 0, sizeof(inputText));
@@ -137,12 +137,12 @@ void handleEventBestScore(int *menuState, Save save, SDL_Event event, Button *bu
                             *menuState = QUIT_GAME;
                         } else if (i == 2) { // Main Menu button
                             // Reset game state before returning to main menu
-                            save.players->health = 100; // Use hardcoded value instead of PLAYER_MAX_HEALTH
-                            save.players->lives = 3;
-                            save.players->score = 0;
-                            save.players->pos.x = 200;
-                            save.players->pos.y = 500;
-                            
+                            save->players->health = 100; // Use hardcoded value instead of PLAYER_MAX_HEALTH
+                            save->players->lives = 3;
+                            save->players->score = 0;
+                            save->players->pos.x = 200;
+                            save->players->pos.y = 500;
+
                             *menuState = MENU_PRINCIPAL;
                         }
                     }

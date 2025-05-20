@@ -88,7 +88,7 @@ typedef struct Menu {
      * @param n_btns Number of buttons
      * @param hoverSound Sound to play on button hover
      */
-    void (*handleEvent)(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
+    void (*handleEvent)(int *menuState, Save *save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound);
 } Menu;
 
 /**
@@ -131,7 +131,7 @@ void init_menus(Menu *menus);
  * @param save Game save data
  * @param menus Array of menus
  */
-void menu(SDL_Surface *screen, SDL_Surface *background, TTF_Font *font, SDL_Color textColor, SDL_Surface *butImage, Mix_Chunk *hoverSound, Mix_Music *musique, int *menuState, Save save, Menu *menus);
+void menu(SDL_Surface *screen, SDL_Surface *background, TTF_Font *font, SDL_Color textColor, SDL_Surface *butImage, Mix_Chunk *hoverSound, Mix_Music *musique, int *menuState, Save *save, Menu *menus);
 
 /**
  * @brief Clean up menu resources

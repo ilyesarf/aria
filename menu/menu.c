@@ -81,7 +81,7 @@ void cleanup(Mix_Chunk *hoverSound, Mix_Music *musique, SDL_Surface *background,
     SDL_Quit();
 }
 
-void menu(SDL_Surface *screen, SDL_Surface *background, TTF_Font *font, SDL_Color textColor, SDL_Surface *butImage, Mix_Chunk *hoverSound, Mix_Music *musique, int *menuState, Save save, Menu *menus) {
+void menu(SDL_Surface *screen, SDL_Surface *background, TTF_Font *font, SDL_Color textColor, SDL_Surface *butImage, Mix_Chunk *hoverSound, Mix_Music *musique, int *menuState, Save *save, Menu *menus) {
     while (*menuState != QUIT_GAME && *menuState != MAIN_GAME) {
         SDL_Event event;
         //SDL_PollEvent(&event);

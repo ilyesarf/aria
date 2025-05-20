@@ -72,7 +72,7 @@ void cleanupMenuOption(Menu *menu) {
     menu->buttons = NULL;
 }
 
-void handleEventOptionMenu(int *menuState, Save save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
+void handleEventOptionMenu(int *menuState, Save *save, SDL_Event event, Button *buttons, int n_btns, Mix_Chunk *hoverSound) {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) *menuState = QUIT_GAME;
         if (event.type == SDL_MOUSEMOTION) {
