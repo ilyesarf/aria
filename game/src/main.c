@@ -262,10 +262,7 @@ int main(int argc, char** argv) {
             }
 
             if (all_enemies_defeated) {
-                player.score += 500; // Bonus points for clearing all enemies
-                menuState = MENU_BEST_SCORE;
-                // Immediately call menu to show high score screen
-                menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, save, menus);
+                player.score += 500; // Bonus points for clearing all enemies 
             }
 
             // Check game over condition
