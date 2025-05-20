@@ -76,14 +76,21 @@ int main(int argc, char** argv) {
     Mix_PlayMusic(musique, -1);
     Mix_VolumeMusic(volume); // Set initial volume
 
-
+    // Initialize game resources
+    if (!init_game_resources()) {
+        printf("Failed to initialize game resources!\n");
+        TTF_Quit();
+        IMG_Quit();
+        SDL_Quit();
+        return -1;
+    }
+    
     Menu menus[N_MENUS];
     init_menus(menus);
 
 
-        // Initialize random seed
+    // Initialize random seed
     srand(time(NULL));
-
     // Initialize game resources
     if (!init_game_resources()) {
         printf("Failed to initialize game resources!\n");
@@ -147,10 +154,9 @@ int main(int argc, char** argv) {
     save.level.n = 1; //level 1
     if (fopen("savegame.dat", "rb")) {
        menuState = MENU_NEW_LOAD_SAVE;
+       menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, &save, menus);
     }
     
-
-    menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, &save, menus);
 
 
     // Game loop variables
@@ -185,16 +191,25 @@ int main(int argc, char** argv) {
         } 
 
         if (menuState == MENU_BEST_SCORE) {
-            SDL_Event event;
-            while (SDL_PollEvent(&event)) {
-                if (event.type == SDL_QUIT) {
-                    running = 0;
+            if (input.space) {
+                // Reset game
+                player.health = PLAYER_MAX_HEALTH;
+                player.lives = 3;
+                player.score = 0;
+                player.pos.x = 200;
+                player.pos.y = 500;
+                
+                // Reset enemies
+                for (int i = 0; i < NUM_ENEMIES; i++) {
+                    int x = rand() % (SCREEN_WIDTH - 100);
+                    init_enemy(&enemies[i], 100, x);
                 }
-                // Pass the event to the menu system
+                
+                menuState = MAIN_GAME;
+            } else if (input.q) {
                 menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, &save, menus);
             }
-            continue; // Skip the rest of the game loop when in high score menu
-        } else if (menuState == MENU_SAVE || menuState == MENU_ENIGME) {
+        } else if (menuState == MENU_SAVE || menuState == MENU_ENIGME || menuState == MENU_BEST_SCORE) {
             menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, &save, menus);
         }
 
@@ -235,35 +250,30 @@ int main(int argc, char** argv) {
                 }
             }
 
-            // Track enemy health before collisions
-            int prev_health[NUM_ENEMIES];
-            for (int i = 0; i < NUM_ENEMIES; i++) {
-                prev_health[i] = enemies[i].health;
-            }
-
             // Check ball collisions with enemies
             check_ball_enemy_collisions(enemies, NUM_ENEMIES);
-
-            // Award points for each enemy killed
             for (int i = 0; i < NUM_ENEMIES; i++) {
-                if (prev_health[i] > 0 && enemies[i].health <= 0) {
+                if (enemies[i].health <= 0) {
                     player.score += 100;
-                    printf("Score: %d\n", player.score);
+                    // Don't respawn enemy, just make it invisible
+                    enemies[i].x = -1000;  // Move far off screen
+                    enemies[i].y = -1000;
                 }
             }
 
-            // Check if all enemies are defeated
-            int all_enemies_defeated = 1;
-            for (int i = 0; i < NUM_ENEMIES; i++) {
-                if (enemies[i].health > 0) {
-                    all_enemies_defeated = 0;
-                    break;
+            for (int i = 0; i < background.platform_count; i++) {
+                if (check_collision_with_platform(player.pos, &background.platforms[i])) {
+                    // If player is falling and hits platform from above
+                    if (player.vy > 0 && player.pos.y + player.pos.h > background.platforms[i].y) {
+                        player.pos.y = background.platforms[i].y - player.pos.h;
+                        player.vy = 0;
+                        player.is_jumping = 0;
+                    }
                 }
             }
 
-            if (all_enemies_defeated) {
-                player.score += 500; // Bonus points for clearing all enemies 
-            }
+            // Update camera to follow playerviv
+            updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
 
             // Check game over condition
             if (player.health <= 0) {
@@ -272,16 +282,11 @@ int main(int argc, char** argv) {
                     player.health = PLAYER_MAX_HEALTH;
                 } else {
                     menuState = MENU_BEST_SCORE;
-                    // Immediately call menu to show high score screen
-                    menu(screen, background.image, font, textColor, butImage, hoverSound, musique, &menuState, &save, menus);
                 }
             }
 
-            // Update camera to follow player
-            updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);
-
             // Update minimap with player position
-            MAJMinimap(player.pos, &minimap, 0.2f); // Reduced scale factor to make minimap smaller
+            MAJMinimap(player.pos, &minimap, 0.05f); // Reduced scale factor to make minimap smaller
 
             // Clear screen and render
             SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
@@ -298,7 +303,7 @@ int main(int argc, char** argv) {
             }
 
             // Display minimap
-            dessinerJoueurMinimap(screen, &minimap);
+           dessinerJoueurMinimap(screen, &minimap);
 
             // Display HUD
             char score_text[32];
