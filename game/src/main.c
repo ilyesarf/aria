@@ -216,9 +216,25 @@ int main(int argc, char** argv) {
         if (menuState == MAIN_GAME) {
             // Create ball when 'H' is pressed
             player = save.players[0];
-            enemies[0] = save.level.enemies[0];
-            enemies[1] = save.level.enemies[1];
-            enemies[2] = save.level.enemies[2];
+            
+            // Copy enemies but ensure their frames are properly set
+            for (int i = 0; i < NUM_ENEMIES; i++) {
+                enemies[i] = save.level.enemies[i];
+                
+                // If frames are NULL (after loading from file), reinitialize them
+                if (enemies[i].frames[0] == NULL) {
+                    const char* enemy_frame_paths[] = {
+                        "./game/assets/enemy/shadowf1t.png",
+                        "./game/assets/enemy/shadowf2t.png",
+                        "./game/assets/enemy/shadowf3t.png",
+                        "./game/assets/enemy/shadowf4t.png"
+                    };
+                    
+                    for (int j = 0; j < 4; j++) {
+                        enemies[i].frames[j] = IMG_Load(enemy_frame_paths[j]);
+                    }
+                }
+            }
 
             background = *save.level.background;
 

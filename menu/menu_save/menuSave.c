@@ -151,10 +151,27 @@ void load_game(char *filename, Save *save) {
         //fprintf(stderr, "Failed to open file: %s\n", filename);
         return;
     }
-    fread(save, sizeof(Save), 1, file);
-    printf("Game loaded from %s\n", filename);
-    printf("Player position: %d, %d\n", save->players->pos.x, save->players->pos.y);
-    printf("Level: %d\n", save->level.n);
+    
+    // Create a temporary structure to hold the player data
+    Player player_data;
+    
+    // Read just the player data
+    if (fread(&player_data, sizeof(Player), 1, file) == 1) {
+        // Copy player position, health, lives, and score
+        save->players->pos.x = player_data.pos.x;
+        save->players->pos.y = player_data.pos.y;
+        save->players->health = player_data.health;
+        save->players->lives = player_data.lives;
+        save->players->score = player_data.score;
+        
+        // Don't copy the image pointer, keep using the existing one
+        
+        printf("Game loaded from %s\n", filename);
+        printf("Player position: %d, %d\n", save->players->pos.x, save->players->pos.y);
+        printf("Player health: %d, lives: %d, score: %d\n", 
+               save->players->health, save->players->lives, save->players->score);
+    }
+    
     fclose(file);
 }
 
@@ -164,7 +181,10 @@ void save_game(char *filename, Save *save) {
         fprintf(stderr, "Failed to open file: %s\n", filename);
         return;
     }
-    fwrite(save, sizeof(Save), 1, file);
+    
+    // Write just the player data
+    fwrite(save->players, sizeof(Player), 1, file);
+    
     fclose(file);
     printf("Game saved to %s\n", filename); 
 }
