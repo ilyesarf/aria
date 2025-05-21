@@ -152,24 +152,55 @@ void load_game(char *filename, Save *save) {
         return;
     }
     
-    // Create a temporary structure to hold the player data
-    Player player_data;
+    // Read number of players and input methods
+    int num_players;
+    int input_methods[2];
     
-    // Read just the player data
-    if (fread(&player_data, sizeof(Player), 1, file) == 1) {
-        // Copy player position, health, lives, and score
-        save->players->pos.x = player_data.pos.x;
-        save->players->pos.y = player_data.pos.y;
-        save->players->health = player_data.health;
-        save->players->lives = player_data.lives;
-        save->players->score = player_data.score;
+    fread(&num_players, sizeof(int), 1, file);
+    fread(input_methods, sizeof(int), 2, file);
+    
+    // Update save structure with player configuration
+    save->num_players = num_players;
+    save->input_methods[0] = input_methods[0];
+    save->input_methods[1] = input_methods[1];
+    
+    // Ensure we have enough memory allocated for all players
+    if (num_players > 1 && save->num_players != 2) {
+        // Allocate memory for second player if needed
+        save->players = realloc(save->players, 2 * sizeof(Player));
         
-        // Don't copy the image pointer, keep using the existing one
+        // Initialize the second player with default values
+        // Copy values from first player but change position
+        save->players[1] = save->players[0];
+        save->players[1].pos.x = SCREEN_WIDTH / 4 + 100;
         
-        printf("Game loaded from %s\n", filename);
-        printf("Player position: %d, %d\n", save->players->pos.x, save->players->pos.y);
-        printf("Player health: %d, lives: %d, score: %d\n", 
-               save->players->health, save->players->lives, save->players->score);
+        // Load the second player's image
+        if (save->players[1].img) {
+            SDL_FreeSurface(save->players[1].img);
+        }
+        save->players[1].img = IMG_Load("./game/assets/player/2.png");
+    }
+    
+    // Read player data for each player
+    for (int i = 0; i < num_players; i++) {
+        Player player_data;
+        
+        // Read player data
+        if (fread(&player_data, sizeof(Player), 1, file) == 1) {
+            // Copy player position, health, lives, and score
+            save->players[i].pos.x = player_data.pos.x;
+            save->players[i].pos.y = player_data.pos.y;
+            save->players[i].health = player_data.health;
+            save->players[i].lives = player_data.lives;
+            save->players[i].score = player_data.score;
+            
+            // Don't copy the image pointer, keep using the existing one
+            
+            printf("Player %d loaded from %s\n", i+1, filename);
+            printf("Player %d position: %d, %d\n", i+1, save->players[i].pos.x, save->players[i].pos.y);
+            printf("Player %d health: %d, lives: %d, score: %d\n", i+1,
+                   save->players[i].health, save->players[i].lives, save->players[i].score);
+        }
     }
     
     fclose(file);
@@ -182,8 +213,16 @@ void save_game(char *filename, Save *save) {
         return;
     }
     
-    // Write just the player data
-    fwrite(save->players, sizeof(Player), 1, file);
+    // Write player configuration
+    fwrite(&save->num_players, sizeof(int), 1, file);
+    fwrite(save->input_methods, sizeof(int), 2, file);
+    
+    // Write data for each player
+    for (int i = 0; i < save->num_players; i++) {
+        // Write player data
+        fwrite(&save->players[i], sizeof(Player), 1, file);
+        printf("Player %d saved to %s\n", i+1, filename);
+    }
     
     fclose(file);
     printf("Game saved to %s\n", filename); 

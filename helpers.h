@@ -60,7 +60,9 @@ typedef struct Level {
  * @brief Game save data structure
  */
 typedef struct Save {
-    Player *players;              /**< Player data */
+    Player *players;              /**< Player data array (can be single player or array of 2) */
+    int num_players;              /**< Number of active players (1 or 2) */
+    int input_methods[2];         /**< Input method for each player: 0=keyboard, 1=controller */
     Level level;                  /**< Level data */
 } Save;
 
