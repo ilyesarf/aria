@@ -121,8 +121,7 @@ void animate_enemy_move(Enemy *enemy) {
         enemy->frame_counter = 0;
     }
 }
-
-void move_enemy_randomly(Enemy *enemy, int level) {
+void move_enemy_randomly(Enemy *enemy, int level, Platform platforms[], int num_platforms) {
     // Only move if enemy has health
     if (enemy->health <= 0) {
         return;
@@ -144,11 +143,38 @@ void move_enemy_randomly(Enemy *enemy, int level) {
         last_dir_change = current_time;
     }
     
-    int move_speed = 3; // Slightly slower for better control
-    enemy->x += enemy->dx * move_speed;
-    enemy->y += enemy->dy * move_speed;
+    int move_speed = 5;
+    float new_x = enemy->x + enemy->dx * move_speed;
+    float new_y = enemy->y + enemy->dy * move_speed;
     
-    // World boundary checks
+    // Create a temporary rect for collision checking
+    SDL_Rect enemy_rect = {
+        (int)new_x,
+        (int)new_y,
+        enemy->frames[0]->w,
+        enemy->frames[0]->h
+    };
+    
+    // Check platform collisions
+    int can_move_x = 1;
+    int can_move_y = 1;
+    
+    for (int i = 0; i < num_platforms; i++) {
+        if (check_collision_with_platform(enemy_rect, &platforms[i])) {
+            // If collision detected, reverse direction and prevent movement
+            enemy->dx *= -1;
+            enemy->dy *= -1;
+            can_move_x = 0;
+            can_move_y = 0;
+            break;
+        }
+    }
+    
+    // Apply movement if allowed
+    if (can_move_x) enemy->x = new_x;
+    if (can_move_y) enemy->y = new_y;
+    
+    // Screen boundary checks
     if (enemy->x < 0) {
         enemy->x = 0;
         enemy->dx = 1;
@@ -157,17 +183,16 @@ void move_enemy_randomly(Enemy *enemy, int level) {
         enemy->y = 0;
         enemy->dy = 1;
     }
-    if (enemy->x > SCREEN_WIDTH * 3 - enemy->frames[0]->w) { // Use extended world width
-        enemy->x = SCREEN_WIDTH * 3 - enemy->frames[0]->w;
+    if (enemy->x > SCREEN_WIDTH - enemy->frames[0]->w) {
+        enemy->x = SCREEN_WIDTH - enemy->frames[0]->w;
         enemy->dx = -1;
     }
     if (enemy->y > SCREEN_HEIGHT - enemy->frames[0]->h) {
         enemy->y = SCREEN_HEIGHT - enemy->frames[0]->h;
         enemy->dy = -1;
     }
-    
-    // Remove ground level restrictions to allow free movement
 }
+
 
 void move_enemy_ai(Enemy *enemy, int player_x, int player_y, int vision_range, int attack_range) {
     if (enemy->health <= 0) return;
@@ -269,6 +294,22 @@ int check_collision_player_enemy(SDL_Rect player_rect, Enemy *enemy) {
         player_rect.x > enemy_rect.x + enemy_rect.w ||
         player_rect.y + player_rect.h < enemy_rect.y ||
         player_rect.y > enemy_rect.y + enemy_rect.h) {
+        return 0;
+    }
+    return 1;
+}
+
+
+
+int check_collision_with_platform(SDL_Rect object_rect, Platform* platform) {
+    // Only check collision if platform is solid
+    if (platform->type != 'F') return 0;
+    
+    // Check for intersection between object and platform
+    if (object_rect.x + object_rect.w <= platform->x ||    // object is to the left
+        object_rect.x >= platform->x + platform->w ||  // object is to the right
+        object_rect.y + object_rect.h <= platform->y ||    // object is above
+        object_rect.y >= platform->y + platform->h) { // object is below
         return 0;
     }
     return 1;
@@ -635,20 +676,6 @@ void check_ball_enemy_collisions(Enemy enemies[], int num_enemies) {
             }
         }
     }
-}
-
-int check_collision_with_platform(SDL_Rect object_rect, Platform* platform) {
-    // Only check collision if platform is solid
-    if (platform->type!='F') return 0;
-    
-    // Check for intersection between object and platform
-    if (object_rect.x + object_rect.w <= platform->x ||    // object is to the left
-        object_rect.x >= platform->x + platform->w ||  // object is to the right
-        object_rect.y + object_rect.h <= platform->y ||    // object is above
-        object_rect.y >= platform->y + platform->h) { // object is below
-        return 0;
-    }
-    return 1;
 }
 
 // Add new function for enemy attacks

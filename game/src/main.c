@@ -172,7 +172,6 @@ int main(int argc, char** argv) {
 
         // Handle input
         get_input(&input);
-        printf("menuState: %d\n", menuState);
         // Handle global controls
         if (input.escape && menuState == MAIN_GAME) {
             menuState = MENU_SAVE;
@@ -252,7 +251,7 @@ int main(int argc, char** argv) {
             // Update enemies and check collisions
             for (int i = 0; i < NUM_ENEMIES; i++) {
                 if (i % 2 == 0) {
-                    move_enemy_randomly(&enemies[i], 1);
+                    move_enemy_randomly(&enemies[i], save.level.n, background.platforms, background.platform_count);
                 } else {
                     move_enemy_ai(&enemies[i], player.pos.x, player.pos.y, 300, 100);
                 }
@@ -277,7 +276,7 @@ int main(int argc, char** argv) {
                 }
             }
 
-            for (int i = 0; i < background.platform_count; i++) {
+           for (int i = 0; i < background.platform_count; i++) {
                 if (check_collision_with_platform(player.pos, &background.platforms[i])) {
                     // If player is falling and hits platform from above
                     if (player.vy > 0 && player.pos.y + player.pos.h > background.platforms[i].y) {
@@ -286,7 +285,7 @@ int main(int argc, char** argv) {
                         player.is_jumping = 0;
                     }
                 }
-            }
+            } 
 
             // Update camera to follow playerviv
             updateBackgroundCamera(&background, &player.pos, SCREEN_WIDTH, SCREEN_HEIGHT, 100);

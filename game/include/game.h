@@ -219,7 +219,7 @@ void animate_enemy_move(Enemy *enemy);
  * @param enemy Pointer to enemy structure
  * @param level Current game level (affects behavior)
  */
-void move_enemy_randomly(Enemy *enemy, int level);
+void move_enemy_randomly(Enemy *enemy, int level, Platform platforms[], int num_platforms);
 
 /**
  * @brief Move enemy using AI to follow player
